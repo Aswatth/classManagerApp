@@ -2,22 +2,23 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:class_manager/Model/board.dart';
 
 class DatabaseHelper{
 
+  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
+  static Database? _database;
+
+  factory DatabaseHelper()
+  {
+    return instance;
+  }
   DatabaseHelper._privateConstructor()
   {
     _initDB();
   }
-  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
-  final _dbName = "temp2.db";
+  final _dbName = "temp1.db";
   final _version = 1;
-
-  String boardTableName = 'BOARD';
-
-  static Database? _database;
 
   Future<Database> get database async{
     if(_database != null) return _database!;
@@ -29,23 +30,11 @@ class DatabaseHelper{
     Directory dbPath = await getApplicationDocumentsDirectory();
     final path = join(dbPath.path,_dbName);
 
-    _database = await openDatabase(path,version: _version);
-
-    String createBoardTable ='''
-CREATE TABLE IF NOT EXISTS $boardTableName(
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-boardName VARCHAR(20)
-)
- ''';
-    createTable(createBoardTable);
-
-    return _database!;
+    return await openDatabase(path,version: _version);
   }
   void createTable(String query)async
   {
-    _database ??= await _initDB();
     _database!.execute(query);
-    //print("Table created");
   }
   void dropTable(String tableName)async
   {
@@ -59,7 +48,7 @@ boardName VARCHAR(20)
   }
   void rawInsert(String rawQuery)
   {
-    Future<int> id = _database!.rawInsert(rawQuery);
+    _database!.rawInsert(rawQuery);
   }
   Future<List<Map<String,dynamic>>> readAll(String tableName) async
   {
