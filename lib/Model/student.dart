@@ -12,7 +12,7 @@ class StudentHelper{
   final String _parentPhoneNumber2 = 'studentPhoneNumber2';
   final String _name = 'name';
   final String _dob = 'dob';
-  final String _area = 'area';
+  final String _location = 'location';
 
   static final StudentHelper instance = StudentHelper._privateConstructor();
 
@@ -28,7 +28,7 @@ class StudentHelper{
     $_parentPhoneNumber2 VARCHAR(10),
     $_name VARCHAR(50),
     $_dob DATETIME,
-    $_area VARCHAR(25)    
+    $_location VARCHAR(25)    
     )
      ''';
 
@@ -99,7 +99,7 @@ class StudentModel{
   String? parentPhoneNumber2;
   String name;
   DateTime dob;
-  String area;
+  String location;
 
   StudentModel.createNewStudent({
     this.id,
@@ -108,7 +108,7 @@ class StudentModel{
     this.parentPhoneNumber2,
     required this.name,
     required this.dob,
-    required this.area
+    required this.location
   });
 
   StudentModel({
@@ -118,7 +118,7 @@ class StudentModel{
     required this.parentPhoneNumber2,
     required this.name,
     required this.dob,
-    required this.area,
+    required this.location,
   });
 
   factory StudentModel.fromMap(Map<String,dynamic> json) => StudentModel(
@@ -128,7 +128,7 @@ class StudentModel{
       parentPhoneNumber2: json['parentPhoneNumber2'],
       name:  json['name'],
       dob:  json['dob'],
-      area: json['area']
+      location: json['location']
 
   );
 
@@ -140,12 +140,12 @@ class StudentModel{
       'parentPhoneNumber2':parentPhoneNumber2,
       'name':name,
       'dob':dob,
-      'area':area
+      'location':location
     };
   }
 
   @override
   String toString() {
-    return 'StudentModel{id: $id, name: $name, dob: $dob, studentPhoneNumber: $studentPhoneNumber, parentPhoneNumber1: $parentPhoneNumber1, parentPhoneNumber2: $parentPhoneNumber2, area: $area}';
+    return 'StudentModel{id: $id, name: $name, dob: $dob, studentPhoneNumber: $studentPhoneNumber, parentPhoneNumber1: $parentPhoneNumber1, parentPhoneNumber2: $parentPhoneNumber2, location: $location}';
   }
 }

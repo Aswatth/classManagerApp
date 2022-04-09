@@ -1,4 +1,5 @@
 import 'package:class_manager/AppPages/class_details_page.dart';
+import 'package:class_manager/AppPages/student_details_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -13,7 +14,11 @@ class HomePage extends StatelessWidget {
             children: [
               Flexible(
                 child: TextButton(
-                  onPressed: () {  },
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => StudentDetailPage())
+                    );
+                  },
                   child: Card(
                     child: Center(child: Text("Student details"),),
                   ),
