@@ -1,4 +1,5 @@
 import 'package:class_manager/AppPages/board_details.dart';
+import 'package:class_manager/AppPages/class_details.dart';
 import 'package:class_manager/AppPages/subject_details.dart';
 import 'package:flutter/material.dart';
 
@@ -42,6 +43,11 @@ class _ClassDetailsPageState extends State<ClassDetailsPage> {
             ),
             ListTile(
               title: Text("Class details"),
+              onTap: (){
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ClassDetails())
+                );
+              },
             ),
           ],
         ),
