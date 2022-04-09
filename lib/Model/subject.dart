@@ -65,7 +65,7 @@ class SubjectHelper{
 
     if(data.isEmpty){
       String oldSubjectName = subject.subjectName;
-      subject.subjectName = newSubjectName;
+      subject.subjectName = newSubjectName.toUpperCase();
       db.update(_subjectTableName, subject.toMap(),where: '$_subjectName = ?',whereArgs: [oldSubjectName]);
     }else{
       print(newSubjectName + " already exists");

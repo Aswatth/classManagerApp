@@ -61,7 +61,7 @@ class BoardHelper{
 
     if(data.isEmpty){
       String oldBoardName = board.boardName;
-      board.boardName = newBoardName;
+      board.boardName = newBoardName.toUpperCase();
       db.update(_boardTableName, board.toMap(),where: '$_boardName = ?',whereArgs: [oldBoardName]);
     }else{
       print(newBoardName + " already exists");

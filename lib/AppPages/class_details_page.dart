@@ -1,4 +1,5 @@
 import 'package:class_manager/AppPages/board_details.dart';
+import 'package:class_manager/AppPages/subject_details.dart';
 import 'package:flutter/material.dart';
 
 class ClassDetailsPage extends StatefulWidget {
@@ -33,6 +34,11 @@ class _ClassDetailsPageState extends State<ClassDetailsPage> {
             ),
             ListTile(
               title: Text("Subject"),
+              onTap: (){
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SubjectDetails())
+                );
+              },
             ),
             ListTile(
               title: Text("Class details"),
