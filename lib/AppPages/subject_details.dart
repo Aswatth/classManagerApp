@@ -71,7 +71,7 @@ class _SubjectDetailsState extends State<SubjectDetails> {
                   Navigator.pop(context);
                 },
               ),
-              title: Text("Class details page"),
+              title: Text("Subject details page"),
             ),
             body: Column(
               children: [

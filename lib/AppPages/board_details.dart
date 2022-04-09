@@ -71,7 +71,7 @@ class _BoardDetailsState extends State<BoardDetails> {
                   Navigator.pop(context);
                 },
               ),
-              title: Text("Class details page"),
+              title: Text("Board details page"),
             ),
             body: Column(
               children: [
