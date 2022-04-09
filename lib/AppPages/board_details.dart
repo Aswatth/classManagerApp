@@ -10,15 +10,15 @@ class BoardDetails extends StatefulWidget {
 }
 
 class _BoardDetailsState extends State<BoardDetails> {
-  List<BoardModel> boards = [];
+  List<BoardModel> boardList = [];
 
   String boardName = '';
   Future<List<BoardModel>> _initialize() async{
-    boards = await BoardHelper.instance.getAllBoard();
+    boardList = await BoardHelper.instance.getAllBoard();
     setState(() {
 
     });
-    return boards;
+    return boardList;
   }
   void addBoard(String boardName)
   {
@@ -90,13 +90,13 @@ class _BoardDetailsState extends State<BoardDetails> {
                       if(!snapshot.hasData) return CircularProgressIndicator();
                       else{
                         return ListView.builder(
-                          itemCount: boards.length,
+                          itemCount: boardList.length,
                           itemBuilder: (context,index){
                             return ListTile(
                               onLongPress: (){
-                                showPopUp(boards[index]);
+                                showPopUp(boardList[index]);
                               },
-                              title: Text(boards[index].boardName),
+                              title: Text(boardList[index].boardName),
                             );
                           },
                         );

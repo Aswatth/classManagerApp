@@ -10,15 +10,15 @@ class SubjectDetails extends StatefulWidget {
 }
 
 class _SubjectDetailsState extends State<SubjectDetails> {
-  List<SubjectModel> subjects = [];
+  List<SubjectModel> subjectList = [];
 
   String subjectName = '';
   Future<List<SubjectModel>> _initialize() async{
-    subjects = await SubjectHelper.instance.getAllSubject();
+    subjectList = await SubjectHelper.instance.getAllSubject();
     setState(() {
 
     });
-    return subjects;
+    return subjectList;
   }
   void addSubject(String subjectName)
   {
@@ -27,7 +27,7 @@ class _SubjectDetailsState extends State<SubjectDetails> {
   }
   void showPopUp(SubjectModel subject)
   {
-    String _newsubjectName = "";
+    String _newSubjectName = "";
     Alert(
         context: context,
         title: "Edit subject",
@@ -37,13 +37,13 @@ class _SubjectDetailsState extends State<SubjectDetails> {
             border: OutlineInputBorder(),
           ),
           onChanged: (_){
-            _newsubjectName = _;
+            _newSubjectName = _;
           },
         ),
         buttons: [
           DialogButton(child: Text("Update"), onPressed: (){
             //Update with new subjectName
-            SubjectHelper.instance.update(subject, _newsubjectName);
+            SubjectHelper.instance.update(subject, _newSubjectName);
           }),
           DialogButton(child: Text("Delete"), onPressed: (){
             //Delete subject (unless some student is part of this subject)
@@ -90,13 +90,13 @@ class _SubjectDetailsState extends State<SubjectDetails> {
                       if(!snapshot.hasData) return CircularProgressIndicator();
                       else{
                         return ListView.builder(
-                          itemCount: subjects.length,
+                          itemCount: subjectList.length,
                           itemBuilder: (context,index){
                             return ListTile(
                               onLongPress: (){
-                                showPopUp(subjects[index]);
+                                showPopUp(subjectList[index]);
                               },
-                              title: Text(subjects[index].subjectName),
+                              title: Text(subjectList[index].subjectName),
                             );
                           },
                         );
