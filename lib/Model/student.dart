@@ -3,10 +3,10 @@ import 'package:class_manager/database_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class StudentHelper{
-  final String _studentTableName = 'STUDENT';
+  final String studentTableName = 'STUDENT';
 
   //Columns
-  final String _id = 'id';
+  final String id = 'id';
   final String _studentPhoneNumber = 'studentPhoneNumber';
   final String _parentPhoneNumber1 = 'studentPhoneNumber1';
   final String _parentPhoneNumber2 = 'studentPhoneNumber2';
@@ -21,8 +21,8 @@ class StudentHelper{
   }
   void _initialize()async{
     String _createStudentTable ='''
-    CREATE TABLE IF NOT EXISTS $_studentTableName(
-    $_id  PRIMARY KEY AUTOINCREMENT,
+    CREATE TABLE IF NOT EXISTS $studentTableName(
+    $id  INTEGER PRIMARY KEY AUTOINCREMENT,
     $_studentPhoneNumber VARCHAR(10),
     $_parentPhoneNumber1 VARCHAR(10),
     $_parentPhoneNumber2 VARCHAR(10),
@@ -41,13 +41,13 @@ class StudentHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if it already exists
-    List<Map<String,dynamic>> data = await db.query(_studentTableName,where: '$_studentPhoneNumber = ?',whereArgs: [student.studentPhoneNumber]);
+    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$_studentPhoneNumber = ?',whereArgs: [student.studentPhoneNumber]);
 
     if(data.isEmpty)
     {
       print(student.toString()+" does not already exists");
       //Insert
-      db.insert(_studentTableName, student.toMap());
+      db.insert(studentTableName, student.toMap());
     }
     else{
       print(student.toString()+" already exists");
@@ -59,10 +59,10 @@ class StudentHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if newBoardName already exists
-    List<Map<String,dynamic>> data = await db.query(_studentTableName,where: '$_id = ?',whereArgs: [student.id]);
+    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$id = ?',whereArgs: [student.id]);
 
     if(data.isNotEmpty){
-      db.update(_studentTableName, student.toMap(),where: '$_id = ?',whereArgs: [student.id]);
+      db.update(studentTableName, student.toMap(),where: '$id = ?',whereArgs: [student.id]);
     }
   }
 
@@ -71,16 +71,16 @@ class StudentHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if newBoardName already exists
-    List<Map<String,dynamic>> data = await db.query(_studentTableName,where: '$_id = ?',whereArgs: [student.id]);
+    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$id = ?',whereArgs: [student.id]);
 
     if(data.isNotEmpty) {
-      db.delete(_studentTableName,where: '$_id = ?',whereArgs: [student.id]);
+      db.delete(studentTableName,where: '$id = ?',whereArgs: [student.id]);
     }
   }
 
   Future<List<StudentModel>> getAllStudent() async {
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(_studentTableName);
+    List<Map<String,dynamic>> data = await db.query(studentTableName);
     int dataCount = data.length;
 
     List<StudentModel> students = [];

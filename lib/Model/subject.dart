@@ -2,9 +2,9 @@ import 'package:class_manager/database_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SubjectHelper{
-  final String _subjectTableName = 'SUBJECT';
+  final String subjectTableName = 'SUBJECT';
 
-  final String _id = 'id';
+  final String id = 'id';
   final String _subjectName = 'subjectName';
 
   static final SubjectHelper instance = SubjectHelper._privateConstructor();
@@ -15,8 +15,8 @@ class SubjectHelper{
 
   void _initialize()async{
     String createSubjectTable ='''
-    CREATE TABLE IF NOT EXISTS $_subjectTableName(
-    $_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    CREATE TABLE IF NOT EXISTS $subjectTableName(
+    $id INTEGER PRIMARY KEY AUTOINCREMENT,
     $_subjectName VARCHAR(20)
     )
      ''';
@@ -42,14 +42,14 @@ class SubjectHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if it already exists
-    List<Map<String,dynamic>> data = await db.query(_subjectTableName,where: '$_subjectName = ?',whereArgs: [subject.subjectName.toUpperCase()]);
+    List<Map<String,dynamic>> data = await db.query(subjectTableName,where: '$_subjectName = ?',whereArgs: [subject.subjectName.toUpperCase()]);
 
     if(data.isEmpty)
     {
       print(subject.subjectName+" does not already exists");
       subject.subjectName = subject.subjectName.toUpperCase();
       //Insert
-      db.insert(_subjectTableName, subject.toMap());
+      db.insert(subjectTableName, subject.toMap());
     }
     else{
       print(subject.subjectName+" already exists");
@@ -61,12 +61,12 @@ class SubjectHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if newsubjectName already exists
-    List<Map<String,dynamic>> data = await db.query(_subjectTableName,where: '$_subjectName = ?',whereArgs: [newSubjectName.toUpperCase()]);
+    List<Map<String,dynamic>> data = await db.query(subjectTableName,where: '$_subjectName = ?',whereArgs: [newSubjectName.toUpperCase()]);
 
     if(data.isEmpty){
       String oldSubjectName = subject.subjectName;
       subject.subjectName = newSubjectName.toUpperCase();
-      db.update(_subjectTableName, subject.toMap(),where: '$_subjectName = ?',whereArgs: [oldSubjectName]);
+      db.update(subjectTableName, subject.toMap(),where: '$_subjectName = ?',whereArgs: [oldSubjectName]);
     }else{
       print(newSubjectName + " already exists");
     }
@@ -77,16 +77,16 @@ class SubjectHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if newsubjectName already exists
-    List<Map<String,dynamic>> data = await db.query(_subjectTableName,where: '$_subjectName = ?',whereArgs: [subject.subjectName.toUpperCase()]);
+    List<Map<String,dynamic>> data = await db.query(subjectTableName,where: '$_subjectName = ?',whereArgs: [subject.subjectName.toUpperCase()]);
 
     if(data.isNotEmpty) {
-      db.delete(_subjectTableName,where: '$_subjectName = ?',whereArgs: [subject.subjectName.toUpperCase()]);
+      db.delete(subjectTableName,where: '$_subjectName = ?',whereArgs: [subject.subjectName.toUpperCase()]);
     }
   }
 
   Future<List<SubjectModel>> getAllSubject() async {
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(_subjectTableName);
+    List<Map<String,dynamic>> data = await db.query(subjectTableName);
     int dataCount = data.length;
 
     List<SubjectModel> subjects = [];
