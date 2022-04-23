@@ -80,6 +80,24 @@ class BoardHelper{
     }
   }
 
+  Future<int?> getBoardId(String boardName) async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(boardTableName,where: '$_boardName = ?',whereArgs: [boardName]);
+    if(data.length == 1){
+      return BoardModel.fromMap(data[0]).id;
+    }
+    return -1;
+  }
+
+  Future<BoardModel?> getBoard(int boardId)async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(boardTableName,where: '$id = ?',whereArgs: [boardId]);
+    if(data.length == 1){
+      return BoardModel.fromMap(data[0]);
+    }
+    return null;
+  }
+
   Future<List<BoardModel>> getAllBoard() async {
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = await db.query(boardTableName);

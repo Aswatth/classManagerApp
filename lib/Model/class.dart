@@ -91,6 +91,24 @@ class ClassHelper{
     }
   }
 
+  Future<int?> getClassId(String className) async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$_className = ?',whereArgs: [className]);
+    if(data.length == 1){
+      return ClassModel.fromMap(data[0]).id;
+    }
+    return -1;
+  }
+
+  Future<ClassModel?> getClass(int classId)async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$id = ?',whereArgs: [classId]);
+    if(data.length == 1){
+      return ClassModel.fromMap(data[0]);
+    }
+    return null;
+  }
+
   Future<List<ClassModel>> getAllClass() async {
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = await db.query(classTableName);

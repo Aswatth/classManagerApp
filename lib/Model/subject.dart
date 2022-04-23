@@ -84,6 +84,24 @@ class SubjectHelper{
     }
   }
 
+  Future<int?> getSubjectId(String subjectName)async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(subjectTableName,where: '$_subjectName = ?',whereArgs: [subjectName]);
+    if(data.length == 1){
+      return SubjectModel.fromMap(data[0]).id;
+    }
+    return -1;
+  }
+
+  Future<SubjectModel?> getSubject(int subjectId)async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(subjectTableName,where: '$id = ?',whereArgs: [subjectId]);
+    if(data.length == 1){
+      return SubjectModel.fromMap(data[0]);
+    }
+    return null;
+  }
+
   Future<List<SubjectModel>> getAllSubject() async {
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = await db.query(subjectTableName);

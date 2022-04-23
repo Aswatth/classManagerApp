@@ -1,5 +1,6 @@
 import 'package:class_manager/Model/class.dart';
 import 'package:class_manager/database_helper.dart';
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 
 class StudentHelper{
@@ -8,8 +9,8 @@ class StudentHelper{
   //Columns
   final String id = 'id';
   final String _studentPhoneNumber = 'studentPhoneNumber';
-  final String _parentPhoneNumber1 = 'studentPhoneNumber1';
-  final String _parentPhoneNumber2 = 'studentPhoneNumber2';
+  final String _parentPhoneNumber1 = 'parentPhoneNumber1';
+  final String _parentPhoneNumber2 = 'parentPhoneNumber2';
   final String _name = 'name';
   final String _dob = 'dob';
   final String _location = 'location';
@@ -27,7 +28,7 @@ class StudentHelper{
     $_parentPhoneNumber1 VARCHAR(10),
     $_parentPhoneNumber2 VARCHAR(10),
     $_name VARCHAR(50),
-    $_dob DATETIME,
+    $_dob VARCHAR(25),
     $_location VARCHAR(25)    
     )
      ''';
@@ -36,21 +37,22 @@ class StudentHelper{
     db.execute(_createStudentTable);
   }
 
-  void insertStudent(StudentModel student)async {
+  Future<int> insertStudent(StudentModel student)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
     //Check if it already exists
-    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$_studentPhoneNumber = ?',whereArgs: [student.studentPhoneNumber]);
+    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$_studentPhoneNumber = ? or $_parentPhoneNumber1 = ?',whereArgs: [student.studentPhoneNumber,student.parentPhoneNumber1]);
 
     if(data.isEmpty)
     {
       print(student.toString()+" does not already exists");
       //Insert
-      db.insert(studentTableName, student.toMap());
+      return db.insert(studentTableName, student.toMap());
     }
     else{
       print(student.toString()+" already exists");
+      return -1;
     }
   }
 
@@ -76,6 +78,15 @@ class StudentHelper{
     if(data.isNotEmpty) {
       db.delete(studentTableName,where: '$id = ?',whereArgs: [student.id]);
     }
+  }
+
+  Future<StudentModel?> getStudent(int studentId)async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$id = ?',whereArgs: [studentId]);
+    if(data.length == 1){
+      return StudentModel.fromMap(data[0]);
+    }
+    return null;
   }
 
   Future<List<StudentModel>> getAllStudent() async {
@@ -127,7 +138,7 @@ class StudentModel{
       parentPhoneNumber1: json['parentPhoneNumber1'],
       parentPhoneNumber2: json['parentPhoneNumber2'],
       name:  json['name'],
-      dob:  json['dob'],
+      dob:  DateFormat('dd-MMM-yyyy').parse(json['dob']),
       location: json['location']
 
   );
@@ -139,7 +150,7 @@ class StudentModel{
       'parentPhoneNumber1':parentPhoneNumber1,
       'parentPhoneNumber2':parentPhoneNumber2,
       'name':name,
-      'dob':dob,
+      'dob':DateFormat('dd-MMM-yyyy').format(dob).toString(),
       'location':location
     };
   }
