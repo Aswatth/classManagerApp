@@ -8,7 +8,6 @@ import 'package:class_manager/Model/subject.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:tuple/tuple.dart';
 
 class StudentDetailPage extends StatefulWidget {
   const StudentDetailPage({Key? key}) : super(key: key);
