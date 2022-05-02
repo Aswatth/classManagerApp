@@ -2,7 +2,7 @@ import 'package:class_manager/database_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class ClassHelper{
-  final String classTableName = 'classObj';
+  final String classTableName = 'CLASS';
 
   final String id = 'id';
   final String _className = 'className';
@@ -36,7 +36,6 @@ class ClassHelper{
     insertClass(ClassModel.createNewClass(className: 'X'));
     insertClass(ClassModel.createNewClass(className: 'XI'));
     insertClass(ClassModel.createNewClass(className: 'XII'));
-
   }
 
   factory ClassHelper()

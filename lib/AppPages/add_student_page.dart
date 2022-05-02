@@ -22,45 +22,6 @@ class _AddStudentState extends State<AddStudent> {
   DateTime _dob = DateTime.now();
   String _location = '';
 
-  //Session details
-  List<String> _classNames = [];
-  String? _selectedClass = null;
-
-  List<String> _boardNames = [];
-  String? _selectedBoard = null;
-
-  List<String> _subjectNames = [];
-  String? _selectedSubject = null;
-  String _startTime = '';
-  String _endTime = '';
-  double _fees = 0.0;
-  Future<List<String>> _getAllClass() async{
-    List<ClassModel> _classList = await ClassHelper.instance.getAllClass();
-    for(int i = 0; i < _classList.length; ++i){
-      _classNames.add(_classList[i].className);
-    }
-    _classNames = _classNames.toSet().toList();
-    return _classNames;
-  }
-
-  Future<List<String>> _getAllBoard() async{
-    List<BoardModel> _boardList = await BoardHelper.instance.getAllBoard();
-    for(int i = 0; i < _boardList.length; ++i){
-      _boardNames.add(_boardList[i].boardName);
-    }
-    _boardNames = _boardNames.toSet().toList();//Remove duplicates
-    return _boardNames;
-  }
-
-  Future<List<String>> _getAllSubject() async{
-    List<SubjectModel> _subjectList = await SubjectHelper.instance.getAllSubject();
-    for(int i = 0; i < _subjectList.length; ++i){
-      _subjectNames.add(_subjectList[i].subjectName);
-    }
-    _subjectNames = _subjectNames.toSet().toList();//Remove duplicates
-    return _subjectNames;
-  }
-
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
@@ -68,9 +29,6 @@ class _AddStudentState extends State<AddStudent> {
   final TextEditingController _parentPhnNum1Controller = TextEditingController();
   final TextEditingController _parentPhnNum2Controller = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _sessionStartTimeController = TextEditingController();
-  final TextEditingController _sessionEndTimeController = TextEditingController();
-  final TextEditingController _feesController = TextEditingController();
 
   Widget nameField() {
     return TextFormField(
@@ -213,7 +171,7 @@ class _AddStudentState extends State<AddStudent> {
     );
   }
 
-  void _save()async{
+  _save(){
     print("SAVING");
     _formKey.currentState!.save();
 
@@ -235,6 +193,7 @@ class _AddStudentState extends State<AddStudent> {
         Locale('en', 'US')
       ],
       home: Scaffold(
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
           leading: BackButton(
             onPressed: (){
@@ -251,47 +210,42 @@ class _AddStudentState extends State<AddStudent> {
             ),
           ],
         ),
-        body:Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: ListView(
-              //mainAxisAlignment: MainAxisAlignment.center,
-              //crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  "Student details",
-                  style: TextStyle(
-                    fontSize: 20
-                  ),
-                ),
-                nameField(),
-                dobField(),
-                studentPhoneNumberField(),
-                parentPhoneNumber1Field(),
-                parentPhoneNumber2Field(),
-                locationField(),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: TextButton(
-                    onPressed: (){
-                      setState(() {
-                        //Save
-                        if(_formKey.currentState!.validate()){
-                          _save();
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: ListTile(
-                              title: Text("Saved student information"),
-                              trailing: Icon(Icons.done_outline_rounded),
-                            ),
-                          ));
-                        }
-                      });
-                    },
-                    child: Text("Save"),
-                  ),
-                )
-              ],
+        body:SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  nameField(),
+                  dobField(),
+                  studentPhoneNumberField(),
+                  parentPhoneNumber1Field(),
+                  parentPhoneNumber2Field(),
+                  locationField(),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: TextButton(
+                      onPressed: (){
+                        setState(() {
+                          //Save
+                          if(_formKey.currentState!.validate()){
+                            _save();
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: ListTile(
+                                title: Text("Saved student information"),
+                                trailing: Icon(Icons.done_outline_rounded),
+                              ),
+                            ));
+                          }
+                        });
+                      },
+                      child: Text("Save"),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),

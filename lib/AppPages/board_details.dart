@@ -15,9 +15,9 @@ class _BoardDetailsState extends State<BoardDetails> {
   String boardName = '';
   Future<List<BoardModel>> _initialize() async{
     boardList = await BoardHelper.instance.getAllBoard();
-    setState(() {
+    /*setState(() {
 
-    });
+    });*/
     return boardList;
   }
   void addBoard(String boardName)
@@ -53,8 +53,12 @@ class _BoardDetailsState extends State<BoardDetails> {
     ).show();
   }
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    // TODO: implement initState
     _initialize();
+  }
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
             floatingActionButton: TextButton(

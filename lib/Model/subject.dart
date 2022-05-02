@@ -60,7 +60,7 @@ class SubjectHelper{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
-    //Check if newsubjectName already exists
+    //Check if new subjectName already exists
     List<Map<String,dynamic>> data = await db.query(subjectTableName,where: '$_subjectName = ?',whereArgs: [newSubjectName.toUpperCase()]);
 
     if(data.isEmpty){
@@ -76,7 +76,7 @@ class SubjectHelper{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
-    //Check if newsubjectName already exists
+    //Check if new subjectName already exists
     List<Map<String,dynamic>> data = await db.query(subjectTableName,where: '$_subjectName = ?',whereArgs: [subject.subjectName.toUpperCase()]);
 
     if(data.isNotEmpty) {

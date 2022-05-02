@@ -2,7 +2,6 @@ import 'package:class_manager/Model/board.dart';
 import 'package:class_manager/Model/class.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:class_manager/Model/subject.dart';
-import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../database_helper.dart';
@@ -15,7 +14,9 @@ class SessionHelper{
   final String _classId = 'classId';
   final String _boardId = 'boardId';
   final String _subjectId = 'subjectId';
-  final String _time = 'time';
+  final String _sessionSlot = 'sessionSlot';
+  final String _startTime = 'startTime';
+  final String _endTime = 'endTime';
   final String _fees = 'fees';
 
   //Student
@@ -52,12 +53,14 @@ class SessionHelper{
     $_classId INTEGER,
     $_boardId INTEGER,
     $_subjectId INTEGER,
-    $_time DATETIME,
+    $_sessionSlot VARCHAR(100),
+    $_startTime VARCHAR(10),
+    $_endTime VARCHAR(10),
     $_fees FLOAT,
     FOREIGN KEY($_studentId) REFERENCES $_studentTableName($_studentId_ref),
     FOREIGN KEY($_classId) REFERENCES $_classTableName($_classId_ref),
-    FOREIGN KEY($_classId) REFERENCES $_boardTableName($_boardId_ref),
-    FOREIGN KEY($_classId) REFERENCES $_subjectTableName($_subjectId_ref),
+    FOREIGN KEY($_boardId) REFERENCES $_boardTableName($_boardId_ref),
+    FOREIGN KEY($_subjectId) REFERENCES $_subjectTableName($_subjectId_ref),
     PRIMARY KEY($_studentId,$_classId,$_boardId,$_subjectId)
     );
      ''';
@@ -77,7 +80,7 @@ class SessionHelper{
     //Check if it already exists
     List<Map<String,dynamic>> data = await db.query(
         sessionTableName,
-        where: '$_studentId = ? and $_classId = ? and $_boardId = ? and $_subjectId',
+        where: '$_studentId = ? and $_classId = ? and $_boardId = ? and $_subjectId = ?',
         whereArgs: [session.studentId,session.classId,session.boardId,session.subjectId]);
 
     if(data.isEmpty)
@@ -107,6 +110,43 @@ class SessionHelper{
           whereArgs: [session.studentId]);
     }
   }
+
+  void delete(int studentId,int classId, int subjectId, int boardId)async{
+    //GET DB
+    Database db = await DatabaseHelper.instance.database;
+    int count = await db.delete(
+        sessionTableName,
+        where: '$_studentId = ? and $_classId = ? and $_boardId = ? and $_subjectId = ?',
+        whereArgs: [studentId,classId,boardId,subjectId]);
+    print("$studentId-$classId-$subjectId-$boardId");
+  }
+
+  Future<List<SessionModel>> getSession(int studentId)async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_studentId = ?',whereArgs: [studentId]);
+    int dataCount = data.length;
+    //print("Session dataCount ->"+dataCount.toString());
+
+    List<SessionModel> sessionList = [];
+
+    for(int i = 0;i<dataCount;++i) {
+      sessionList.add(SessionModel.fromMap(data[i]));
+    }
+    return sessionList;
+  }
+
+  Future<List<SessionModel>> getAllSession() async {
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(sessionTableName);
+    int dataCount = data.length;
+
+    List<SessionModel> sessionList = [];
+
+    for(int i = 0;i<dataCount;++i) {
+      sessionList.add(SessionModel.fromMap(data[i]));
+    }
+    return sessionList;
+  }
 }
 
 class SessionModel{
@@ -114,8 +154,9 @@ class SessionModel{
   int classId;
   int boardId;
   int subjectId;
-  DateTime startTime;
-  DateTime endTime;
+  String startTime;
+  String endTime;
+  String sessionSlot;
   double fees;
 
   SessionModel({
@@ -125,6 +166,7 @@ class SessionModel{
     required this.subjectId,
     required this.startTime,
     required this.endTime,
+    required this.sessionSlot,
     required this.fees
   });
 
@@ -134,8 +176,9 @@ class SessionModel{
       'classId': classId,
       'boardId': boardId,
       'subjectId': subjectId,
-      'startTime': DateFormat.Hms().format(startTime),
-      'endTime': DateFormat.Hms().format(endTime),
+      'startTime': startTime,
+      'sessionSlot':sessionSlot,
+      'endTime': endTime,
       'fees': fees.toString()
     };
   }
@@ -144,13 +187,14 @@ class SessionModel{
       classId: json['classId'],
       boardId: json['boardId'],
       subjectId: json['subjectId'],
-      startTime: DateTime.parse(json['startTime']),
-      endTime: DateTime.parse(json['endTime']),
-      fees:  double.parse(json['fees'])
+      startTime: json['startTime'],
+      endTime: json['endTime'],
+      sessionSlot: json['sessionSlot'],
+      fees:  json['fees']
   );
 
   @override
   String toString() {
-    return 'SessionModel{studentId: $studentId, classId: $classId, boardId: $boardId, subjectId: $subjectId, startTime: $startTime, endTime: $endTime, fees: $fees}';
+    return 'SessionModel{studentId: $studentId, classId: $classId, boardId: $boardId, subjectId: $subjectId, startTime: $startTime, endTime: $endTime, sessionSlot: $sessionSlot, fees: $fees}';
   }
 }

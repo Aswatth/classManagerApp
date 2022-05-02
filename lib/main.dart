@@ -1,8 +1,5 @@
 import 'package:class_manager/AppPages/homepage.dart';
-import 'package:class_manager/database_helper.dart';
 import 'package:flutter/material.dart';
-
-import 'Model/board.dart';
 
 void main() {
   runApp(MyApp());
