@@ -1,5 +1,11 @@
+import 'package:class_manager/Model/board.dart';
+import 'package:class_manager/Model/class.dart';
+import 'package:class_manager/Model/session.dart';
+import 'package:class_manager/Model/student.dart';
+import 'package:class_manager/Model/subject.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AddStudent extends StatefulWidget {
   const AddStudent({Key? key}) : super(key: key);
@@ -17,9 +23,16 @@ class _AddStudentState extends State<AddStudent> {
   String _location = '';
 
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _dobController = TextEditingController();
+  final TextEditingController _studentPhnNumController = TextEditingController();
+  final TextEditingController _parentPhnNum1Controller = TextEditingController();
+  final TextEditingController _parentPhnNum2Controller = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
 
   Widget nameField() {
     return TextFormField(
+      controller: _nameController,
       decoration: InputDecoration(
           icon: Icon(Icons.school_rounded),
           labelText: "Student name"
@@ -29,35 +42,45 @@ class _AddStudentState extends State<AddStudent> {
       validator: (value){
         if(value!.isEmpty){
           return 'Student name cannot be empty';
+        }else{
+          return null;
         }
       },
       onSaved: (value){
-        _name = value!;
+        setState(() {
+          _name = value!;
+        });
       },
     );
   }
   Widget dobField() {
     return DateTimePicker(
-      initialValue: '',
+      controller: _dobController,
+      type: DateTimePickerType.date,
       dateMask: 'dd-MMM-yyyy',
       decoration: InputDecoration(
-        icon: Icon(Icons.calendar_today_rounded),
+        icon: Icon(Icons.event),
         labelText: "Student DOB",
       ),
       validator: (value){
         if(value!.isEmpty){
           return 'Student DOB cannot be empty';
+        }else{
+          return null;
         }
       },
       firstDate: DateTime(1999),
       lastDate: DateTime(2100),
       onSaved: (value){
-        _dob = DateTime.parse(value!);
+        setState(() {
+          _dob = DateTime.parse(value!);
+        });
       },
     );
   }
   Widget studentPhoneNumberField() {
     return TextFormField(
+      controller: _studentPhnNumController,
       decoration: InputDecoration(
         icon: Icon(Icons.call),
         labelText: "Student phone number",
@@ -65,17 +88,22 @@ class _AddStudentState extends State<AddStudent> {
       keyboardType: TextInputType.number,
       maxLength: 10,
       validator: (value){
-        if(value!.isEmpty){
-          return 'Student number cannot be empty';
+        if(value!.isEmpty || value.length < 10){
+          return 'Invalid Student number';
+        }else{
+          return null;
         }
       },
       onSaved: (value){
-        _studentPhoneNumber = value!;
+        setState(() {
+          _studentPhoneNumber = value!;
+        });
       },
     );
   }
   Widget parentPhoneNumber1Field(){
     return TextFormField(
+      controller: _parentPhnNum1Controller,
       decoration: InputDecoration(
         icon: Icon(Icons.call),
         labelText: "Parent phone number 1",
@@ -83,30 +111,45 @@ class _AddStudentState extends State<AddStudent> {
       keyboardType: TextInputType.number,
       maxLength: 10,
       validator: (value){
-        if(value!.isEmpty){
-          return 'Parent number cannot be empty';
+        if(value!.isEmpty || value.length < 10){
+          return 'Invalid Parent number';
+        }else{
+          return null;
         }
       },
       onSaved: (value){
-        _parentPhoneNumber1 = value!;
+        setState(() {
+          _parentPhoneNumber1 = value!;
+        });
       },
     );
   }
   Widget parentPhoneNumber2Field(){
     return TextFormField(
+      controller: _parentPhnNum2Controller,
       decoration: InputDecoration(
         icon: Icon(Icons.call),
         labelText: "Parent phone number 2",
       ),
       keyboardType: TextInputType.number,
       maxLength: 10,
+      validator: (value){
+        if(value!.isNotEmpty && value.length < 10) {
+          return 'Invalid Parent phone number';
+        } else {
+          return null;
+        }
+      },
       onSaved: (value){
-        _parentPhoneNumber2 = value!;
+        setState(() {
+          _parentPhoneNumber2 = value!;
+        });
       },
     );
   }
   Widget locationField() {
     return TextFormField(
+      controller: _locationController,
       decoration: InputDecoration(
           icon: Icon(Icons.location_on_rounded),
           labelText: "Location"
@@ -116,18 +159,41 @@ class _AddStudentState extends State<AddStudent> {
       validator: (value){
         if(value!.isEmpty){
           return 'Location cannot be empty';
+        }else{
+          return null;
         }
       },
       onSaved: (value){
-        _location = value!;
+        setState(() {
+          _location = value!;
+        });
       },
     );
+  }
+
+  _save(){
+    print("SAVING");
+    _formKey.currentState!.save();
+
+    StudentModel student = StudentModel.createNewStudent(
+        studentPhoneNumber:  _studentPhoneNumber,
+        parentPhoneNumber1: _parentPhoneNumber1,
+        parentPhoneNumber2: _parentPhoneNumber2,
+        name: _name,
+        dob: _dob,
+        location: _location
+    );
+    StudentHelper.instance.insertStudent(student);
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      supportedLocales: [
+        Locale('en', 'US')
+      ],
       home: Scaffold(
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
           leading: BackButton(
             onPressed: (){
@@ -139,41 +205,47 @@ class _AddStudentState extends State<AddStudent> {
             IconButton(
               icon: Icon(Icons.save),
               onPressed: (){
-                //Save
-                if(_formKey.currentState!.validate()){
-                  _formKey.currentState!.save();
-                }
+
               },
             ),
           ],
         ),
-        body:Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: ListView(
-              //mainAxisAlignment: MainAxisAlignment.center,
-              //crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  "Student details",
-                  style: TextStyle(
-                    fontSize: 20
-                  ),
-                ),
-                nameField(),
-                dobField(),
-                studentPhoneNumberField(),
-                parentPhoneNumber1Field(),
-                parentPhoneNumber2Field(),
-                locationField(),
-                Text(
-                  "\nSession details",
-                  style: TextStyle(
-                      fontSize: 20
-                  ),
-                ),
-              ],
+        body:SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  nameField(),
+                  dobField(),
+                  studentPhoneNumberField(),
+                  parentPhoneNumber1Field(),
+                  parentPhoneNumber2Field(),
+                  locationField(),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: TextButton(
+                      onPressed: (){
+                        setState(() {
+                          //Save
+                          if(_formKey.currentState!.validate()){
+                            _save();
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: ListTile(
+                                title: Text("Saved student information"),
+                                trailing: Icon(Icons.done_outline_rounded),
+                              ),
+                            ));
+                          }
+                        });
+                      },
+                      child: Text("Save"),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),

@@ -2,9 +2,9 @@ import 'package:class_manager/database_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class BoardHelper{
-  final String _boardTableName = 'BOARD';
+  final String boardTableName = 'BOARD';
 
-  final String _id = 'id';
+  final String id = 'id';
   final String _boardName = 'boardName';
 
   static final BoardHelper instance = BoardHelper._privateConstructor();
@@ -14,8 +14,8 @@ class BoardHelper{
   }
   void _initialize()async{
     String createBoardTable ='''
-    CREATE TABLE IF NOT EXISTS $_boardTableName(
-    $_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    CREATE TABLE IF NOT EXISTS $boardTableName(
+    $id INTEGER PRIMARY KEY AUTOINCREMENT,
     $_boardName VARCHAR(20)
     )
      ''';
@@ -38,14 +38,14 @@ class BoardHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if it already exists
-    List<Map<String,dynamic>> data = await db.query(_boardTableName,where: '$_boardName = ?',whereArgs: [board.boardName.toUpperCase()]);
+    List<Map<String,dynamic>> data = await db.query(boardTableName,where: '$_boardName = ?',whereArgs: [board.boardName.toUpperCase()]);
 
     if(data.isEmpty)
       {
         print(board.boardName+" does not already exists");
         board.boardName = board.boardName.toUpperCase();
         //Insert
-        db.insert(_boardTableName, board.toMap());
+        db.insert(boardTableName, board.toMap());
       }
     else{
       print(board.boardName+" already exists");
@@ -57,12 +57,12 @@ class BoardHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if newBoardName already exists
-    List<Map<String,dynamic>> data = await db.query(_boardTableName,where: '$_boardName = ?',whereArgs: [newBoardName.toUpperCase()]);
+    List<Map<String,dynamic>> data = await db.query(boardTableName,where: '$_boardName = ?',whereArgs: [newBoardName.toUpperCase()]);
 
     if(data.isEmpty){
       String oldBoardName = board.boardName;
       board.boardName = newBoardName.toUpperCase();
-      db.update(_boardTableName, board.toMap(),where: '$_boardName = ?',whereArgs: [oldBoardName]);
+      db.update(boardTableName, board.toMap(),where: '$_boardName = ?',whereArgs: [oldBoardName]);
     }else{
       print(newBoardName + " already exists");
     }
@@ -73,16 +73,34 @@ class BoardHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if newBoardName already exists
-    List<Map<String,dynamic>> data = await db.query(_boardTableName,where: '$_boardName = ?',whereArgs: [board.boardName.toUpperCase()]);
+    List<Map<String,dynamic>> data = await db.query(boardTableName,where: '$_boardName = ?',whereArgs: [board.boardName.toUpperCase()]);
 
     if(data.isNotEmpty) {
-      db.delete(_boardTableName,where: '$_boardName = ?',whereArgs: [board.boardName.toUpperCase()]);
+      db.delete(boardTableName,where: '$_boardName = ?',whereArgs: [board.boardName.toUpperCase()]);
     }
+  }
+
+  Future<int?> getBoardId(String boardName) async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(boardTableName,where: '$_boardName = ?',whereArgs: [boardName]);
+    if(data.length == 1){
+      return BoardModel.fromMap(data[0]).id;
+    }
+    return -1;
+  }
+
+  Future<BoardModel?> getBoard(int boardId)async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(boardTableName,where: '$id = ?',whereArgs: [boardId]);
+    if(data.length == 1){
+      return BoardModel.fromMap(data[0]);
+    }
+    return null;
   }
 
   Future<List<BoardModel>> getAllBoard() async {
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(_boardTableName);
+    List<Map<String,dynamic>> data = await db.query(boardTableName);
     int dataCount = data.length;
 
     List<BoardModel> boards = [];

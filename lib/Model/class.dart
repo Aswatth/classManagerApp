@@ -2,9 +2,9 @@ import 'package:class_manager/database_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class ClassHelper{
-  final String _classTableName = 'classObj';
+  final String classTableName = 'CLASS';
 
-  final String _id = 'id';
+  final String id = 'id';
   final String _className = 'className';
 
   static final ClassHelper instance = ClassHelper._privateConstructor();
@@ -15,8 +15,8 @@ class ClassHelper{
 
   void _initialize()async{
     String createClassObjTable ='''
-    CREATE TABLE IF NOT EXISTS $_classTableName(
-    $_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    CREATE TABLE IF NOT EXISTS $classTableName(
+    $id INTEGER PRIMARY KEY AUTOINCREMENT,
     $_className VARCHAR(20)
     )
      ''';
@@ -36,7 +36,6 @@ class ClassHelper{
     insertClass(ClassModel.createNewClass(className: 'X'));
     insertClass(ClassModel.createNewClass(className: 'XI'));
     insertClass(ClassModel.createNewClass(className: 'XII'));
-
   }
 
   factory ClassHelper()
@@ -49,14 +48,14 @@ class ClassHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if it already exists
-    List<Map<String,dynamic>> data = await db.query(_classTableName,where: '$_className = ?',whereArgs: [classObj.className.toUpperCase()]);
+    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$_className = ?',whereArgs: [classObj.className.toUpperCase()]);
 
     if(data.isEmpty)
     {
       print(classObj.className+" does not already exists");
       classObj.className = classObj.className.toUpperCase();
       //Insert
-      db.insert(_classTableName, classObj.toMap());
+      db.insert(classTableName, classObj.toMap());
     }
     else{
       print(classObj.className+" already exists");
@@ -68,12 +67,12 @@ class ClassHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if new className already exists
-    List<Map<String,dynamic>> data = await db.query(_classTableName,where: '$_className = ?',whereArgs: [newClassName.toUpperCase()]);
+    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$_className = ?',whereArgs: [newClassName.toUpperCase()]);
 
     if(data.isEmpty){
       String oldClassName = classObj.className;
       classObj.className = newClassName.toUpperCase();
-      db.update(_classTableName, classObj.toMap(),where: '$_className = ?',whereArgs: [oldClassName]);
+      db.update(classTableName, classObj.toMap(),where: '$_className = ?',whereArgs: [oldClassName]);
     }else{
       print(newClassName + " already exists");
     }
@@ -84,16 +83,34 @@ class ClassHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if new className already exists
-    List<Map<String,dynamic>> data = await db.query(_classTableName,where: '$_className = ?',whereArgs: [classObj.className.toUpperCase()]);
+    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$_className = ?',whereArgs: [classObj.className.toUpperCase()]);
 
     if(data.isNotEmpty) {
-      db.delete(_classTableName,where: '$_className = ?',whereArgs: [classObj.className.toUpperCase()]);
+      db.delete(classTableName,where: '$_className = ?',whereArgs: [classObj.className.toUpperCase()]);
     }
+  }
+
+  Future<int?> getClassId(String className) async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$_className = ?',whereArgs: [className]);
+    if(data.length == 1){
+      return ClassModel.fromMap(data[0]).id;
+    }
+    return -1;
+  }
+
+  Future<ClassModel?> getClass(int classId)async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$id = ?',whereArgs: [classId]);
+    if(data.length == 1){
+      return ClassModel.fromMap(data[0]);
+    }
+    return null;
   }
 
   Future<List<ClassModel>> getAllClass() async {
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(_classTableName);
+    List<Map<String,dynamic>> data = await db.query(classTableName);
     int dataCount = data.length;
 
     List<ClassModel> classObjs = [];

@@ -53,8 +53,11 @@ class _ClassDetailsState extends State<ClassDetails> {
     ).show();
   }
   @override
-  Widget build(BuildContext context) {
+  void initState() {
     _initialize();
+  }
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
             floatingActionButton: TextButton(
