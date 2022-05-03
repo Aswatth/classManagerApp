@@ -30,7 +30,7 @@ class _AddSessionState extends State<AddSession> {
 
   List<String> _subjectNames = [];
   String? _selectedSubject = null;
-  List<String> sessionDays = ["Weekday","Weekend","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  List<String> sessionDays = ["Weekday","Weekend","Mon","Tue","Wed","Thur","Fri","Sat","Sun"];
   List<String> _selectedSessionDays = [];
   String _startTime = '';
   String _endTime = '';
