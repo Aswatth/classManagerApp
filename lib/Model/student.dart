@@ -13,6 +13,7 @@ class StudentHelper{
   final String _parentPhoneNumber2 = 'parentPhoneNumber2';
   final String _name = 'name';
   final String _dob = 'dob';
+  final String _schoolName = 'schoolName';
   final String _location = 'location';
 
   static final StudentHelper instance = StudentHelper._privateConstructor();
@@ -29,6 +30,7 @@ class StudentHelper{
     $_parentPhoneNumber2 VARCHAR(10),
     $_name VARCHAR(50),
     $_dob VARCHAR(25),
+    $_schoolName VARCHAR(50),
     $_location VARCHAR(25)    
     )
      ''';
@@ -108,6 +110,7 @@ class StudentModel{
   String studentPhoneNumber;
   String parentPhoneNumber1;
   String? parentPhoneNumber2;
+  String schoolName;
   String name;
   DateTime dob;
   String location;
@@ -119,6 +122,7 @@ class StudentModel{
     this.parentPhoneNumber2,
     required this.name,
     required this.dob,
+    required this.schoolName,
     required this.location
   });
 
@@ -129,6 +133,7 @@ class StudentModel{
     required this.parentPhoneNumber2,
     required this.name,
     required this.dob,
+    required this.schoolName,
     required this.location,
   });
 
@@ -139,8 +144,8 @@ class StudentModel{
       parentPhoneNumber2: json['parentPhoneNumber2'],
       name:  json['name'],
       dob:  DateFormat('dd-MMM-yyyy').parse(json['dob']),
+      schoolName: json['schoolName'],
       location: json['location']
-
   );
 
   Map<String,dynamic> toMap(){
@@ -151,12 +156,13 @@ class StudentModel{
       'parentPhoneNumber2':parentPhoneNumber2,
       'name':name,
       'dob':DateFormat('dd-MMM-yyyy').format(dob).toString(),
+      'schoolName': schoolName,
       'location':location
     };
   }
 
   @override
   String toString() {
-    return 'StudentModel{id: $id, name: $name, dob: $dob, studentPhoneNumber: $studentPhoneNumber, parentPhoneNumber1: $parentPhoneNumber1, parentPhoneNumber2: $parentPhoneNumber2, location: $location}';
+    return 'StudentModel{id: $id, studentPhoneNumber: $studentPhoneNumber, parentPhoneNumber1: $parentPhoneNumber1, parentPhoneNumber2: $parentPhoneNumber2, schoolName: $schoolName, name: $name, dob: $dob, location: $location}';
   }
 }

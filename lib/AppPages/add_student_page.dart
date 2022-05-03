@@ -16,6 +16,7 @@ class AddStudent extends StatefulWidget {
 
 class _AddStudentState extends State<AddStudent> {
   String _name = '';
+  String _schoolName = '';
   String _studentPhoneNumber = '';
   String _parentPhoneNumber1 = '';
   String _parentPhoneNumber2 = '';
@@ -25,6 +26,7 @@ class _AddStudentState extends State<AddStudent> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
+  final TextEditingController _schoolNameController = TextEditingController();
   final TextEditingController _studentPhnNumController = TextEditingController();
   final TextEditingController _parentPhnNum1Controller = TextEditingController();
   final TextEditingController _parentPhnNum2Controller = TextEditingController();
@@ -34,7 +36,7 @@ class _AddStudentState extends State<AddStudent> {
     return TextFormField(
       controller: _nameController,
       decoration: InputDecoration(
-          icon: Icon(Icons.school_rounded),
+          icon: Icon(Icons.person),
           labelText: "Student name"
       ),
       keyboardType: TextInputType.name,
@@ -74,6 +76,29 @@ class _AddStudentState extends State<AddStudent> {
       onSaved: (value){
         setState(() {
           _dob = DateTime.parse(value!);
+        });
+      },
+    );
+  }
+  Widget schoolNameField() {
+    return TextFormField(
+      controller: _schoolNameController,
+      decoration: InputDecoration(
+          icon: Icon(Icons.school_rounded),
+          labelText: "School name"
+      ),
+      keyboardType: TextInputType.name,
+      textCapitalization: TextCapitalization.words,
+      validator: (value){
+        if(value!.isEmpty){
+          return 'School name cannot be empty';
+        }else{
+          return null;
+        }
+      },
+      onSaved: (value){
+        setState(() {
+          _schoolName = value!;
         });
       },
     );
@@ -181,6 +206,7 @@ class _AddStudentState extends State<AddStudent> {
         parentPhoneNumber2: _parentPhoneNumber2,
         name: _name,
         dob: _dob,
+        schoolName: _schoolName,
         location: _location
     );
     StudentHelper.instance.insertStudent(student);
@@ -220,6 +246,7 @@ class _AddStudentState extends State<AddStudent> {
                 children: [
                   nameField(),
                   dobField(),
+                  schoolNameField(),
                   studentPhoneNumberField(),
                   parentPhoneNumber1Field(),
                   parentPhoneNumber2Field(),
