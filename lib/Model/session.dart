@@ -125,7 +125,50 @@ class SessionHelper{
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_studentId = ?',whereArgs: [studentId]);
     int dataCount = data.length;
-    //print("Session dataCount ->"+dataCount.toString());
+
+    List<SessionModel> sessionList = [];
+
+    for(int i = 0;i<dataCount;++i) {
+      sessionList.add(SessionModel.fromMap(data[i]));
+    }
+    return sessionList;
+  }
+  Future<List<SessionModel>> getSearchedSession({int selectedClassId = -1,int selectedSubjectId = -1,int selectedBoardId = -1})async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = [];
+
+    if(selectedClassId == -1 && selectedBoardId == -1 && selectedSubjectId == -1){
+      return getAllSession();
+    }else{
+      String query = "";
+      List<int> queryParams = [];
+      if(selectedClassId != -1){
+        query += "$_classId = ?";
+        queryParams.add(selectedClassId);
+      }
+      if(selectedBoardId != -1){
+        if(queryParams.isNotEmpty) {
+          query += " and ";
+          query += "$_boardId = ?";
+        }
+        else {
+          query += "$_boardId = ?";
+        }
+        queryParams.add(selectedBoardId);
+      }
+      if(selectedSubjectId != -1){
+        if(queryParams.isNotEmpty) {
+          query += " and ";
+          query += " $_subjectId = ?";
+        }
+        else {
+          query += " $_subjectId = ?";
+        }
+        queryParams.add(selectedSubjectId);
+      }
+      data = await db.query(sessionTableName,where: query,whereArgs: queryParams);
+    }
+    int dataCount = data.length;
 
     List<SessionModel> sessionList = [];
 
