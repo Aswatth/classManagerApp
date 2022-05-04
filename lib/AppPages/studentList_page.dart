@@ -9,14 +9,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-class StudentDetailPage extends StatefulWidget {
-  const StudentDetailPage({Key? key}) : super(key: key);
+class StudentListPage extends StatefulWidget {
+  const StudentListPage({Key? key}) : super(key: key);
 
   @override
-  _StudentDetailPageState createState() => _StudentDetailPageState();
+  _StudentListPageState createState() => _StudentListPageState();
 }
 
-class _StudentDetailPageState extends State<StudentDetailPage> {
+class _StudentListPageState extends State<StudentListPage> {
 
   @override
   void initState(){

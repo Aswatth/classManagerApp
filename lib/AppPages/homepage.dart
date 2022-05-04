@@ -1,5 +1,5 @@
 import 'package:class_manager/AppPages/class_details_page.dart';
-import 'package:class_manager/AppPages/student_details_page.dart';
+import 'package:class_manager/AppPages/studentList_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -16,7 +16,7 @@ class HomePage extends StatelessWidget {
                 child: TextButton(
                   onPressed: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => StudentDetailPage())
+                        MaterialPageRoute(builder: (context) => StudentListPage())
                     );
                   },
                   child: Card(
