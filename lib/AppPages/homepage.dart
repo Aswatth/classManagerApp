@@ -1,5 +1,5 @@
 import 'package:class_manager/AppPages/class_details_page.dart';
-import 'package:class_manager/AppPages/studentList_page.dart';
+import 'package:class_manager/AppPages/student_list.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {

@@ -49,9 +49,9 @@ class _StudentListPageState extends State<StudentListPage> {
     SubjectModel? subjectModel = await SubjectHelper.instance.getSubject(sessionModel.subjectId);
 
     return SessionReadableData(
-      className: classModel!.className,
-      boardName: boardModel!.boardName,
-      subjectName: subjectModel!.subjectName,
+      classModel: classModel!,
+      boardModel: boardModel!,
+      subjectModel: subjectModel!,
       sessionSlot: sessionModel.sessionSlot,
       startTime: sessionModel.startTime,
       endTime: sessionModel.endTime,
@@ -72,20 +72,9 @@ class _StudentListPageState extends State<StudentListPage> {
   }
 
   void _showSessionDeletionPopup(int studentId, SessionReadableData sessionData) {
-    int classId = -1;
-    ClassHelper.instance.getClassId(sessionData.className).then((value) {
-      classId = value!;
-    });
-
-    int boardId = -1;
-    BoardHelper.instance.getBoardId(sessionData.boardName).then((value){
-      boardId = value!;
-    });
-
-    int subjectId = -1;
-    SubjectHelper.instance.getSubjectId(sessionData.subjectName).then((value){
-      subjectId = value!;
-    });
+    int classId = sessionData.classModel.id==null?-1:sessionData.classModel.id!;
+    int boardId = sessionData.boardModel.id==null?-1:sessionData.boardModel.id!;
+    int subjectId = sessionData.subjectModel.id==null?-1:sessionData.subjectModel.id!;
 
     Alert(
       context:context,
@@ -227,8 +216,8 @@ class _StudentListPageState extends State<StudentListPage> {
                               _showSessionDeletionPopup(_studentModel.id!, _sessionData);
                             });
                           },
-                          title: Text(_sessionData.className +"\t"+_sessionData.subjectName),
-                          subtitle: Text(_sessionData.boardName+"\n"+_sessionData.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
+                          title: Text(_sessionData.classModel.className +"\t"+_sessionData.subjectModel.subjectName),
+                          subtitle: Text(_sessionData.boardModel.boardName+"\n"+_sessionData.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
                           trailing: Text(_sessionData.startTime+" - "+_sessionData.endTime),
                         ),
                       );
@@ -439,20 +428,18 @@ class CompleteStudentDetail{
   }
 }
 class SessionReadableData{
-  String className;
-  String subjectName;
-  String boardName;
+  ClassModel classModel;
+  SubjectModel subjectModel;
+  BoardModel boardModel;
   String sessionSlot;
   String startTime;
   String endTime;
 
   SessionReadableData({
-      required this.className,
-      required this.subjectName, 
-      required this.boardName,
+      required this.classModel,
+      required this.subjectModel,
+      required this.boardModel,
       required this.sessionSlot, 
       required this.startTime, 
       required this.endTime});
-
-
 }
