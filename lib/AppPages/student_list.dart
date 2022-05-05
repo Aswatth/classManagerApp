@@ -1,8 +1,11 @@
 import 'package:class_manager/AppPages/add_session_page.dart';
 import 'package:class_manager/AppPages/add_student_page.dart';
+import 'package:class_manager/AppPages/student_details.dart';
 import 'package:class_manager/Model/board.dart';
 import 'package:class_manager/Model/class.dart';
+import 'package:class_manager/Model/complete_student_detail.dart';
 import 'package:class_manager/Model/session.dart';
+import 'package:class_manager/Model/readable_session_data.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:class_manager/Model/subject.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +36,7 @@ class _StudentListPageState extends State<StudentListPage> {
     List<StudentModel> tempStudentList =await StudentHelper.instance.getAllStudent();
 
     for(int i=0;i<tempStudentList.length;++i){
-      List<SessionReadableData> _sessionList = await _getSessionByStudentId(tempStudentList[i].id!);
+      List<ReadableSessionData> _sessionList = await _getSessionByStudentId(tempStudentList[i].id!);
       setState(() {
         _studentList.add(
             CompleteStudentDetail(studentModel: tempStudentList[i], sessionList: _sessionList)
@@ -43,12 +46,12 @@ class _StudentListPageState extends State<StudentListPage> {
     }
   }
 
-  Future<SessionReadableData> convertToReadableFormat(SessionModel sessionModel)async{
+  Future<ReadableSessionData> convertToReadableFormat(SessionModel sessionModel)async{
     ClassModel? classModel = await ClassHelper.instance.getClass(sessionModel.classId);
     BoardModel? boardModel = await BoardHelper.instance.getBoard(sessionModel.boardId);
     SubjectModel? subjectModel = await SubjectHelper.instance.getSubject(sessionModel.subjectId);
 
-    return SessionReadableData(
+    return ReadableSessionData(
       classModel: classModel!,
       boardModel: boardModel!,
       subjectModel: subjectModel!,
@@ -57,9 +60,9 @@ class _StudentListPageState extends State<StudentListPage> {
       endTime: sessionModel.endTime,
     );
   }
-  Future<List<SessionReadableData>> _getSessionByStudentId(int studentId)async{
+  Future<List<ReadableSessionData>> _getSessionByStudentId(int studentId)async{
     List<SessionModel> sessionList =await SessionHelper.instance.getSession(studentId);
-    List<SessionReadableData> readableSessionList = [];
+    List<ReadableSessionData> readableSessionList = [];
 
     if(sessionList.isEmpty){
       return [];
@@ -71,7 +74,7 @@ class _StudentListPageState extends State<StudentListPage> {
     return readableSessionList;
   }
 
-  void _showSessionDeletionPopup(int studentId, SessionReadableData sessionData) {
+  void _showSessionDeletionPopup(int studentId, ReadableSessionData sessionData) {
     int classId = sessionData.classModel.id==null?-1:sessionData.classModel.id!;
     int boardId = sessionData.boardModel.id==null?-1:sessionData.boardModel.id!;
     int subjectId = sessionData.subjectModel.id==null?-1:sessionData.subjectModel.id!;
@@ -156,14 +159,14 @@ class _StudentListPageState extends State<StudentListPage> {
 
       if(studentModel != null){
         if(!studentDictionary.containsKey(studentId)){
-          SessionReadableData sessionReadableData = await convertToReadableFormat(sessionList[i]);
+          ReadableSessionData readableSessionData = await convertToReadableFormat(sessionList[i]);
 
           studentDictionary[studentId] = CompleteStudentDetail(studentModel: studentModel, sessionList: []);
-          studentDictionary[studentId]!.addSession(sessionReadableData);
+          studentDictionary[studentId]!.addSession(readableSessionData);
         }else{
-          SessionReadableData sessionReadableData = await convertToReadableFormat(sessionList[i]);
+          ReadableSessionData readableSessionData = await convertToReadableFormat(sessionList[i]);
 
-          studentDictionary[studentId]!.addSession(sessionReadableData);
+          studentDictionary[studentId]!.addSession(readableSessionData);
         }
       }
     }
@@ -178,85 +181,58 @@ class _StudentListPageState extends State<StudentListPage> {
   Widget studentDetailWidget(int index){
     List<CompleteStudentDetail> dataList = !_isSearching?_studentList:_searchedStudentList;
     StudentModel _studentModel = dataList[index].studentModel;
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.blueAccent),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 4,
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: Icon(Icons.person_rounded),
-                    title: Text(_studentModel.name),
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.cake_rounded),
-                    title:  Text(DateFormat('dd-MMM-yyyy').format(_studentModel.dob).toString()),
-                  ),
-                  const Divider(color: Colors.black87,),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: dataList[index].sessionList.length,
-                    itemBuilder: (context, sessionIndex){
-                      SessionReadableData _sessionData = dataList[index].sessionList[sessionIndex];
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                          onTap: (){
-                            //TODO: EDIT SESSION
-                          },
-                          onLongPress: (){
-                            setState(() {
-                              _showSessionDeletionPopup(_studentModel.id!, _sessionData);
-                            });
-                          },
-                          title: Text(_sessionData.classModel.className +"\t"+_sessionData.subjectModel.subjectName),
-                          subtitle: Text(_sessionData.boardModel.boardName+"\n"+_sessionData.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
-                          trailing: Text(_sessionData.startTime+" - "+_sessionData.endTime),
-                        ),
-                      );
-                    },
-                  )
-                ],
+    return GestureDetector(
+      onTap: (){
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => StudentDetails(
+              completeStudentDetail: dataList[index],
+            )));
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.blueAccent),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ListTile(
+                leading: Icon(Icons.person_rounded),
+                title: Text(_studentModel.name),
               ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  IconButton(
-                      onPressed: (){},
-                      icon: Icon(Icons.edit_rounded)
-                  ),
-                  IconButton(
-                      onPressed: (){
+              ListTile(
+                leading: Icon(Icons.cake_rounded),
+                title:  Text(DateFormat('dd-MMM-yyyy').format(_studentModel.dob).toString()),
+              ),
+              const Divider(color: Colors.black87,),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: dataList[index].sessionList.length,
+                itemBuilder: (context, sessionIndex){
+                  ReadableSessionData _sessionData = dataList[index].sessionList[sessionIndex];
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      onTap: (){
+                        //TODO: EDIT SESSION
+                      },
+                      onLongPress: (){
                         setState(() {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => AddSession(studentId: dataList[index].studentModel.id!,studentName: dataList[index].studentModel.name)));
+                          _showSessionDeletionPopup(_studentModel.id!, _sessionData);
                         });
                       },
-                      icon: Icon(Icons.more_time_rounded)
-                  ),
-                  IconButton(
-                      onPressed: (){},
-                      icon: Icon(Icons.query_stats_rounded)
-                  ),
-                  IconButton(
-                      onPressed: (){},
-                      icon: Icon(Icons.attach_money_rounded)
-                  )
-                ],
-              ),
-            )
-          ],
+                      title: Text(_sessionData.classModel.className +"\t"+_sessionData.subjectModel.subjectName),
+                      subtitle: Text(_sessionData.boardModel.boardName+"\n"+_sessionData.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
+                      trailing: Text(_sessionData.startTime+" - "+_sessionData.endTime),
+                    ),
+                  );
+                },
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -414,32 +390,4 @@ class _StudentListPageState extends State<StudentListPage> {
       ),
     );
   }
-}
-class CompleteStudentDetail{
-  StudentModel studentModel;
-  List<SessionReadableData> sessionList;
-
-  CompleteStudentDetail({
-    required this.studentModel,
-    required this.sessionList
-  });
-  addSession(SessionReadableData sessionData){
-    sessionList.add(sessionData);
-  }
-}
-class SessionReadableData{
-  ClassModel classModel;
-  SubjectModel subjectModel;
-  BoardModel boardModel;
-  String sessionSlot;
-  String startTime;
-  String endTime;
-
-  SessionReadableData({
-      required this.classModel,
-      required this.subjectModel,
-      required this.boardModel,
-      required this.sessionSlot, 
-      required this.startTime, 
-      required this.endTime});
 }
