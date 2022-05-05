@@ -1,4 +1,9 @@
 import 'dart:io';
+import 'package:class_manager/Model/board.dart';
+import 'package:class_manager/Model/class.dart';
+import 'package:class_manager/Model/session.dart';
+import 'package:class_manager/Model/student.dart';
+import 'package:class_manager/Model/subject.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -17,7 +22,7 @@ class DatabaseHelper{
     _initDB();
   }
 
-  final _dbName = "temp10.db";
+  final _dbName = "temp23.db";
   final _version = 1;
 
   Future<Database> get database async{
@@ -30,32 +35,15 @@ class DatabaseHelper{
     Directory dbPath = await getApplicationDocumentsDirectory();
     final path = join(dbPath.path,_dbName);
 
-    return await openDatabase(path,version: _version);
+    return await openDatabase(path,version: _version,onCreate: _onCreate());
   }
-  void createTable(String query)async
+  _onCreate()
   {
-    _database!.execute(query);
-  }
-  void dropTable(String tableName)async
-  {
-    _database!.delete(tableName);
-  }
-  void insert(String tableName,Map<String,dynamic> data)
-  {
-    //dropTable(tableName);
-    _database!.insert(tableName, data);
-    //print("$data Inserted");
-  }
-  void rawInsert(String rawQuery)
-  {
-    _database!.rawInsert(rawQuery);
-  }
-  Future<List<Map<String,dynamic>>> readAll(String tableName) async
-  {
-    List<Map<String,dynamic>> maps = await _database!.query(tableName);
-    return maps;
-  }
-  Future close() async{
-    _database!.close();
+    //Initializing all table
+    StudentHelper.instance;
+    ClassHelper.instance;
+    BoardHelper.instance;
+    SubjectHelper.instance;
+    SessionHelper.instance;
   }
 }
