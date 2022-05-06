@@ -1,5 +1,6 @@
 import 'package:class_manager/Model/board.dart';
 import 'package:class_manager/Model/class.dart';
+import 'package:class_manager/Model/readable_session_data.dart';
 import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/Model/subject.dart';
 import 'package:date_time_picker/date_time_picker.dart';
@@ -9,8 +10,8 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class AddSession extends StatefulWidget {
   final int studentId;
-  final String studentName;
-  const AddSession({Key? key,required this.studentId,required this.studentName}) : super(key: key);
+  ReadableSessionData? sessionData;
+  AddSession({Key? key,required this.studentId,ReadableSessionData? sessionData}) : super(key: key);
 
   @override
   _AddSessionState createState() => _AddSessionState();
@@ -228,50 +229,35 @@ class _AddSessionState extends State<AddSession> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          leading: BackButton(
-            onPressed: (){
-              Navigator.pop(context);
-            },
-          ),
-          title: Text(widget.studentName + "'s new session"),
-        ),
-        body: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  /*classDropDown(),
+    return Form(
+      key: _formKey,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            /*classDropDown(),
                   boardDropDown(),*/
-                  subjectDropDown(),
-                  sessionDaySelector(),
-                  startTimeField(),
-                  endTimeField(),
-                  feesField(),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: TextButton(
-                      onPressed: (){
-                        setState(() {
-                          //Save
-                          if(_formKey.currentState!.validate()){
-                            _save();
-                          }
-                        });
-                      },
-                      child: Text("Save"),
-                    ),
-                  )
-                ],
+            subjectDropDown(),
+            sessionDaySelector(),
+            startTimeField(),
+            endTimeField(),
+            feesField(),
+            Align(
+              alignment: Alignment.center,
+              child: TextButton(
+                onPressed: (){
+                  setState(() {
+                    //Save
+                    if(_formKey.currentState!.validate()){
+                      _save();
+                    }
+                  });
+                },
+                child: Text("Save"),
               ),
-            ),
-          ),
+            )
+          ],
         ),
       ),
     );

@@ -9,6 +9,9 @@ import 'package:class_manager/Model/subject.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class StudentDetails extends StatefulWidget {
@@ -300,35 +303,61 @@ class _StudentDetailsState extends State<StudentDetails> {
     );
   }
 
+  _save(){
+    print("SAVING");
+    _formKey.currentState!.save();
+
+    late ClassModel _selectedClassModel;
+    late BoardModel _selectedBoardModel;
+
+    for(int i =0;i<_classList.length;++i){
+      if(_classList[i].className == _selectedClass){
+        _selectedClassModel =_classList[i];
+        break;
+      }
+    }
+    for(int i =0;i<_boardList.length;++i){
+      if(_boardList[i].boardName == _selectedBoard){
+        _selectedBoardModel =_boardList[i];
+        break;
+      }
+    }
+
+    StudentModel student = widget.completeStudentDetail.studentModel;
+
+    student.studentPhoneNumber = _studentPhoneNumber;
+    student.parentPhoneNumber1 = _parentPhoneNumber1;
+    student.parentPhoneNumber2 = _parentPhoneNumber2;
+    student.name = _name;
+    student.schoolName = _schoolName;
+    student.dob = _dob;
+    student.location = _location;
+    student.classData = _selectedClassModel;
+    student.boardData = _selectedBoardModel;
+
+    setState(() {
+      StudentHelper.instance.update(student);
+      widget.completeStudentDetail.studentModel = student;
+    });
+  }
+
   Widget studentDrawer() {
     return Drawer(
-      child: ListView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          DrawerHeader(
-            child: const Align(
-              alignment: Alignment.bottomLeft,
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                    "Student actions",
-                  style: TextStyle(
-                    fontSize: 20
-                  ),
-                ),
-              ),
-            ),
-          ),
           Divider(color: Colors.black87,),
           ListTile(
             onTap: (){
-              Navigator.push(context,
+              /*Navigator.push(context,
                   MaterialPageRoute(builder: (context) =>
                       AddSession(studentId: widget.completeStudentDetail.studentModel.id!,studentName: widget.completeStudentDetail.studentModel.name)))
               .then((value){
                 setState(() {
-                  _getSessionByStudentId();
+                  _getSession();
                 });
-              });
+              });*/
+              sessionPopUp();
             },
             leading: Icon(Icons.more_time_rounded),
             title: Text("Add session"),
@@ -346,32 +375,55 @@ class _StudentDetailsState extends State<StudentDetails> {
             title: Text("Delete student"),
           ),
           Divider(color: Colors.black87,),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: widget.completeStudentDetail.sessionList.length,
-            itemBuilder: (context, sessionIndex){
-              ReadableSessionData _sessionData = widget.completeStudentDetail.sessionList[sessionIndex];
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListTile(
-                  onTap: (){
-                    //TODO: EDIT SESSION
-                  },
-                  onLongPress: (){
-                    setState(() {
-                      _showSessionDeletionPopup(widget.completeStudentDetail.studentModel.id!, _sessionData);
-                    });
-                  },
-                  title: Text(_sessionData.subjectModel.subjectName),
-                  subtitle: Text(_sessionData.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
-                  trailing: Text(_sessionData.startTime+" - "+_sessionData.endTime),
+          ListTile(
+            title: Text("Session list"),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blueAccent),
                 ),
-              );
-            },
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: widget.completeStudentDetail.sessionList.length,
+                  itemBuilder: (context, sessionIndex){
+                    ReadableSessionData _sessionData = widget.completeStudentDetail.sessionList[sessionIndex];
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListTile(
+                        onTap: (){
+                          sessionPopUp(_sessionData);
+                        },
+                        onLongPress: (){
+                          setState(() {
+                            _showSessionDeletionPopup(widget.completeStudentDetail.studentModel.id!, _sessionData);
+                          });
+                        },
+                        title: Text(_sessionData.subjectModel.subjectName),
+                        subtitle: Text(_sessionData.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
+                        trailing: Text(_sessionData.startTime+" - "+_sessionData.endTime),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
           )
         ],
       ),
     );
+  }
+
+  void sessionPopUp([ReadableSessionData? sessionData]){
+    Alert(
+      context: context,
+      content: _isEditing?AddSession(studentId: widget.completeStudentDetail.studentModel.id!,sessionData: sessionData,)
+          :AddSession(studentId: widget.completeStudentDetail.studentModel.id!),
+    ).show().then((value){
+      _getSession();
+    });
   }
 
   Future<ReadableSessionData> convertToReadableFormat(SessionModel sessionModel)async{
@@ -384,7 +436,7 @@ class _StudentDetailsState extends State<StudentDetails> {
       endTime: sessionModel.endTime,
     );
   }
-  _getSessionByStudentId()async{
+  _getSession()async{
     List<SessionModel> sessionList = await SessionHelper.instance.getSession(widget.completeStudentDetail.studentModel.id!);
 
     List<ReadableSessionData> readableSessionList = [];
@@ -416,7 +468,7 @@ class _StudentDetailsState extends State<StudentDetails> {
               //Delete session
               SessionHelper.instance.delete(studentId, subjectId);
               setState(() {
-                _getSessionByStudentId();
+                _getSession();
                 Navigator.pop(context);
               });
             },
@@ -455,32 +507,49 @@ class _StudentDetailsState extends State<StudentDetails> {
           title: Text("Student Details"),
         ),
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.edit_rounded),
+          child: !_isEditing? Icon(Icons.edit_rounded):Icon(Icons.clear),
           onPressed: (){
             setState(() {
               _isEditing = !_isEditing;
             });
           },
         ),
-        body:SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  nameField(),
-                  dobField(),
-                  schoolNameField(),
-                  classDropDown(),
-                  boardDropDown(),
-                  studentPhoneNumberField(),
-                  parentPhoneNumber1Field(),
-                  parentPhoneNumber2Field(),
-                  locationField(),
-                ],
-              ),
+        body:Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: ListView(
+              children: [
+                nameField(),
+                dobField(),
+                schoolNameField(),
+                classDropDown(),
+                boardDropDown(),
+                studentPhoneNumberField(),
+                parentPhoneNumber1Field(),
+                parentPhoneNumber2Field(),
+                locationField(),
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: TextButton(
+                    onPressed: (){
+                      setState(() {
+                        //Save
+                        if(_formKey.currentState!.validate()){
+                          _save();
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: ListTile(
+                              title: Text("Saved student information"),
+                              trailing: Icon(Icons.done_outline_rounded),
+                            ),
+                          ));
+                        }
+                      });
+                    },
+                    child: Text("Save"),
+                  ),
+                )
+              ],
             ),
           ),
         ),
