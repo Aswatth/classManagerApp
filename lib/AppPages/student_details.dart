@@ -267,8 +267,8 @@ class _StudentDetailsState extends State<StudentDetails> {
                       _showSessionDeletionPopup(widget.completeStudentDetail.studentModel.id!, _sessionData);
                     });
                   },
-                  title: Text(_sessionData.classModel.className +"\t"+_sessionData.subjectModel.subjectName),
-                  subtitle: Text(_sessionData.boardModel.boardName+"\n"+_sessionData.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
+                  title: Text(_sessionData.subjectModel.subjectName),
+                  subtitle: Text(_sessionData.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
                   trailing: Text(_sessionData.startTime+" - "+_sessionData.endTime),
                 ),
               );
@@ -280,13 +280,9 @@ class _StudentDetailsState extends State<StudentDetails> {
   }
 
   Future<ReadableSessionData> convertToReadableFormat(SessionModel sessionModel)async{
-    ClassModel? classModel = await ClassHelper.instance.getClass(sessionModel.classId);
-    BoardModel? boardModel = await BoardHelper.instance.getBoard(sessionModel.boardId);
     SubjectModel? subjectModel = await SubjectHelper.instance.getSubject(sessionModel.subjectId);
 
     return ReadableSessionData(
-      classModel: classModel!,
-      boardModel: boardModel!,
       subjectModel: subjectModel!,
       sessionSlot: sessionModel.sessionSlot,
       startTime: sessionModel.startTime,
@@ -305,8 +301,6 @@ class _StudentDetailsState extends State<StudentDetails> {
     });
   }
   void _showSessionDeletionPopup(int studentId, ReadableSessionData sessionData) {
-    int classId = sessionData.classModel.id==null?-1:sessionData.classModel.id!;
-    int boardId = sessionData.boardModel.id==null?-1:sessionData.boardModel.id!;
     int subjectId = sessionData.subjectModel.id==null?-1:sessionData.subjectModel.id!;
 
     Alert(
@@ -323,7 +317,7 @@ class _StudentDetailsState extends State<StudentDetails> {
             child: Text("Yes"),
             onPressed: (){
               //Delete session
-              SessionHelper.instance.delete(studentId, classId, subjectId, boardId);
+              SessionHelper.instance.delete(studentId, subjectId);
               setState(() {
                 _getSessionByStudentId();
                 Navigator.pop(context);

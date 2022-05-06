@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:class_manager/Model/board.dart';
 import 'package:class_manager/Model/class.dart';
 import 'package:class_manager/database_helper.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +17,8 @@ class StudentHelper{
   final String _name = 'name';
   final String _dob = 'dob';
   final String _schoolName = 'schoolName';
+  final String _classData = 'classData';
+  final String _boardData = 'boardData';
   final String _location = 'location';
 
   static final StudentHelper instance = StudentHelper._privateConstructor();
@@ -31,6 +36,8 @@ class StudentHelper{
     $_name VARCHAR(50),
     $_dob VARCHAR(25),
     $_schoolName VARCHAR(50),
+    $_classData VARCHAR,
+    $_boardData VARCHAR,
     $_location VARCHAR(25)    
     )
      ''';
@@ -48,7 +55,7 @@ class StudentHelper{
 
     if(data.isEmpty)
     {
-      print(student.toString()+" does not already exists");
+      print(student.toMap().toString()+" does not already exists");
       //Insert
       return db.insert(studentTableName, student.toMap());
     }
@@ -113,6 +120,8 @@ class StudentModel{
   String schoolName;
   String name;
   DateTime dob;
+  ClassModel classData;
+  BoardModel boardData;
   String location;
 
   StudentModel.createNewStudent({
@@ -122,6 +131,8 @@ class StudentModel{
     this.parentPhoneNumber2,
     required this.name,
     required this.dob,
+    required this.classData,
+    required this.boardData,
     required this.schoolName,
     required this.location
   });
@@ -133,19 +144,23 @@ class StudentModel{
     required this.parentPhoneNumber2,
     required this.name,
     required this.dob,
+    required this.classData,
+    required this.boardData,
     required this.schoolName,
     required this.location,
   });
 
-  factory StudentModel.fromMap(Map<String,dynamic> json) => StudentModel(
-      id: json['id'],
-      studentPhoneNumber: json['studentPhoneNumber'],
-      parentPhoneNumber1: json['parentPhoneNumber1'],
-      parentPhoneNumber2: json['parentPhoneNumber2'],
-      name:  json['name'],
-      dob:  DateFormat('dd-MMM-yyyy').parse(json['dob']),
-      schoolName: json['schoolName'],
-      location: json['location']
+  factory StudentModel.fromMap(Map<String,dynamic> jsonToParse) => StudentModel(
+      id: jsonToParse['id'],
+      studentPhoneNumber: jsonToParse['studentPhoneNumber'],
+      parentPhoneNumber1: jsonToParse['parentPhoneNumber1'],
+      parentPhoneNumber2: jsonToParse['parentPhoneNumber2'],
+      name:  jsonToParse['name'],
+      dob:  DateFormat('dd-MMM-yyyy').parse(jsonToParse['dob']),
+      schoolName: jsonToParse['schoolName'],
+      classData: ClassModel.fromMap(json.decode(jsonToParse['classData'])),
+      boardData: BoardModel.fromMap(json.decode(jsonToParse['boardData'])),
+      location: jsonToParse['location']
   );
 
   Map<String,dynamic> toMap(){
@@ -157,12 +172,14 @@ class StudentModel{
       'name':name,
       'dob':DateFormat('dd-MMM-yyyy').format(dob).toString(),
       'schoolName': schoolName,
+      'classData': json.encode(classData.toMap()),
+      'boardData': json.encode(boardData.toMap()),
       'location':location
     };
   }
 
   @override
   String toString() {
-    return 'StudentModel{id: $id, studentPhoneNumber: $studentPhoneNumber, parentPhoneNumber1: $parentPhoneNumber1, parentPhoneNumber2: $parentPhoneNumber2, schoolName: $schoolName, name: $name, dob: $dob, location: $location}';
+    return 'StudentModel{id: $id, studentPhoneNumber: $studentPhoneNumber, parentPhoneNumber1: $parentPhoneNumber1, parentPhoneNumber2: $parentPhoneNumber2, schoolName: $schoolName, name: $name, dob: $dob, classData: ${classData.toString()}, boardData: ${boardData.toString()}, location: $location}';
   }
 }

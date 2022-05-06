@@ -47,13 +47,9 @@ class _StudentListPageState extends State<StudentListPage> {
   }
 
   Future<ReadableSessionData> convertToReadableFormat(SessionModel sessionModel)async{
-    ClassModel? classModel = await ClassHelper.instance.getClass(sessionModel.classId);
-    BoardModel? boardModel = await BoardHelper.instance.getBoard(sessionModel.boardId);
     SubjectModel? subjectModel = await SubjectHelper.instance.getSubject(sessionModel.subjectId);
 
     return ReadableSessionData(
-      classModel: classModel!,
-      boardModel: boardModel!,
       subjectModel: subjectModel!,
       sessionSlot: sessionModel.sessionSlot,
       startTime: sessionModel.startTime,
@@ -75,8 +71,6 @@ class _StudentListPageState extends State<StudentListPage> {
   }
 
   void _showSessionDeletionPopup(int studentId, ReadableSessionData sessionData) {
-    int classId = sessionData.classModel.id==null?-1:sessionData.classModel.id!;
-    int boardId = sessionData.boardModel.id==null?-1:sessionData.boardModel.id!;
     int subjectId = sessionData.subjectModel.id==null?-1:sessionData.subjectModel.id!;
 
     Alert(
@@ -93,7 +87,7 @@ class _StudentListPageState extends State<StudentListPage> {
           child: Text("Yes"),
           onPressed: (){
             //Delete session
-            SessionHelper.instance.delete(studentId, classId, subjectId, boardId);
+            SessionHelper.instance.delete(studentId, subjectId);
             Navigator.pop(context);
           },
         )
@@ -119,17 +113,7 @@ class _StudentListPageState extends State<StudentListPage> {
     });
   }
   _getSearchedResults() async{
-    int selectedClassId = -1;
     int selectedSubjectId = -1;
-    int selectedBoardId = -1;
-
-    for (var element in _classList) {
-      if(_selectedClass != null){
-        if(element.className == _selectedClass){
-          selectedClassId = element.id!;
-        }
-      }
-    }
 
     for (var element in _subjectList) {
       if(_selectedSubject!=null){
@@ -139,16 +123,8 @@ class _StudentListPageState extends State<StudentListPage> {
       }
     }
 
-    for (var element in _boardList) {
-      if(_selectedBoard!=null){
-        if(element.boardName == _selectedBoard){
-          selectedBoardId = element.id!;
-        }
-      }
-    }
+
     List<SessionModel> sessionList =await SessionHelper.instance.getSearchedSession(
-        selectedBoardId: selectedBoardId,
-        selectedClassId: selectedClassId,
         selectedSubjectId: selectedSubjectId
     );
     Map<int,CompleteStudentDetail> studentDictionary = <int,CompleteStudentDetail>{};
@@ -224,8 +200,8 @@ class _StudentListPageState extends State<StudentListPage> {
                           _showSessionDeletionPopup(_studentModel.id!, _sessionData);
                         });
                       },
-                      title: Text(_sessionData.classModel.className +"\t"+_sessionData.subjectModel.subjectName),
-                      subtitle: Text(_sessionData.boardModel.boardName+"\n"+_sessionData.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
+                      title: Text(_sessionData.subjectModel.subjectName),
+                      subtitle: Text(_sessionData.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
                       trailing: Text(_sessionData.startTime+" - "+_sessionData.endTime),
                     ),
                   );

@@ -23,6 +23,19 @@ class _AddStudentState extends State<AddStudent> {
   DateTime _dob = DateTime.now();
   String _location = '';
 
+  List<ClassModel> _classList = [];
+  String? _selectedClass = null;
+
+  List<BoardModel> _boardList = [];
+  String? _selectedBoard = null;
+
+  _getAllClass() async{
+    _classList = await ClassHelper.instance.getAllClass();
+  }
+  _getAllBoard() async{
+    _boardList = await BoardHelper.instance.getAllBoard();
+  }
+
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
@@ -102,6 +115,70 @@ class _AddStudentState extends State<AddStudent> {
         });
       },
     );
+  }
+  Widget classDropDown(){
+    return ListTile(
+      leading: Icon(Icons.book_rounded),
+      title: DropdownButtonFormField(
+        hint: Text("Select class"),
+        validator: (value){
+          if(value == null){
+            return 'Select class';
+          }else{
+            return null;
+          }
+        },
+        items: _classList.map<DropdownMenuItem<String>>((ClassModel classModel){
+          return DropdownMenuItem(
+            value: classModel.className,
+            child: Text(classModel.className),
+          );
+        }).toList(),
+        value: _selectedClass,
+        onChanged: (_){
+          setState(() {
+            _selectedClass = _ as String?;
+          });
+        },
+        onSaved: (_){
+          setState(() {
+            _selectedClass = _ as String?;
+          });
+        },
+      )
+    );
+  }
+  Widget boardDropDown(){
+    return ListTile(
+      leading: Icon(Icons.assignment_rounded),
+      title:DropdownButtonFormField(
+        hint: Text("Select board"),
+        validator: (value){
+          if(value == null){
+            return 'Select board';
+          }else{
+            return null;
+          }
+        },
+        items: _boardList.map<DropdownMenuItem<String>>((BoardModel boardModel){
+          return DropdownMenuItem(
+            value: boardModel.boardName,
+            child: Text(boardModel.boardName),
+          );
+        }).toList(),
+        value: _selectedBoard,
+        onChanged: (_){
+          setState(() {
+            _selectedBoard = _ as String?;
+          });
+        },
+        onSaved: (_){
+          setState(() {
+            _selectedBoard = _ as String?;
+          });
+        },
+      )
+      );
   }
   Widget studentPhoneNumberField() {
     return TextFormField(
@@ -200,6 +277,22 @@ class _AddStudentState extends State<AddStudent> {
     print("SAVING");
     _formKey.currentState!.save();
 
+    late ClassModel _selectedClassModel;
+    late BoardModel _selectedBoardModel;
+
+    for(int i =0;i<_classList.length;++i){
+      if(_classList[i].className == _selectedClass){
+        _selectedClassModel =_classList[i];
+        break;
+      }
+    }
+    for(int i =0;i<_boardList.length;++i){
+      if(_boardList[i].boardName == _selectedBoard){
+        _selectedBoardModel =_boardList[i];
+        break;
+      }
+    }
+
     StudentModel student = StudentModel.createNewStudent(
         studentPhoneNumber:  _studentPhoneNumber,
         parentPhoneNumber1: _parentPhoneNumber1,
@@ -207,9 +300,19 @@ class _AddStudentState extends State<AddStudent> {
         name: _name,
         dob: _dob,
         schoolName: _schoolName,
+        classData: _selectedClassModel,
+        boardData: _selectedBoardModel,
         location: _location
     );
     StudentHelper.instance.insertStudent(student);
+  }
+
+  @override
+  void initState() {
+    setState(() {
+      _getAllClass();
+      _getAllBoard();
+    });
   }
 
   @override
@@ -236,43 +339,43 @@ class _AddStudentState extends State<AddStudent> {
             ),
           ],
         ),
-        body:SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  nameField(),
-                  dobField(),
-                  schoolNameField(),
-                  studentPhoneNumberField(),
-                  parentPhoneNumber1Field(),
-                  parentPhoneNumber2Field(),
-                  locationField(),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: TextButton(
-                      onPressed: (){
-                        setState(() {
-                          //Save
-                          if(_formKey.currentState!.validate()){
-                            _save();
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: ListTile(
-                                title: Text("Saved student information"),
-                                trailing: Icon(Icons.done_outline_rounded),
-                              ),
-                            ));
-                          }
-                        });
-                      },
-                      child: Text("Save"),
-                    ),
-                  )
-                ],
-              ),
+        body:Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                nameField(),
+                dobField(),
+                schoolNameField(),
+                classDropDown(),
+                boardDropDown(),
+                studentPhoneNumberField(),
+                parentPhoneNumber1Field(),
+                parentPhoneNumber2Field(),
+                locationField(),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: TextButton(
+                    onPressed: (){
+                      setState(() {
+                        //Save
+                        if(_formKey.currentState!.validate()){
+                          _save();
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: ListTile(
+                              title: Text("Saved student information"),
+                              trailing: Icon(Icons.done_outline_rounded),
+                            ),
+                          ));
+                        }
+                      });
+                    },
+                    child: Text("Save"),
+                  ),
+                )
+              ],
             ),
           ),
         ),

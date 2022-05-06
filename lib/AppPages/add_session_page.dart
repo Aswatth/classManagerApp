@@ -314,11 +314,11 @@ class _AddSessionState extends State<AddSession> {
   }
 
   _save()async{
-    int? _classId = await ClassHelper.instance.getClassId(_selectedClass!);
-    int? _boardId = await BoardHelper.instance.getBoardId(_selectedBoard!);
+    /*int? _classId = await ClassHelper.instance.getClassId(_selectedClass!);
+    int? _boardId = await BoardHelper.instance.getBoardId(_selectedBoard!);*/
     int? _subjectId = await SubjectHelper.instance.getSubjectId(_selectedSubject!);
 
-    SessionModel newSession = SessionModel(studentId: widget.studentId,classId: _classId!,boardId: _boardId!,subjectId: _subjectId!,sessionSlot: _selectedSessionDays.toString(), startTime: _startTime,endTime: _endTime, fees: _fees);
+    SessionModel newSession = SessionModel(studentId: widget.studentId,subjectId: _subjectId!,sessionSlot: _selectedSessionDays.toString(), startTime: _startTime,endTime: _endTime, fees: _fees);
     SessionHelper.instance.insertSession(newSession);
   }
 
@@ -343,8 +343,8 @@ class _AddSessionState extends State<AddSession> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  classDropDown(),
-                  boardDropDown(),
+                  /*classDropDown(),
+                  boardDropDown(),*/
                   subjectDropDown(),
                   sessionDaySelector(),
                   startTimeField(),
