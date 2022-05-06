@@ -10,7 +10,6 @@ import 'package:class_manager/Model/student.dart';
 import 'package:class_manager/Model/subject.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 
 class StudentListPage extends StatefulWidget {
   const StudentListPage({Key? key}) : super(key: key);
@@ -28,8 +27,8 @@ class _StudentListPageState extends State<StudentListPage> {
     _initializeSearchFilters();
   }
 
-  final List<CompleteStudentDetail> _studentList = [];
-  final List<CompleteStudentDetail> _searchedStudentList = [];
+  List<CompleteStudentDetail> _studentList = [];
+  List<CompleteStudentDetail> _searchedStudentList = [];
   bool _isSearching = false;
 
   _getStudentDetails() async{
@@ -71,37 +70,12 @@ class _StudentListPageState extends State<StudentListPage> {
     return readableSessionList;
   }
 
-  void _showSessionDeletionPopup(int studentId, ReadableSessionData sessionData) {
-    int subjectId = sessionData.subjectModel.id==null?-1:sessionData.subjectModel.id!;
-
-    Alert(
-      context:context,
-      content: Text("Are you sure you want to delete this session?"),
-      buttons: [
-        DialogButton(
-            child: Text("No"),
-            onPressed: (){
-              Navigator.pop(context);
-            },
-        ),
-        DialogButton(
-          child: Text("Yes"),
-          onPressed: (){
-            //Delete session
-            SessionHelper.instance.delete(studentId, subjectId);
-            Navigator.pop(context);
-          },
-        )
-      ]
-    ).show();
-  }
-
   List<ClassModel> _classList = [];
-  String? _selectedClass;
+  String _selectedClass = '';
   List<SubjectModel> _subjectList = [];
-  String? _selectedSubject;
+  String _selectedSubject = '';
   List<BoardModel> _boardList = [];
-  String? _selectedBoard;
+  String _selectedBoard = '';
 
   _initializeSearchFilters()async{
     var tempClassList = await ClassHelper.instance.getAllClass();
@@ -114,43 +88,62 @@ class _StudentListPageState extends State<StudentListPage> {
     });
   }
   _getSearchedResults() async{
-    int selectedSubjectId = -1;
+    _searchedStudentList.clear();
+    print("$_selectedClass - $_selectedBoard - $_selectedSubject ");
 
-    for (var element in _subjectList) {
-      if(_selectedSubject!=null){
-        if(element.subjectName == _selectedSubject){
-          selectedSubjectId = element.id!;
-        }
-      }
-    }
-
-    List<SessionModel> sessionList =await SessionHelper.instance.getSearchedSession(
-        selectedSubjectId: selectedSubjectId
-    );
-    Map<int,CompleteStudentDetail> studentDictionary = <int,CompleteStudentDetail>{};
-
-    for(int i=0;i<sessionList.length;++i){
-      int studentId = sessionList[i].studentId;
-      StudentModel? studentModel = await StudentHelper.instance.getStudent(studentId);
-
-      if(studentModel != null){
-        if(!studentDictionary.containsKey(studentId)){
-          ReadableSessionData readableSessionData = await convertToReadableFormat(sessionList[i]);
-
-          studentDictionary[studentId] = CompleteStudentDetail(studentModel: studentModel, sessionList: []);
-          studentDictionary[studentId]!.addSession(readableSessionData);
-        }else{
-          ReadableSessionData readableSessionData = await convertToReadableFormat(sessionList[i]);
-
-          studentDictionary[studentId]!.addSession(readableSessionData);
-        }
-      }
-    }
     setState(() {
-      _searchedStudentList.clear();
-      studentDictionary.forEach((key, value) {
-        _searchedStudentList.add(value);
-      });
+      if(_selectedClass.isNotEmpty && _selectedBoard.isNotEmpty) {
+        for (var element in _studentList) {
+          if (element.studentModel.classData.className == _selectedClass &&
+              element.studentModel.boardData.boardName == _selectedBoard) {
+            _searchedStudentList.add(element);
+          }
+        }
+      }
+      else{
+        if (_selectedClass.isNotEmpty){
+          for(var element in _studentList) {
+            if (element.studentModel.classData.className == _selectedClass) {
+              _searchedStudentList.add(element);
+            }
+          }
+        }
+        if (_selectedBoard.isNotEmpty){
+          for(var element in _studentList) {
+            if (element.studentModel.boardData.boardName == _selectedBoard) {
+              _searchedStudentList.add(element);
+            }
+          }
+        }
+      }
+      if(_selectedSubject.isNotEmpty){
+        if (_selectedClass.isNotEmpty || _selectedBoard.isNotEmpty){
+          List<CompleteStudentDetail> temp = [];
+          for(var element in _searchedStudentList){
+            for(var session in element.sessionList){
+              if(session.subjectModel.subjectName == _selectedSubject){
+                temp.add(element);
+              }
+            }
+          }
+          _searchedStudentList = temp;
+        }
+        else{
+          for(var element in _studentList){
+            for(var session in element.sessionList){
+              if(session.subjectModel.subjectName == _selectedSubject){
+                _searchedStudentList.add(element);
+              }
+            }
+          }
+        }
+      }
+
+      if(_selectedSubject.isEmpty && _selectedBoard.isEmpty && _selectedClass.isEmpty){
+        _searchedStudentList = _studentList;
+      }
+
+      _searchedStudentList = _searchedStudentList.toSet().toList();
     });
   }
 
@@ -162,7 +155,11 @@ class _StudentListPageState extends State<StudentListPage> {
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => StudentDetails(
               completeStudentDetail: dataList[index],
-            )));
+            ))).then((value){
+          setState(() {
+            _getStudentDetails();
+          });
+        });
       },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -177,10 +174,12 @@ class _StudentListPageState extends State<StudentListPage> {
               ListTile(
                 leading: Icon(Icons.person_rounded),
                 title: Text(_studentModel.name),
+                trailing: Text(_studentModel.classData.className),
               ),
               ListTile(
                 leading: Icon(Icons.cake_rounded),
                 title:  Text(DateFormat('dd-MMM-yyyy').format(_studentModel.dob).toString()),
+                trailing: Text(_studentModel.boardData.boardName),
               ),
               const Divider(color: Colors.black87,),
               ListView.builder(
@@ -192,14 +191,6 @@ class _StudentListPageState extends State<StudentListPage> {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ListTile(
-                      onTap: (){
-                        //TODO: EDIT SESSION
-                      },
-                      onLongPress: (){
-                        setState(() {
-                          _showSessionDeletionPopup(_studentModel.id!, _sessionData);
-                        });
-                      },
                       title: Text(_sessionData.subjectModel.subjectName),
                       subtitle: Text(_sessionData.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
                       trailing: Text(_sessionData.startTime+" - "+_sessionData.endTime),
@@ -228,11 +219,11 @@ class _StudentListPageState extends State<StudentListPage> {
                     child: Text(_classModelItem.className),
                   );
                 }).toList(),
-                value: _selectedClass,
+                value: _selectedClass.isEmpty?null:_selectedClass,
                 hint: Text("Select class"),
                 onChanged: (_){
                   setState(() {
-                    _selectedClass = _ as String?;
+                    _selectedClass = (_ as String);
                   });
                 },
               ),
@@ -246,11 +237,11 @@ class _StudentListPageState extends State<StudentListPage> {
                     child: Text(_subjectItem.subjectName),
                   );
                 }).toList(),
-                value: _selectedSubject,
+                value: _selectedSubject.isEmpty?null:_selectedSubject,
                 hint: Text("Select subject"),
                 onChanged: (_){
                   setState(() {
-                    _selectedSubject = _ as String?;
+                    _selectedSubject = (_ as String);
                   });
                 },
               ),
@@ -269,11 +260,11 @@ class _StudentListPageState extends State<StudentListPage> {
                     child: Text(_boardItem.boardName),
                   );
                 }).toList(),
-                value: _selectedBoard,
+                value: _selectedBoard.isEmpty?null:_selectedBoard,
                 hint: Text("Select board"),
                 onChanged: (_){
                   setState(() {
-                    _selectedBoard = _ as String?;
+                    _selectedBoard = (_ as String);
                   });
                 },
               ),
@@ -294,9 +285,9 @@ class _StudentListPageState extends State<StudentListPage> {
             TextButton(
                 onPressed: (){
                   setState(() {
-                    _selectedClass = null;
-                    _selectedSubject = null;
-                    _selectedBoard = null;
+                    _selectedClass = '';
+                    _selectedSubject = '';
+                    _selectedBoard = '';
                     _searchedStudentList.clear();
                   });
                 },

@@ -21,15 +21,9 @@ class _AddSessionState extends State<AddSession> {
   final _formKey = GlobalKey<FormState>();
   final _multiSelectKey = GlobalKey<FormFieldState>();
 
-  //Session details
-  List<String> _classNames = [];
-  String? _selectedClass = null;
-
-  List<String> _boardNames = [];
-  String? _selectedBoard = null;
-
-  List<String> _subjectNames = [];
+  List<SubjectModel> _subjectList = [];
   String? _selectedSubject = null;
+
   List<String> sessionDays = ["Weekday","Weekend","Mon","Tue","Wed","Thur","Fri","Sat","Sun"];
   List<String> _selectedSessionDays = [];
   String _startTime = '';
@@ -40,113 +34,15 @@ class _AddSessionState extends State<AddSession> {
   final TextEditingController _sessionEndTimeController = TextEditingController();
   final TextEditingController _feesController = TextEditingController();
 
-
-  Future<List<String>> _getAllClass() async{
-    List<ClassModel> _classList = await ClassHelper.instance.getAllClass();
-    for(int i = 0; i < _classList.length; ++i){
-      _classNames.add(_classList[i].className);
-    }
-    _classNames = _classNames.toSet().toList();
-    return _classNames;
-  }
-  Future<List<String>> _getAllBoard() async{
-    List<BoardModel> _boardList = await BoardHelper.instance.getAllBoard();
-    for(int i = 0; i < _boardList.length; ++i){
-      _boardNames.add(_boardList[i].boardName);
-    }
-    _boardNames = _boardNames.toSet().toList();//Remove duplicates
-    return _boardNames;
-  }
-  Future<List<String>> _getAllSubject() async{
-    List<SubjectModel> _subjectList = await SubjectHelper.instance.getAllSubject();
-    for(int i = 0; i < _subjectList.length; ++i){
-      _subjectNames.add(_subjectList[i].subjectName);
-    }
-    _subjectNames = _subjectNames.toSet().toList();//Remove duplicates
-    return _subjectNames;
+  Future<List<SubjectModel>> _getAllSubject() async{
+    List<SubjectModel> _temp = await SubjectHelper.instance.getAllSubject();
+    setState(() {
+      _subjectList = _temp;
+    });
+    return _temp;
   }
 
   //Session details
-  Widget classDropDown(){
-    return ListTile(
-      leading: Icon(Icons.book_rounded),
-      title: FutureBuilder(
-        future: _getAllClass(),
-        builder: (context, snapshot){
-          if(!snapshot.hasData) return CircularProgressIndicator();
-          else {
-            return DropdownButtonFormField(
-              hint: Text("Select class"),
-              validator: (value){
-                if(value == null){
-                  return 'Select class';
-                }else{
-                  return null;
-                }
-              },
-              items: _classNames.map<DropdownMenuItem<String>>((String value){
-                return DropdownMenuItem(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              value: _selectedClass,
-              onChanged: (_){
-                setState(() {
-                  _selectedClass = _ as String?;
-                });
-              },
-              onSaved: (_){
-                setState(() {
-                  _selectedClass = _ as String?;
-                });
-              },
-            );
-          }
-        },
-      ),
-    );
-  }
-  Widget boardDropDown(){
-    return ListTile(
-      leading: Icon(Icons.assignment_rounded),
-      title: FutureBuilder(
-        future: _getAllBoard(),
-        builder: (context, snapshot){
-          if(!snapshot.hasData) return CircularProgressIndicator();
-          else {
-            return DropdownButtonFormField(
-              hint: Text("Select board"),
-              validator: (value){
-                if(value == null){
-                  return 'Select board';
-                }else{
-                  return null;
-                }
-              },
-              items: _boardNames.map<DropdownMenuItem<String>>((String value){
-                return DropdownMenuItem(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              value: _selectedBoard,
-              onChanged: (_){
-                setState(() {
-                  _selectedBoard = _ as String?;
-                });
-              },
-              onSaved: (_){
-                setState(() {
-                  _selectedBoard = _ as String?;
-                });
-              },
-            );
-          }
-        },
-      ),
-    );
-  }
   Widget subjectDropDown(){
     return ListTile(
       leading: Icon(Icons.menu_book),
@@ -164,10 +60,10 @@ class _AddSessionState extends State<AddSession> {
                   return null;
                 }
               },
-              items: _subjectNames.map<DropdownMenuItem<String>>((String value){
+              items: _subjectList.map<DropdownMenuItem<String>>((SubjectModel subjectModel){
                 return DropdownMenuItem(
-                  value: value,
-                  child: Text(value),
+                  value: subjectModel.subjectName,
+                  child: Text(subjectModel.subjectName),
                 );
               }).toList(),
               value: _selectedSubject,
@@ -313,13 +209,21 @@ class _AddSessionState extends State<AddSession> {
     );
   }
 
-  _save()async{
-    /*int? _classId = await ClassHelper.instance.getClassId(_selectedClass!);
-    int? _boardId = await BoardHelper.instance.getBoardId(_selectedBoard!);*/
-    int? _subjectId = await SubjectHelper.instance.getSubjectId(_selectedSubject!);
+  _save(){
+    int _subjectId = -1;
 
-    SessionModel newSession = SessionModel(studentId: widget.studentId,subjectId: _subjectId!,sessionSlot: _selectedSessionDays.toString(), startTime: _startTime,endTime: _endTime, fees: _fees);
-    SessionHelper.instance.insertSession(newSession);
+    for(int i =0;i<_subjectList.length;++i){
+      if(_subjectList[i].subjectName == _selectedSubject){
+        _subjectId = _subjectList[i].id!;
+        break;
+      }
+    }
+
+    setState(() {
+      SessionModel newSession = SessionModel(studentId: widget.studentId,subjectId: _subjectId,sessionSlot: _selectedSessionDays.toString(), startTime: _startTime,endTime: _endTime, fees: _fees);
+      SessionHelper.instance.insertSession(newSession);
+    });
+
   }
 
   @override

@@ -9,6 +9,7 @@ class CompleteStudentDetail{
     required this.studentModel,
     required this.sessionList
   });
+
   addSession(ReadableSessionData sessionData){
     sessionList.add(sessionData);
   }

@@ -322,7 +322,13 @@ class _StudentDetailsState extends State<StudentDetails> {
           ListTile(
             onTap: (){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AddSession(studentId: widget.completeStudentDetail.studentModel.id!,studentName: widget.completeStudentDetail.studentModel.name)));
+                  MaterialPageRoute(builder: (context) =>
+                      AddSession(studentId: widget.completeStudentDetail.studentModel.id!,studentName: widget.completeStudentDetail.studentModel.name)))
+              .then((value){
+                setState(() {
+                  _getSessionByStudentId();
+                });
+              });
             },
             leading: Icon(Icons.more_time_rounded),
             title: Text("Add session"),
@@ -379,19 +385,21 @@ class _StudentDetailsState extends State<StudentDetails> {
     );
   }
   _getSessionByStudentId()async{
-    List<SessionModel> sessionList =await SessionHelper.instance.getSession(widget.completeStudentDetail.studentModel.id!);
+    List<SessionModel> sessionList = await SessionHelper.instance.getSession(widget.completeStudentDetail.studentModel.id!);
+
     List<ReadableSessionData> readableSessionList = [];
 
     for(int i=0;i<sessionList.length;++i){
-      readableSessionList.add(await convertToReadableFormat(sessionList[i]));
+      convertToReadableFormat(sessionList[i]).then((value) => readableSessionList.add(value));
     }
     setState(() {
       widget.completeStudentDetail.sessionList = readableSessionList;
     });
   }
+
   void _showSessionDeletionPopup(int studentId, ReadableSessionData sessionData) {
     int subjectId = sessionData.subjectModel.id==null?-1:sessionData.subjectModel.id!;
-
+    print("DELETING: $studentId, $subjectId");
     Alert(
         context:context,
         content: Text("Are you sure you want to delete this session?"),
