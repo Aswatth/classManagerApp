@@ -33,6 +33,7 @@ class _StudentListPageState extends State<StudentListPage> {
   bool _isSearching = false;
 
   _getStudentDetails() async{
+    _studentList.clear();
     List<StudentModel> tempStudentList =await StudentHelper.instance.getAllStudent();
 
     for(int i=0;i<tempStudentList.length;++i){
@@ -101,7 +102,7 @@ class _StudentListPageState extends State<StudentListPage> {
   String? _selectedSubject;
   List<BoardModel> _boardList = [];
   String? _selectedBoard;
-  
+
   _initializeSearchFilters()async{
     var tempClassList = await ClassHelper.instance.getAllClass();
     var tempSubjectList = await SubjectHelper.instance.getAllSubject();
@@ -122,7 +123,6 @@ class _StudentListPageState extends State<StudentListPage> {
         }
       }
     }
-
 
     List<SessionModel> sessionList =await SessionHelper.instance.getSearchedSession(
         selectedSubjectId: selectedSubjectId
@@ -341,7 +341,12 @@ class _StudentListPageState extends State<StudentListPage> {
               icon: Icon(Icons.person_add_alt_1_rounded),
               onPressed: (){
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => AddStudent()));
+                    MaterialPageRoute(builder: (context) => AddStudent())).then((value){
+                  setState(() {
+                    _getStudentDetails();
+                    _initializeSearchFilters();
+                  });
+                });
               },
             ),
             IconButton(
