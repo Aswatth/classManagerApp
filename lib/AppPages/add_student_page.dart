@@ -29,11 +29,23 @@ class _AddStudentState extends State<AddStudent> {
   List<BoardModel> _boardList = [];
   String? _selectedBoard = null;
 
-  _getAllClass() async{
-    _classList = await ClassHelper.instance.getAllClass();
+  _getAllClass() {
+    setState(() {
+      ClassHelper.instance.getAllClass().then((value){
+        setState(() {
+          _classList = value;
+        });
+      });
+    });
   }
   _getAllBoard() async{
-    _boardList = await BoardHelper.instance.getAllBoard();
+    setState(() {
+      BoardHelper.instance.getAllBoard().then((value){
+        setState(() {
+          _boardList = value;
+        });
+      });
+    });
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -309,10 +321,8 @@ class _AddStudentState extends State<AddStudent> {
 
   @override
   void initState() {
-    setState(() {
-      _getAllClass();
-      _getAllBoard();
-    });
+    _getAllClass();
+    _getAllBoard();
   }
 
   @override

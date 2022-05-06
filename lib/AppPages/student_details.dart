@@ -30,6 +30,31 @@ class _StudentDetailsState extends State<StudentDetails> {
   late DateTime _dob;
   String _location = '';
 
+  List<ClassModel> _classList = [];
+  String? _selectedClass = null;
+
+  List<BoardModel> _boardList = [];
+  String? _selectedBoard = null;
+
+  _getAllClass() {
+    setState(() {
+      ClassHelper.instance.getAllClass().then((value){
+        setState(() {
+          _classList = value;
+        });
+      });
+    });
+  }
+  _getAllBoard() async{
+    setState(() {
+      BoardHelper.instance.getAllBoard().then((value){
+        setState(() {
+          _boardList = value;
+        });
+      });
+    });
+  }
+
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _dobController;
@@ -112,6 +137,70 @@ class _StudentDetailsState extends State<StudentDetails> {
           _schoolName = value!;
         });
       },
+    );
+  }
+  Widget classDropDown(){
+    return ListTile(
+        leading: Icon(Icons.book_rounded),
+        title: DropdownButtonFormField(
+          hint: Text("Select class"),
+          validator: (value){
+            if(value == null){
+              return 'Select class';
+            }else{
+              return null;
+            }
+          },
+          items: _classList.map<DropdownMenuItem<String>>((ClassModel classModel){
+            return DropdownMenuItem(
+              value: classModel.className,
+              child: Text(classModel.className),
+            );
+          }).toList(),
+          value: _selectedClass,
+          onChanged: _isEditing?(_){
+            setState(() {
+              _selectedClass = _ as String?;
+            });
+          }:null,
+          onSaved: (_){
+            setState(() {
+              _selectedClass = _ as String?;
+            });
+          },
+        )
+    );
+  }
+  Widget boardDropDown(){
+    return ListTile(
+        leading: Icon(Icons.assignment_rounded),
+        title:DropdownButtonFormField(
+          hint: Text("Select board"),
+          validator: (value){
+            if(value == null){
+              return 'Select board';
+            }else{
+              return null;
+            }
+          },
+          items: _boardList.map<DropdownMenuItem<String>>((BoardModel boardModel){
+            return DropdownMenuItem(
+              value: boardModel.boardName,
+              child: Text(boardModel.boardName),
+            );
+          }).toList(),
+          value: _selectedBoard,
+          onChanged: _isEditing?(_){
+            setState(() {
+              _selectedBoard = _ as String?;
+            });
+          }:null,
+          onSaved: (_){
+            setState(() {
+              _selectedBoard = _ as String?;
+            });
+          },
+        )
     );
   }
   Widget studentPhoneNumberField() {
@@ -337,6 +426,11 @@ class _StudentDetailsState extends State<StudentDetails> {
     _parentPhnNum1Controller = TextEditingController(text: widget.completeStudentDetail.studentModel.parentPhoneNumber1);
     _parentPhnNum2Controller = TextEditingController(text: widget.completeStudentDetail.studentModel.parentPhoneNumber2);
     _locationController = TextEditingController(text: widget.completeStudentDetail.studentModel.location);
+
+    _getAllClass();
+    _selectedClass = widget.completeStudentDetail.studentModel.classData.className;
+    _getAllBoard();
+    _selectedBoard = widget.completeStudentDetail.studentModel.boardData.boardName;
   }
 
   @override
@@ -371,6 +465,8 @@ class _StudentDetailsState extends State<StudentDetails> {
                   nameField(),
                   dobField(),
                   schoolNameField(),
+                  classDropDown(),
+                  boardDropDown(),
                   studentPhoneNumberField(),
                   parentPhoneNumber1Field(),
                   parentPhoneNumber2Field(),
