@@ -105,14 +105,8 @@ class SubjectHelper{
   Future<List<SubjectModel>> getAllSubject() async {
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = await db.query(subjectTableName);
-    int dataCount = data.length;
 
-    List<SubjectModel> subjects = [];
-
-    for(int i = 0;i<dataCount;++i) {
-      subjects.add(SubjectModel.fromMap(data[i]));
-    }
-    return subjects;
+    return data.map((json) => SubjectModel.fromMap(json)).toList();
   }
 
 }

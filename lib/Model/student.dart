@@ -101,14 +101,8 @@ class StudentHelper{
   Future<List<StudentModel>> getAllStudent() async {
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = await db.query(studentTableName);
-    int dataCount = data.length;
 
-    List<StudentModel> students = [];
-
-    for(int i = 0;i<dataCount;++i) {
-      students.add(StudentModel.fromMap(data[i]));
-    }
-    return students;
+    return data.map((json) => StudentModel.fromMap(json)).toList();
   }
 }
 

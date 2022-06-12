@@ -110,15 +110,9 @@ class ClassHelper{
 
   Future<List<ClassModel>> getAllClass() async {
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(classTableName);
-    int dataCount = data.length;
+    List<Map<String, dynamic>> data = await db.query(classTableName);
 
-    List<ClassModel> classObjs = [];
-
-    for(int i = 0;i<dataCount;++i) {
-      classObjs.add(ClassModel.fromMap(data[i]));
-    }
-    return classObjs;
+    return data.map((json) => ClassModel.fromMap(json)).toList();
   }
 
 }

@@ -13,17 +13,43 @@ class _SubjectDetailsState extends State<SubjectDetails> {
   List<SubjectModel> subjectList = [];
 
   String subjectName = '';
-  Future<List<SubjectModel>> _initialize() async{
-    subjectList = await SubjectHelper.instance.getAllSubject();
-    setState(() {
 
-    });
-    return subjectList;
+  @override
+  void initState() {
+    super.initState();
+    _getSubjectDetails();
   }
-  void addSubject(String subjectName)
+
+  _getSubjectDetails() async{
+    subjectList = await SubjectHelper.instance.getAllSubject();
+
+    setState(() {
+    });
+  }
+  void addSubject()
   {
-    SubjectModel subject = SubjectModel.createNewSubject(subjectName: subjectName);
-    SubjectHelper.instance.insertSubject(subject);
+    Alert(
+        context: context,
+        content: TextField(
+          decoration: InputDecoration(
+            hintText: "Enter new subject",
+          ),
+          onChanged: (_){
+            subjectName = _;
+          },
+        ),
+        buttons: [
+          DialogButton(
+            onPressed: (){
+              SubjectModel subject = SubjectModel.createNewSubject(subjectName: subjectName);
+              SubjectHelper.instance.insertSubject(subject);
+            },
+            child: Text("Add subject"),
+          ),
+        ]
+    ).show().then((value) {
+      _getSubjectDetails();
+    });
   }
   void showPopUp(SubjectModel subject)
   {
@@ -50,19 +76,18 @@ class _SubjectDetailsState extends State<SubjectDetails> {
             SubjectHelper.instance.delete(subject);
           }),
         ]
-    ).show();
+    ).show().then((value) {
+      _getSubjectDetails();
+    });
   }
   @override
   Widget build(BuildContext context) {
-    _initialize();
     return MaterialApp(
         home: Scaffold(
-            floatingActionButton: TextButton(
+            floatingActionButton: FloatingActionButton(
                 child: Icon(Icons.add),
                 onPressed: (){
-                  setState(() {
-                    addSubject(subjectName);
-                  });
+                  addSubject();
                 }
             ),
             appBar: AppBar(
@@ -75,34 +100,18 @@ class _SubjectDetailsState extends State<SubjectDetails> {
             ),
             body: Column(
               children: [
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: "Enter new subject",
-                  ),
-                  onChanged: (_){
-                    subjectName = _;
-                  },
-                ),
                 Flexible(
-                  child: FutureBuilder<List<SubjectModel>>(
-                    future: _initialize(),
-                    builder: (context,snapshot){
-                      if(!snapshot.hasData) return CircularProgressIndicator();
-                      else{
-                        return ListView.builder(
-                          itemCount: subjectList.length,
-                          itemBuilder: (context,index){
-                            return ListTile(
-                              onLongPress: (){
-                                showPopUp(subjectList[index]);
-                              },
-                              title: Text(subjectList[index].subjectName),
-                            );
-                          },
-                        );
-                      }
+                  child: ListView.builder(
+                    itemCount: subjectList.length,
+                    itemBuilder: (context,index){
+                      return ListTile(
+                        onLongPress: (){
+                          showPopUp(subjectList[index]);
+                        },
+                        title: Text(subjectList[index].subjectName),
+                      );
                     },
-                  ),
+                  )
                 ),
               ],
             )

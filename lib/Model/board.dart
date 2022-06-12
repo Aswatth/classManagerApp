@@ -44,6 +44,7 @@ class BoardHelper{
       {
         print(board.boardName+" does not already exists");
         board.boardName = board.boardName.toUpperCase();
+
         //Insert
         db.insert(boardTableName, board.toMap());
       }
@@ -101,14 +102,8 @@ class BoardHelper{
   Future<List<BoardModel>> getAllBoard() async {
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = await db.query(boardTableName);
-    int dataCount = data.length;
 
-    List<BoardModel> boards = [];
-
-    for(int i = 0;i<dataCount;++i) {
-      boards.add(BoardModel.fromMap(data[i]));
-    }
-    return boards;
+    return data.map((json)=> BoardModel.fromMap(json)).toList();
   }
 }
 

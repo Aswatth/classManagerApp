@@ -13,20 +13,43 @@ class _ClassDetailsState extends State<ClassDetails> {
   List<ClassModel> classList = [];
 
   String className = '';
-  Future<List<ClassModel>> _initialize() async{
-    classList = await ClassHelper.instance.getAllClass();
-    setState(() {
 
+  @override
+  void initState() {
+    _getClassDetails();
+  }
+
+  _getClassDetails() async{
+    classList = await ClassHelper.instance.getAllClass();
+
+    setState(() {
     });
     return classList;
   }
-  void addClass(String className)
-  {
-    ClassModel classObj = ClassModel.createNewClass(className: className);
-    ClassHelper.instance.insertClass(classObj);
+  void addClass() {
+    Alert(
+      context: context,
+      content: TextField(
+        decoration: InputDecoration(
+          hintText: "Enter new class",
+        ),
+        onChanged: (_){
+          className = _;
+        },
+      ),
+      buttons: [
+        DialogButton(
+            child: Text("Add class"),
+            onPressed: (){
+              ClassModel classObj = ClassModel.createNewClass(className: className);
+              ClassHelper.instance.insertClass(classObj);
+        })
+      ]
+    ).show().then((value) {
+      _getClassDetails();
+    });
   }
-  void showPopUp(ClassModel classObj)
-  {
+  void showPopUp(ClassModel classObj) {
     String _newClassName = "";
     Alert(
         context: context,
@@ -50,21 +73,20 @@ class _ClassDetailsState extends State<ClassDetails> {
             ClassHelper.instance.delete(classObj);
           }),
         ]
-    ).show();
+    ).show().then((value) {
+      _getClassDetails();
+    });
   }
-  @override
-  void initState() {
-    _initialize();
-  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-            floatingActionButton: TextButton(
+            floatingActionButton: FloatingActionButton(
                 child: Icon(Icons.add),
                 onPressed: (){
                   setState(() {
-                    addClass(className);
+                    addClass();
                   });
                 }
             ),
@@ -78,34 +100,19 @@ class _ClassDetailsState extends State<ClassDetails> {
             ),
             body: Column(
               children: [
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: "Enter new class",
-                  ),
-                  onChanged: (_){
-                    className = _;
-                  },
-                ),
+
                 Flexible(
-                  child: FutureBuilder<List<ClassModel>>(
-                    future: _initialize(),
-                    builder: (context,snapshot){
-                      if(!snapshot.hasData) return CircularProgressIndicator();
-                      else{
-                        return ListView.builder(
-                          itemCount: classList.length,
-                          itemBuilder: (context,index){
-                            return ListTile(
-                              onLongPress: (){
-                                showPopUp(classList[index]);
-                              },
-                              title: Text(classList[index].className),
-                            );
-                          },
-                        );
-                      }
+                  child: ListView.builder(
+                    itemCount: classList.length,
+                    itemBuilder: (context,index){
+                      return ListTile(
+                        onLongPress: (){
+                          showPopUp(classList[index]);
+                        },
+                        title: Text(classList[index].className),
+                      );
                     },
-                  ),
+                  )
                 ),
               ],
             )

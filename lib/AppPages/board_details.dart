@@ -13,20 +13,45 @@ class _BoardDetailsState extends State<BoardDetails> {
   List<BoardModel> boardList = [];
 
   String boardName = '';
-  Future<List<BoardModel>> _initialize() async{
-    boardList = await BoardHelper.instance.getAllBoard();
-    /*setState(() {
 
-    });*/
-    return boardList;
+  @override
+  void initState() {
+    super.initState();
+    _getBoardDetails();
   }
-  void addBoard(String boardName)
-  {
-    BoardModel board = BoardModel.createNewBoard(boardName: boardName);
-    BoardHelper.instance.insertBoard(board);
+
+  _getBoardDetails() async{
+    boardList = await BoardHelper.instance.getAllBoard();
+
+    setState(() {
+
+    });
   }
-  void showPopUp(BoardModel board)
-  {
+  void addBoard()async {
+    Alert(
+      context: context,
+      content: TextField(
+        decoration: InputDecoration(
+          hintText: "Enter new board",
+        ),
+        onChanged: (_){
+          boardName = _;
+        },
+      ),
+      buttons: [
+        DialogButton(
+          onPressed: (){
+            BoardModel board = BoardModel.createNewBoard(boardName: boardName);
+            BoardHelper.instance.insertBoard(board);
+          },
+          child: Text("Add board"),
+        ),
+      ]
+    ).show().then((value) {
+      _getBoardDetails();
+    });
+  }
+  void showPopUp(BoardModel board) {
     String _newBoardName = "";
     Alert(
         context: context,
@@ -44,29 +69,26 @@ class _BoardDetailsState extends State<BoardDetails> {
           DialogButton(child: Text("Update"), onPressed: (){
             //Update with new boardName
             BoardHelper.instance.update(board, _newBoardName);
+            _getBoardDetails();
           }),
           DialogButton(child: Text("Delete"), onPressed: (){
             //Delete board (unless some student is part of this board)
             BoardHelper.instance.delete(board);
           }),
         ]
-    ).show();
+    ).show().then((value){
+      _getBoardDetails();
+    });
   }
-  @override
-  void initState() {
-    // TODO: implement initState
-    _initialize();
-  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-            floatingActionButton: TextButton(
+            floatingActionButton: FloatingActionButton(
                 child: Icon(Icons.add),
                 onPressed: (){
-                  setState(() {
-                    addBoard(boardName);
-                  });
+                  addBoard();
                 }
             ),
             appBar: AppBar(
@@ -79,34 +101,18 @@ class _BoardDetailsState extends State<BoardDetails> {
             ),
             body: Column(
               children: [
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: "Enter new board",
-                  ),
-                  onChanged: (_){
-                    boardName = _;
-                  },
-                ),
                 Flexible(
-                  child: FutureBuilder<List<BoardModel>>(
-                    future: _initialize(),
-                    builder: (context,snapshot){
-                      if(!snapshot.hasData) return CircularProgressIndicator();
-                      else{
-                        return ListView.builder(
-                          itemCount: boardList.length,
-                          itemBuilder: (context,index){
-                            return ListTile(
-                              onLongPress: (){
-                                showPopUp(boardList[index]);
-                              },
-                              title: Text(boardList[index].boardName),
-                            );
-                          },
-                        );
-                      }
+                  child: ListView.builder(
+                    itemCount: boardList.length,
+                    itemBuilder: (context,index){
+                      return ListTile(
+                        onLongPress: (){
+                          showPopUp(boardList[index]);
+                        },
+                        title: Text(boardList[index].boardName),
+                      );
                     },
-                  ),
+                  )
                 ),
               ],
             )
