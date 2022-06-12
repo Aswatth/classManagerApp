@@ -180,6 +180,6 @@ class StudentModel{
 
   @override
   String toString() {
-    return 'StudentModel{id: $id, studentPhoneNumber: $studentPhoneNumber, parentPhoneNumber1: $parentPhoneNumber1, parentPhoneNumber2: $parentPhoneNumber2, schoolName: $schoolName, name: $name, dob: $dob, classData: ${classData.toString()}, boardData: ${boardData.toString()}, location: $location}';
+    return 'StudentModel{id: $id, studentPhoneNumber: $studentPhoneNumber, parentPhoneNumber1: $parentPhoneNumber1, parentPhoneNumber2: $parentPhoneNumber2, schoolName: $schoolName, name: $name, dob: $dob, classData: ${json.encode(classData.toMap())}, boardData: ${json.encode(boardData.toMap())}, location: $location}';
   }
 }

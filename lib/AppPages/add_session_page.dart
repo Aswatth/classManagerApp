@@ -216,12 +216,8 @@ class _AddSessionState extends State<AddSession> {
         break;
       }
     }
-
-    setState(() {
-      SessionModel newSession = SessionModel(studentData: widget.student,subjectData: _selectedSubjectModel!,sessionSlot: _selectedSessionDays.toString(), startTime: _startTime,endTime: _endTime, fees: _fees);
-      SessionHelper.instance.insertSession(newSession);
-    });
-
+     SessionModel newSession = SessionModel(studentData: widget.student,subjectData: _selectedSubjectModel!,sessionSlot: _selectedSessionDays.toString(), startTime: _startTime,endTime: _endTime, fees: _fees);
+     SessionHelper.instance.insertSession(newSession);
   }
 
   @override
@@ -233,8 +229,6 @@ class _AddSessionState extends State<AddSession> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            /*classDropDown(),
-                  boardDropDown(),*/
             subjectDropDown(),
             sessionDaySelector(),
             startTimeField(),
@@ -244,12 +238,9 @@ class _AddSessionState extends State<AddSession> {
               alignment: Alignment.center,
               child: TextButton(
                 onPressed: (){
-                  setState(() {
-                    //Save
-                    if(_formKey.currentState!.validate()){
-                      _save();
-                    }
-                  });
+                  if(_formKey.currentState!.validate()){
+                    _save();
+                  }
                 },
                 child: Text("Save"),
               ),

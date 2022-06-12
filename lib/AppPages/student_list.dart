@@ -21,41 +21,26 @@ class _StudentListPageState extends State<StudentListPage> {
   @override
   void initState(){
     super.initState();
-    //_getStudentDetails();
+    _getStudentDetails();
     //_initializeSearchFilters();
   }
   bool _isSearching = false;
 
-/*
-  _getStudentDetails() async{
+  List<CompleteStudentDetail> _studentList = [];
+
+  _getStudentDetails()async {
     _studentList.clear();
-    List<StudentModel> tempStudentList =await StudentHelper.instance.getAllStudent();
-
-    for(int i=0;i<tempStudentList.length;++i){
-      List<ReadableSessionData> _sessionList = await _getSessionByStudentId(tempStudentList[i].id!);
-      setState(() {
-        _studentList.add(
-            CompleteStudentDetail(studentModel: tempStudentList[i], sessionList: _sessionList)
-        );
-      });
-
+    List<StudentModel> studentList = await StudentHelper.instance
+        .getAllStudent();
+    print("Student list: "+studentList.length.toString());
+    for (int i = 0; i < studentList.length; ++i) {
+      List<SessionModel> sessionList = await _getSession(studentList[i]);
+      _studentList.add(CompleteStudentDetail(studentList[i], sessionList));
     }
+
+    setState(() {
+    });
   }
-
-  Future<List<ReadableSessionData>> _getSessionByStudentId(int studentId)async{
-    List<SessionModel> sessionList =await SessionHelper.instance.getSession(studentId);
-    List<ReadableSessionData> readableSessionList = [];
-
-    if(sessionList.isEmpty){
-      return [];
-    }
-
-    for(int i=0;i<sessionList.length;++i){
-      readableSessionList.add(await convertToReadableFormat(sessionList[i]));
-    }
-    return readableSessionList;
-  }
-*/
 
   List<ClassModel> _classList = [];
   String _selectedClass = '';
@@ -73,8 +58,8 @@ class _StudentListPageState extends State<StudentListPage> {
       _subjectList = tempSubjectList;
       _boardList = tempBoardList;
     });
-  }
-  _getSearchedResults() async{
+  }*/
+  /*_getSearchedResults() async{
     _searchedStudentList.clear();
     print("$_selectedClass - $_selectedBoard - $_selectedSubject ");
 
@@ -132,20 +117,19 @@ class _StudentListPageState extends State<StudentListPage> {
 
       _searchedStudentList = _searchedStudentList.toSet().toList();
     });
-  }
+  }*/
 
+  Future<List<SessionModel>> _getSession(StudentModel student) async{
+      return await SessionHelper.instance.getSession(student);
+  }
   Widget studentDetailWidget(int index){
-    List<CompleteStudentDetail> dataList = !_isSearching?_studentList:_searchedStudentList;
-    StudentModel _studentModel = dataList[index].studentModel;
+    CompleteStudentDetail _completeStudentDetail = _studentList[index];
+    //print("Session Length "+sessionList.length.toString());
     return GestureDetector(
       onTap: (){
         Navigator.push(context,
-            MaterialPageRoute(builder: (context) => StudentDetails(
-              completeStudentDetail: dataList[index],
-            ))).then((value){
-          setState(() {
-            _getStudentDetails();
-          });
+            MaterialPageRoute(builder: (context) => StudentDetails(studentModel: _completeStudentDetail.studentModel,))).then((value){
+          _getStudentDetails();
         });
       },
       child: Padding(
@@ -160,25 +144,25 @@ class _StudentListPageState extends State<StudentListPage> {
             children: [
               ListTile(
                 leading: Icon(Icons.person_rounded),
-                title: Text(_studentModel.name),
-                trailing: Text(_studentModel.classData.className),
+                title: Text(_completeStudentDetail.studentModel.name),
+                trailing: Text(_completeStudentDetail.studentModel.classData.className),
               ),
               ListTile(
                 leading: Icon(Icons.cake_rounded),
-                title:  Text(DateFormat('dd-MMM-yyyy').format(_studentModel.dob).toString()),
-                trailing: Text(_studentModel.boardData.boardName),
+                title:  Text(DateFormat('dd-MMM-yyyy').format(_completeStudentDetail.studentModel.dob).toString()),
+                trailing: Text(_completeStudentDetail.studentModel.boardData.boardName),
               ),
               const Divider(color: Colors.black87,),
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: dataList[index].sessionList.length,
+                itemCount: _completeStudentDetail.sessionList.length,
                 itemBuilder: (context, sessionIndex){
-                  ReadableSessionData _sessionData = dataList[index].sessionList[sessionIndex];
+                  SessionModel _sessionData = _completeStudentDetail.sessionList[sessionIndex];
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ListTile(
-                      title: Text(_sessionData.subjectModel.subjectName),
+                      title: Text(_sessionData.subjectData.subjectName),
                       subtitle: Text(_sessionData.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
                       trailing: Text(_sessionData.startTime+" - "+_sessionData.endTime),
                     ),
@@ -191,7 +175,7 @@ class _StudentListPageState extends State<StudentListPage> {
       ),
     );
   }
-  Widget studentSearchWidget(){
+  /*Widget studentSearchWidget(){
     return Column(
       children: [
         Row(
@@ -320,34 +304,45 @@ class _StudentListPageState extends State<StudentListPage> {
               onPressed: (){
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => AddStudent())).then((value){
-                  setState(() {
-                    /*_getStudentDetails();
-                    _initializeSearchFilters();*/
-                  });
+                      setState(() {
+                        _getStudentDetails();
+                      });
                 });
               },
             ),
             IconButton(
               icon: !_isSearching?Icon(Icons.search_rounded):Icon(Icons.close_rounded),
               onPressed:  (){
-              setState(() {
+              /*setState(() {
                 _isSearching = !_isSearching;
                 if(_isSearching){
                   //_getSearchedResults();
                 }
-              });
+              });*/
               }
             )
           ],
         ),
-        body: Container()
-        /* !_isSearching?ListView.builder(
-        itemCount: _studentList.length,
-        itemBuilder: (context, index) {
-          return studentDetailWidget(index);
-        })
+        body: ListView.builder(
+          itemCount: _studentList.length,
+          itemBuilder: (context, index) {
+            return studentDetailWidget(index);
+          })
+        /* !_isSearching?
             :studentSearchWidget(),*/
       ),
     );
   }
 }
+class CompleteStudentDetail{
+  late StudentModel studentModel;
+  late List<SessionModel> sessionList;
+
+  CompleteStudentDetail(StudentModel _studentModel, List<SessionModel> _sessionList)
+  {
+    this.studentModel = _studentModel;
+    this.sessionList = _sessionList;
+  }
+}
+/*
+*/

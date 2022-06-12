@@ -30,6 +30,8 @@ class SessionHelper{
   void _initialize()async{
     String _createStudentTable ='''
     CREATE TABLE IF NOT EXISTS $sessionTableName(
+    $_studentData TEXT,
+    $_subjectData TEXT,
     $_sessionSlot VARCHAR(100),
     $_startTime VARCHAR(10),
     $_endTime VARCHAR(10),
@@ -92,7 +94,7 @@ class SessionHelper{
 
   Future<List<SessionModel>> getSession(StudentModel studentData)async{
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_studentData = ?',whereArgs: [studentData]);
+    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_studentData = ?',whereArgs: [json.encode(studentData.toMap())]);
     int dataCount = data.length;
 
     List<SessionModel> sessionList = [];
@@ -162,7 +164,7 @@ class SessionModel{
   Map<String,dynamic> toMap() {
     return {
       'studentData': json.encode(studentData.toMap()),
-      'subjectId': json.encode(subjectData.toMap()),
+      'subjectData': json.encode(subjectData.toMap()),
       'startTime': startTime,
       'sessionSlot':sessionSlot,
       'endTime': endTime,
@@ -171,7 +173,7 @@ class SessionModel{
   }
   factory SessionModel.fromMap(Map<String,dynamic> jsonString) => SessionModel(
       studentData: StudentModel.fromMap(json.decode(jsonString['studentData'])),
-      subjectData: SubjectModel.fromMap(json.decode(jsonString['subjectId'])),
+      subjectData: SubjectModel.fromMap(json.decode(jsonString['subjectData'])),
       startTime: jsonString['startTime'],
       endTime: jsonString['endTime'],
       sessionSlot: jsonString['sessionSlot'],
@@ -180,6 +182,6 @@ class SessionModel{
 
   @override
   String toString() {
-    return 'SessionModel{studentData: ${studentData.toString()}, subjectData: ${subjectData.toString()}, startTime: $startTime, endTime: $endTime, sessionSlot: $sessionSlot, fees: $fees}';
+    return 'SessionModel{studentData: ${json.encode(studentData.toMap())}, subjectData: ${json.encode(subjectData.toMap())}, startTime: $startTime, endTime: $endTime, sessionSlot: $sessionSlot, fees: $fees}';
   }
 }

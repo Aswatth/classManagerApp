@@ -22,7 +22,7 @@ class DatabaseHelper{
     _initDB();
   }
 
-  final _dbName = "temp25.db";
+  final _dbName = "temp28.db";
   final _version = 1;
 
   Future<Database> get database async{
@@ -37,6 +37,14 @@ class DatabaseHelper{
 
     return await openDatabase(path,version: _version,onCreate: _onCreate());
   }
+
+  dropDB()async{
+    Directory dbPath = await getApplicationDocumentsDirectory();
+    final path = join(dbPath.path,_dbName);
+    deleteDatabase(path);
+    _initDB();
+  }
+
   _onCreate()
   {
     //Initializing all table

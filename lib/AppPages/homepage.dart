@@ -1,5 +1,6 @@
 import 'package:class_manager/AppPages/class_details_page.dart';
 import 'package:class_manager/AppPages/student_list.dart';
+import 'package:class_manager/database_helper.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -44,7 +45,13 @@ class HomePage extends StatelessWidget {
           child: Card(
             child: Center(child: Text("Fees details"),),
           ),
-        ),)
+        ),),
+        // TEMP drop DB
+        Flexible(child:TextButton(
+          onPressed: (){
+            DatabaseHelper.instance.dropDB();
+          }, child: Text("Drop DB"),
+        ))
       ],
     );
   }

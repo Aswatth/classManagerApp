@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:class_manager/AppPages/add_session_page.dart';
 import 'package:class_manager/Model/board.dart';
 import 'package:class_manager/Model/class.dart';
@@ -38,33 +40,23 @@ class _StudentDetailsState extends State<StudentDetails> {
   String? _selectedBoard = null;
 
   List<SessionModel> _sessionList = [];
-  SessionModel? _selectedSessionModel;
 
-  _getAllClass() {
+  _getAllClass() async {
+    _classList = await ClassHelper.instance.getAllClass();
     setState(() {
-      ClassHelper.instance.getAllClass().then((value){
-        setState(() {
-          _classList = value;
-        });
-      });
+
     });
   }
-  _getAllBoard() {
+  _getAllBoard() async{
+    _boardList = await BoardHelper.instance.getAllBoard();
     setState(() {
-      BoardHelper.instance.getAllBoard().then((value){
-        setState(() {
-          _boardList = value;
-        });
-      });
+
     });
   }
-  _getSession() {
+  _getSession() async{
+    _sessionList = await SessionHelper.instance.getSession(widget.studentModel);
     setState(() {
-      SessionHelper.instance.getSession(widget.studentModel).then((value){
-        setState(() {
-          _sessionList = value;
-        });
-      });
+
     });
   }
 
@@ -345,9 +337,11 @@ class _StudentDetailsState extends State<StudentDetails> {
     _student.classData = _selectedClassModel;
     _student.boardData = _selectedBoardModel;
 
+    StudentHelper.instance.update(_student);
+    widget.studentModel = _student;
+
     setState(() {
-      StudentHelper.instance.update(_student);
-      widget.studentModel = _student;
+
     });
   }
 
@@ -359,15 +353,8 @@ class _StudentDetailsState extends State<StudentDetails> {
           Divider(color: Colors.black87,),
           ListTile(
             onTap: (){
-              /*Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>
-                      AddSession(studentId: widget.completeStudentDetail.studentModel.id!,studentName: widget.completeStudentDetail.studentModel.name)))
-              .then((value){
-                setState(() {
-                  _getSession();
-                });
-              });*/
-              //sessionPopUp();
+              sessionPopUp();
+              _getSession();
             },
             leading: Icon(Icons.more_time_rounded),
             title: Text("Add session"),
@@ -408,7 +395,7 @@ class _StudentDetailsState extends State<StudentDetails> {
                         },
                         onLongPress: (){
                           setState(() {
-                            //_showSessionDeletionPopup(widget.completeStudentDetail.studentModel.id!, _sessionData);
+                            _showSessionDeletionPopup(_sessionData);
                           });
                         },
                         title: Text(_sessionData.subjectData.subjectName),
@@ -426,27 +413,19 @@ class _StudentDetailsState extends State<StudentDetails> {
     );
   }
 
- /* void sessionPopUp([ReadableSessionData? sessionData]){
+  void sessionPopUp([SessionModel? sessionData]){
     Alert(
       context: context,
-      content: _isEditing?AddSession(studentModel: widget.completeStudentDetail.studentModel,)
-          :AddSession(studentModel: widget.student),
-    ).show().then((value){
+      content: AddSession(student: widget.studentModel),
+      style: AlertStyle(
+        isButtonVisible: false
+      )
+    ).show().then((value) {
       _getSession();
     });
   }
 
-  _getSession()async{
-    List<SessionModel> sessionList = await SessionHelper.instance.getSession(widget.completeStudentDetail.studentModel);
-
-    setState(() {
-      widget.completeStudentDetail.sessionList = readableSessionList;
-    });
-  }*/
-
-  /*void _showSessionDeletionPopup(int studentId, ReadableSessionData sessionData) {
-    int subjectId = sessionData.subjectModel.id==null?-1:sessionData.subjectModel.id!;
-    print("DELETING: $studentId, $subjectId");
+  void _showSessionDeletionPopup(SessionModel sessionModel) {
     Alert(
         context:context,
         content: Text("Are you sure you want to delete this session?"),
@@ -461,7 +440,7 @@ class _StudentDetailsState extends State<StudentDetails> {
             child: Text("Yes"),
             onPressed: (){
               //Delete session
-              SessionHelper.instance.delete(studentId, subjectId);
+              SessionHelper.instance.delete(widget.studentModel, sessionModel.subjectData);
               setState(() {
                 _getSession();
                 Navigator.pop(context);
@@ -471,7 +450,7 @@ class _StudentDetailsState extends State<StudentDetails> {
         ]
     ).show();
   }
-*/
+
   @override
   void initState() {
     _nameController = TextEditingController(text: widget.studentModel.name);
@@ -486,6 +465,7 @@ class _StudentDetailsState extends State<StudentDetails> {
     _selectedClass = widget.studentModel.classData.className;
     _getAllBoard();
     _selectedBoard = widget.studentModel.boardData.boardName;
+    _getSession();
   }
 
   @override
