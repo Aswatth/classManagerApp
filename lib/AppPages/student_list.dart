@@ -3,9 +3,7 @@ import 'package:class_manager/AppPages/add_student_page.dart';
 import 'package:class_manager/AppPages/student_details.dart';
 import 'package:class_manager/Model/board.dart';
 import 'package:class_manager/Model/class.dart';
-import 'package:class_manager/Model/complete_student_detail.dart';
 import 'package:class_manager/Model/session.dart';
-import 'package:class_manager/Model/readable_session_data.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:class_manager/Model/subject.dart';
 import 'package:flutter/material.dart';
@@ -23,14 +21,12 @@ class _StudentListPageState extends State<StudentListPage> {
   @override
   void initState(){
     super.initState();
-    _getStudentDetails();
-    _initializeSearchFilters();
+    //_getStudentDetails();
+    //_initializeSearchFilters();
   }
-
-  List<CompleteStudentDetail> _studentList = [];
-  List<CompleteStudentDetail> _searchedStudentList = [];
   bool _isSearching = false;
 
+/*
   _getStudentDetails() async{
     _studentList.clear();
     List<StudentModel> tempStudentList =await StudentHelper.instance.getAllStudent();
@@ -46,16 +42,6 @@ class _StudentListPageState extends State<StudentListPage> {
     }
   }
 
-  Future<ReadableSessionData> convertToReadableFormat(SessionModel sessionModel)async{
-    SubjectModel? subjectModel = await SubjectHelper.instance.getSubject(sessionModel.subjectId);
-
-    return ReadableSessionData(
-      subjectModel: subjectModel!,
-      sessionSlot: sessionModel.sessionSlot,
-      startTime: sessionModel.startTime,
-      endTime: sessionModel.endTime,
-    );
-  }
   Future<List<ReadableSessionData>> _getSessionByStudentId(int studentId)async{
     List<SessionModel> sessionList =await SessionHelper.instance.getSession(studentId);
     List<ReadableSessionData> readableSessionList = [];
@@ -69,6 +55,7 @@ class _StudentListPageState extends State<StudentListPage> {
     }
     return readableSessionList;
   }
+*/
 
   List<ClassModel> _classList = [];
   String _selectedClass = '';
@@ -77,7 +64,7 @@ class _StudentListPageState extends State<StudentListPage> {
   List<BoardModel> _boardList = [];
   String _selectedBoard = '';
 
-  _initializeSearchFilters()async{
+  /*_initializeSearchFilters()async{
     var tempClassList = await ClassHelper.instance.getAllClass();
     var tempSubjectList = await SubjectHelper.instance.getAllSubject();
     var tempBoardList = await BoardHelper.instance.getAllBoard();
@@ -314,7 +301,7 @@ class _StudentListPageState extends State<StudentListPage> {
         )
       ],
     );
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -334,8 +321,8 @@ class _StudentListPageState extends State<StudentListPage> {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => AddStudent())).then((value){
                   setState(() {
-                    _getStudentDetails();
-                    _initializeSearchFilters();
+                    /*_getStudentDetails();
+                    _initializeSearchFilters();*/
                   });
                 });
               },
@@ -346,19 +333,20 @@ class _StudentListPageState extends State<StudentListPage> {
               setState(() {
                 _isSearching = !_isSearching;
                 if(_isSearching){
-                  _getSearchedResults();
+                  //_getSearchedResults();
                 }
               });
               }
             )
           ],
         ),
-        body: !_isSearching?ListView.builder(
+        body: Container()
+        /* !_isSearching?ListView.builder(
         itemCount: _studentList.length,
         itemBuilder: (context, index) {
           return studentDetailWidget(index);
         })
-            :studentSearchWidget(),
+            :studentSearchWidget(),*/
       ),
     );
   }

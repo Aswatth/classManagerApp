@@ -1,5 +1,4 @@
-import 'package:class_manager/Model/board.dart';
-import 'package:class_manager/Model/class.dart';
+import 'dart:convert';
 import 'package:class_manager/Model/student.dart';
 import 'package:class_manager/Model/subject.dart';
 import 'package:sqflite/sqflite.dart';
@@ -10,20 +9,12 @@ class SessionHelper{
   final String sessionTableName = 'SESSION';
 
   //Columns
-  final String _studentId = 'studentId';
-  final String _subjectId = 'subjectId';
+  final String _studentData = 'studentData';
+  final String _subjectData = 'subjectData';
   final String _sessionSlot = 'sessionSlot';
   final String _startTime = 'startTime';
   final String _endTime = 'endTime';
   final String _fees = 'fees';
-
-  //Student
-  final String _studentTableName = StudentHelper.instance.studentTableName;
-  final String _studentId_ref = StudentHelper.instance.id;
-
-  //Subject
-  final String _subjectTableName = SubjectHelper.instance.subjectTableName;
-  final String _subjectId_ref = SubjectHelper.instance.id;
 
   static final SessionHelper instance = SessionHelper._privateConstructor();
 
@@ -39,22 +30,15 @@ class SessionHelper{
   void _initialize()async{
     String _createStudentTable ='''
     CREATE TABLE IF NOT EXISTS $sessionTableName(
-    $_studentId INTEGER,
-    $_subjectId INTEGER,
     $_sessionSlot VARCHAR(100),
     $_startTime VARCHAR(10),
     $_endTime VARCHAR(10),
     $_fees FLOAT,
-    FOREIGN KEY($_studentId) REFERENCES $_studentTableName($_studentId_ref),
-    FOREIGN KEY($_subjectId) REFERENCES $_subjectTableName($_subjectId_ref),
-    PRIMARY KEY($_studentId,$_subjectId)
+    PRIMARY KEY($_studentData,$_subjectData)
     );
      ''';
 
     Database db = await DatabaseHelper.instance.database;
-
-    //Enabling foreign keys
-    await db.execute('PRAGMA foreign_keys = ON');
 
     db.execute(_createStudentTable);
   }
@@ -66,8 +50,8 @@ class SessionHelper{
     //Check if it already exists
     List<Map<String,dynamic>> data = await db.query(
         sessionTableName,
-        where: '$_studentId = ? and $_subjectId = ?',
-        whereArgs: [session.studentId,session.subjectId]);
+        where: '$_studentData = ? and $_subjectData = ?',
+        whereArgs: [json.encode(session.studentData.toMap()),json.encode(session.subjectData.toMap())]);
 
     if(data.isEmpty)
     {
@@ -87,28 +71,28 @@ class SessionHelper{
     //Check if session already exists
     List<Map<String,dynamic>> data = await db.query(
         sessionTableName,
-        where: '$_studentId = ?',
-        whereArgs: [session.studentId]);
+        where: '$_studentData = ?',
+        whereArgs: [session.studentData.toMap()]);
 
     if(data.isNotEmpty){
       db.update(sessionTableName, session.toMap(),
-          where: '$_studentId = ?',
-          whereArgs: [session.studentId]);
+          where: '$_studentData = ?',
+          whereArgs: [json.encode(session.studentData.toMap())]);
     }
   }
 
-  void delete(int studentId, int subjectId)async{
+  void delete(StudentModel studentData, SubjectModel subjectData)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
     await db.delete(
         sessionTableName,
-        where: '$_studentId = ? and $_subjectId = ?',
-        whereArgs: [studentId,subjectId]);
+        where: '$_studentData = ? and $_subjectData = ?',
+        whereArgs: [json.encode(studentData.toMap()),json.encode(subjectData.toMap())]);
   }
 
-  Future<List<SessionModel>> getSession(int studentId)async{
+  Future<List<SessionModel>> getSession(StudentModel studentData)async{
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_studentId = ?',whereArgs: [studentId]);
+    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_studentData = ?',whereArgs: [studentData]);
     int dataCount = data.length;
 
     List<SessionModel> sessionList = [];
@@ -118,20 +102,21 @@ class SessionHelper{
     }
     return sessionList;
   }
-  Future<List<SessionModel>> getSearchedSession({int selectedSubjectId = -1})async{
+  Future<List<SessionModel>> getSearchedSession({SubjectModel? selectedSubjectData})async{
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = [];
 
-    if(selectedSubjectId == -1){
+    if(selectedSubjectData == null){
       return getAllSession();
-    }else{
+    }
+    /*else{
       String query = "";
       List<int> queryParams = [];
-      query += "$_subjectId = ?";
-      queryParams.add(selectedSubjectId);
+      query += "$selectedSubjectData = ?";
+      queryParams.add(selectedSubjectData);
 
       data = await db.query(sessionTableName,where: query,whereArgs: queryParams);
-    }
+    }*/
 
     int dataCount = data.length;
 
@@ -158,16 +143,16 @@ class SessionHelper{
 }
 
 class SessionModel{
-  int studentId;
-  int subjectId;
+  StudentModel studentData;
+  SubjectModel subjectData;
   String startTime;
   String endTime;
   String sessionSlot;
   double fees;
 
   SessionModel({
-    required this.studentId,
-    required this.subjectId,
+    required this.studentData,
+    required this.subjectData,
     required this.startTime,
     required this.endTime,
     required this.sessionSlot,
@@ -176,22 +161,25 @@ class SessionModel{
 
   Map<String,dynamic> toMap() {
     return {
-      'studentId': studentId,
-      'subjectId': subjectId,
+      'studentData': json.encode(studentData.toMap()),
+      'subjectId': json.encode(subjectData.toMap()),
       'startTime': startTime,
       'sessionSlot':sessionSlot,
       'endTime': endTime,
       'fees': fees.toString()
     };
   }
-  factory SessionModel.fromMap(Map<String,dynamic> json) => SessionModel(
-      studentId: json['studentId'],
-      subjectId: json['subjectId'],
-      startTime: json['startTime'],
-      endTime: json['endTime'],
-      sessionSlot: json['sessionSlot'],
-      fees:  json['fees']
+  factory SessionModel.fromMap(Map<String,dynamic> jsonString) => SessionModel(
+      studentData: StudentModel.fromMap(json.decode(jsonString['studentData'])),
+      subjectData: SubjectModel.fromMap(json.decode(jsonString['subjectId'])),
+      startTime: jsonString['startTime'],
+      endTime: jsonString['endTime'],
+      sessionSlot: jsonString['sessionSlot'],
+      fees:  jsonString['fees']
   );
 
-
+  @override
+  String toString() {
+    return 'SessionModel{studentData: ${studentData.toString()}, subjectData: ${subjectData.toString()}, startTime: $startTime, endTime: $endTime, sessionSlot: $sessionSlot, fees: $fees}';
+  }
 }

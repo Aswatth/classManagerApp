@@ -1,8 +1,6 @@
 import 'package:class_manager/AppPages/add_session_page.dart';
 import 'package:class_manager/Model/board.dart';
 import 'package:class_manager/Model/class.dart';
-import 'package:class_manager/Model/complete_student_detail.dart';
-import 'package:class_manager/Model/readable_session_data.dart';
 import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:class_manager/Model/subject.dart';
@@ -15,8 +13,8 @@ import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class StudentDetails extends StatefulWidget {
-  final CompleteStudentDetail completeStudentDetail;
-  const StudentDetails({Key? key,required this.completeStudentDetail}) : super(key: key);
+  StudentModel studentModel;
+  StudentDetails({Key? key,required this.studentModel}) : super(key: key);
 
   @override
   _StudentDetailsState createState() => _StudentDetailsState();
@@ -39,6 +37,9 @@ class _StudentDetailsState extends State<StudentDetails> {
   List<BoardModel> _boardList = [];
   String? _selectedBoard = null;
 
+  List<SessionModel> _sessionList = [];
+  SessionModel? _selectedSessionModel;
+
   _getAllClass() {
     setState(() {
       ClassHelper.instance.getAllClass().then((value){
@@ -48,11 +49,20 @@ class _StudentDetailsState extends State<StudentDetails> {
       });
     });
   }
-  _getAllBoard() async{
+  _getAllBoard() {
     setState(() {
       BoardHelper.instance.getAllBoard().then((value){
         setState(() {
           _boardList = value;
+        });
+      });
+    });
+  }
+  _getSession() {
+    setState(() {
+      SessionHelper.instance.getSession(widget.studentModel).then((value){
+        setState(() {
+          _sessionList = value;
         });
       });
     });
@@ -323,21 +333,21 @@ class _StudentDetailsState extends State<StudentDetails> {
       }
     }
 
-    StudentModel student = widget.completeStudentDetail.studentModel;
+    StudentModel _student = widget.studentModel;
 
-    student.studentPhoneNumber = _studentPhoneNumber;
-    student.parentPhoneNumber1 = _parentPhoneNumber1;
-    student.parentPhoneNumber2 = _parentPhoneNumber2;
-    student.name = _name;
-    student.schoolName = _schoolName;
-    student.dob = _dob;
-    student.location = _location;
-    student.classData = _selectedClassModel;
-    student.boardData = _selectedBoardModel;
+    _student.studentPhoneNumber = _studentPhoneNumber;
+    _student.parentPhoneNumber1 = _parentPhoneNumber1;
+    _student.parentPhoneNumber2 = _parentPhoneNumber2;
+    _student.name = _name;
+    _student.schoolName = _schoolName;
+    _student.dob = _dob;
+    _student.location = _location;
+    _student.classData = _selectedClassModel;
+    _student.boardData = _selectedBoardModel;
 
     setState(() {
-      StudentHelper.instance.update(student);
-      widget.completeStudentDetail.studentModel = student;
+      StudentHelper.instance.update(_student);
+      widget.studentModel = _student;
     });
   }
 
@@ -357,7 +367,7 @@ class _StudentDetailsState extends State<StudentDetails> {
                   _getSession();
                 });
               });*/
-              sessionPopUp();
+              //sessionPopUp();
             },
             leading: Icon(Icons.more_time_rounded),
             title: Text("Add session"),
@@ -372,7 +382,7 @@ class _StudentDetailsState extends State<StudentDetails> {
           ),
           ListTile(
             leading: Icon(Icons.delete_forever_rounded),
-            title: Text("Delete student"),
+            title: Text("Delete studentModel"),
           ),
           Divider(color: Colors.black87,),
           ListTile(
@@ -387,21 +397,21 @@ class _StudentDetailsState extends State<StudentDetails> {
                 ),
                 child: ListView.builder(
                   shrinkWrap: true,
-                  itemCount: widget.completeStudentDetail.sessionList.length,
+                  itemCount: _sessionList.length,
                   itemBuilder: (context, sessionIndex){
-                    ReadableSessionData _sessionData = widget.completeStudentDetail.sessionList[sessionIndex];
+                    SessionModel _sessionData = _sessionList[sessionIndex];
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ListTile(
                         onTap: (){
-                          sessionPopUp(_sessionData);
+                          //sessionPopUp(_sessionData);
                         },
                         onLongPress: (){
                           setState(() {
-                            _showSessionDeletionPopup(widget.completeStudentDetail.studentModel.id!, _sessionData);
+                            //_showSessionDeletionPopup(widget.completeStudentDetail.studentModel.id!, _sessionData);
                           });
                         },
-                        title: Text(_sessionData.subjectModel.subjectName),
+                        title: Text(_sessionData.subjectData.subjectName),
                         subtitle: Text(_sessionData.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
                         trailing: Text(_sessionData.startTime+" - "+_sessionData.endTime),
                       ),
@@ -416,40 +426,25 @@ class _StudentDetailsState extends State<StudentDetails> {
     );
   }
 
-  void sessionPopUp([ReadableSessionData? sessionData]){
+ /* void sessionPopUp([ReadableSessionData? sessionData]){
     Alert(
       context: context,
-      content: _isEditing?AddSession(studentId: widget.completeStudentDetail.studentModel.id!,sessionData: sessionData,)
-          :AddSession(studentId: widget.completeStudentDetail.studentModel.id!),
+      content: _isEditing?AddSession(studentModel: widget.completeStudentDetail.studentModel,)
+          :AddSession(studentModel: widget.student),
     ).show().then((value){
       _getSession();
     });
   }
 
-  Future<ReadableSessionData> convertToReadableFormat(SessionModel sessionModel)async{
-    SubjectModel? subjectModel = await SubjectHelper.instance.getSubject(sessionModel.subjectId);
-
-    return ReadableSessionData(
-      subjectModel: subjectModel!,
-      sessionSlot: sessionModel.sessionSlot,
-      startTime: sessionModel.startTime,
-      endTime: sessionModel.endTime,
-    );
-  }
   _getSession()async{
-    List<SessionModel> sessionList = await SessionHelper.instance.getSession(widget.completeStudentDetail.studentModel.id!);
+    List<SessionModel> sessionList = await SessionHelper.instance.getSession(widget.completeStudentDetail.studentModel);
 
-    List<ReadableSessionData> readableSessionList = [];
-
-    for(int i=0;i<sessionList.length;++i){
-      convertToReadableFormat(sessionList[i]).then((value) => readableSessionList.add(value));
-    }
     setState(() {
       widget.completeStudentDetail.sessionList = readableSessionList;
     });
-  }
+  }*/
 
-  void _showSessionDeletionPopup(int studentId, ReadableSessionData sessionData) {
+  /*void _showSessionDeletionPopup(int studentId, ReadableSessionData sessionData) {
     int subjectId = sessionData.subjectModel.id==null?-1:sessionData.subjectModel.id!;
     print("DELETING: $studentId, $subjectId");
     Alert(
@@ -476,21 +471,21 @@ class _StudentDetailsState extends State<StudentDetails> {
         ]
     ).show();
   }
-
+*/
   @override
   void initState() {
-    _nameController = TextEditingController(text: widget.completeStudentDetail.studentModel.name);
-    _dobController = TextEditingController(text: widget.completeStudentDetail.studentModel.dob.toString());
-    _schoolNameController = TextEditingController(text: widget.completeStudentDetail.studentModel.schoolName);
-    _studentPhnNumController = TextEditingController(text: widget.completeStudentDetail.studentModel.studentPhoneNumber);
-    _parentPhnNum1Controller = TextEditingController(text: widget.completeStudentDetail.studentModel.parentPhoneNumber1);
-    _parentPhnNum2Controller = TextEditingController(text: widget.completeStudentDetail.studentModel.parentPhoneNumber2);
-    _locationController = TextEditingController(text: widget.completeStudentDetail.studentModel.location);
+    _nameController = TextEditingController(text: widget.studentModel.name);
+    _dobController = TextEditingController(text: widget.studentModel.dob.toString());
+    _schoolNameController = TextEditingController(text: widget.studentModel.schoolName);
+    _studentPhnNumController = TextEditingController(text: widget.studentModel.studentPhoneNumber);
+    _parentPhnNum1Controller = TextEditingController(text: widget.studentModel.parentPhoneNumber1);
+    _parentPhnNum2Controller = TextEditingController(text: widget.studentModel.parentPhoneNumber2);
+    _locationController = TextEditingController(text: widget.studentModel.location);
 
     _getAllClass();
-    _selectedClass = widget.completeStudentDetail.studentModel.classData.className;
+    _selectedClass = widget.studentModel.classData.className;
     _getAllBoard();
-    _selectedBoard = widget.completeStudentDetail.studentModel.boardData.boardName;
+    _selectedBoard = widget.studentModel.boardData.boardName;
   }
 
   @override
@@ -539,7 +534,7 @@ class _StudentDetailsState extends State<StudentDetails> {
                           _save();
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: ListTile(
-                              title: Text("Saved student information"),
+                              title: Text("Saved studentModel information"),
                               trailing: Icon(Icons.done_outline_rounded),
                             ),
                           ));

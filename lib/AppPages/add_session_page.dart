@@ -1,7 +1,5 @@
-import 'package:class_manager/Model/board.dart';
-import 'package:class_manager/Model/class.dart';
-import 'package:class_manager/Model/readable_session_data.dart';
 import 'package:class_manager/Model/session.dart';
+import 'package:class_manager/Model/student.dart';
 import 'package:class_manager/Model/subject.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +7,9 @@ import 'package:intl/intl.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class AddSession extends StatefulWidget {
-  final int studentId;
-  ReadableSessionData? sessionData;
-  AddSession({Key? key,required this.studentId,ReadableSessionData? sessionData}) : super(key: key);
+  final StudentModel student;
+  //ReadableSessionData? sessionData;
+  AddSession({Key? key,required this.student}) : super(key: key);
 
   @override
   _AddSessionState createState() => _AddSessionState();
@@ -23,7 +21,8 @@ class _AddSessionState extends State<AddSession> {
   final _multiSelectKey = GlobalKey<FormFieldState>();
 
   List<SubjectModel> _subjectList = [];
-  String? _selectedSubject = null;
+  String? _selectedSubject;
+  SubjectModel? _selectedSubjectModel;
 
   List<String> sessionDays = ["Weekday","Weekend","Mon","Tue","Wed","Thur","Fri","Sat","Sun"];
   List<String> _selectedSessionDays = [];
@@ -211,17 +210,15 @@ class _AddSessionState extends State<AddSession> {
   }
 
   _save(){
-    int _subjectId = -1;
-
-    for(int i =0;i<_subjectList.length;++i){
+     for(int i =0;i<_subjectList.length;++i){
       if(_subjectList[i].subjectName == _selectedSubject){
-        _subjectId = _subjectList[i].id!;
+        _selectedSubjectModel = _subjectList[i];
         break;
       }
     }
 
     setState(() {
-      SessionModel newSession = SessionModel(studentId: widget.studentId,subjectId: _subjectId,sessionSlot: _selectedSessionDays.toString(), startTime: _startTime,endTime: _endTime, fees: _fees);
+      SessionModel newSession = SessionModel(studentData: widget.student,subjectData: _selectedSubjectModel!,sessionSlot: _selectedSessionDays.toString(), startTime: _startTime,endTime: _endTime, fees: _fees);
       SessionHelper.instance.insertSession(newSession);
     });
 
