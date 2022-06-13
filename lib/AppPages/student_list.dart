@@ -22,20 +22,22 @@ class _StudentListPageState extends State<StudentListPage> {
   void initState(){
     super.initState();
     _getStudentDetails();
-    //_initializeSearchFilters();
+    _initializeSearchFilters();
   }
   bool _isSearching = false;
 
-  List<CompleteStudentDetail> _studentList = [];
+  List<CompleteStudentDetail> _completeStudentDataList = [];
+
+  List<CompleteStudentDetail> _searchedStudentList = [];
 
   _getStudentDetails()async {
-    _studentList.clear();
+    _completeStudentDataList.clear();
     List<StudentModel> studentList = await StudentHelper.instance
         .getAllStudent();
     print("Student list: "+studentList.length.toString());
     for (int i = 0; i < studentList.length; ++i) {
       List<SessionModel> sessionList = await _getSession(studentList[i]);
-      _studentList.add(CompleteStudentDetail(studentList[i], sessionList));
+      _completeStudentDataList.add(CompleteStudentDetail(studentList[i], sessionList));
     }
 
     setState(() {
@@ -49,82 +51,96 @@ class _StudentListPageState extends State<StudentListPage> {
   List<BoardModel> _boardList = [];
   String _selectedBoard = '';
 
-  /*_initializeSearchFilters()async{
-    var tempClassList = await ClassHelper.instance.getAllClass();
-    var tempSubjectList = await SubjectHelper.instance.getAllSubject();
-    var tempBoardList = await BoardHelper.instance.getAllBoard();
+  _initializeSearchFilters()async{
+    _classList = await ClassHelper.instance.getAllClass();
+    _subjectList = await SubjectHelper.instance.getAllSubject();
+    _boardList = await BoardHelper.instance.getAllBoard();
+
     setState(() {
-      _classList = tempClassList;
-      _subjectList = tempSubjectList;
-      _boardList = tempBoardList;
     });
-  }*/
-  /*_getSearchedResults() async{
+  }
+
+  _getSearchedResults() async{
     _searchedStudentList.clear();
-    print("$_selectedClass - $_selectedBoard - $_selectedSubject ");
+    print("Search filter: $_selectedClass - $_selectedBoard - $_selectedSubject ");
+
+    if(_selectedClass.isEmpty && _selectedSubject.isEmpty && _selectedBoard.isEmpty){
+      _searchedStudentList = List.from(_completeStudentDataList);
+    }
+    else if(_selectedBoard.isNotEmpty && _selectedClass.isNotEmpty){//When both BOARD and CLASS is selected
+      for(int i = 0; i < _completeStudentDataList.length; ++i) {
+        if(_completeStudentDataList[i].studentModel.classData.className == _selectedClass
+            && _completeStudentDataList[i].studentModel.boardData.boardName == _selectedBoard){
+          _searchedStudentList.add(_completeStudentDataList[i]);
+        }
+      }
+    }
+    else if(_selectedSubject.isNotEmpty && _selectedClass.isNotEmpty) {//When both SUBJECT and CLASS is selected
+      for(int i = 0; i < _completeStudentDataList.length; ++i){
+        for(int j=0; j < _completeStudentDataList[i].sessionList.length; ++j) {
+          if(_completeStudentDataList[i].sessionList[j].subjectData.subjectName == _selectedSubject
+              && _completeStudentDataList[i].studentModel.classData.className == _selectedClass){
+            _searchedStudentList.add(_completeStudentDataList[i]);
+            break;
+          }
+        }
+      }
+    }
+    else if(_selectedSubject.isNotEmpty && _selectedBoard.isNotEmpty) {//When both SUBJECT and BOARD is selected
+      for(int i = 0; i < _completeStudentDataList.length; ++i){
+        for(int j=0; j < _completeStudentDataList[i].sessionList.length; ++j) {
+          if(_completeStudentDataList[i].sessionList[j].subjectData.subjectName == _selectedSubject
+              && _completeStudentDataList[i].studentModel.boardData.boardName == _selectedBoard){
+            _searchedStudentList.add(_completeStudentDataList[i]);
+            break;
+          }
+        }
+      }
+    }
+    else if(_selectedSubject.isNotEmpty && _selectedBoard.isNotEmpty && _selectedClass.isNotEmpty){//When all three are selected
+      for(int i = 0; i < _completeStudentDataList.length; ++i){
+        for(int j=0; j < _completeStudentDataList[i].sessionList.length; ++j) {
+          if(_completeStudentDataList[i].sessionList[j].subjectData.subjectName == _selectedSubject
+              && _completeStudentDataList[i].studentModel.boardData.boardName == _selectedBoard
+              && _completeStudentDataList[i].studentModel.classData.className == _selectedClass){
+            _searchedStudentList.add(_completeStudentDataList[i]);
+            break;
+          }
+        }
+      }
+    }
+    else{
+      for(int i = 0; i < _completeStudentDataList.length; ++i) {
+        if(_selectedClass.isNotEmpty && _completeStudentDataList[i].studentModel.classData.className == _selectedClass){
+          _searchedStudentList.add(_completeStudentDataList[i]);
+        }
+        else if(_selectedBoard.isNotEmpty && _completeStudentDataList[i].studentModel.boardData.boardName == _selectedBoard){
+          print(_completeStudentDataList[i].studentModel.toString());
+          _searchedStudentList.add(_completeStudentDataList[i]);
+        }
+        else if(_selectedSubject.isNotEmpty){
+          for(int j=0; j < _completeStudentDataList[i].sessionList.length; ++j) {
+            if(_completeStudentDataList[i].sessionList[j].subjectData.subjectName == _selectedSubject){
+              _searchedStudentList.add(_completeStudentDataList[i]);
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    _searchedStudentList = _searchedStudentList.toSet().toList();
 
     setState(() {
-      if(_selectedClass.isNotEmpty && _selectedBoard.isNotEmpty) {
-        for (var element in _studentList) {
-          if (element.studentModel.classData.className == _selectedClass &&
-              element.studentModel.boardData.boardName == _selectedBoard) {
-            _searchedStudentList.add(element);
-          }
-        }
-      }
-      else{
-        if (_selectedClass.isNotEmpty){
-          for(var element in _studentList) {
-            if (element.studentModel.classData.className == _selectedClass) {
-              _searchedStudentList.add(element);
-            }
-          }
-        }
-        if (_selectedBoard.isNotEmpty){
-          for(var element in _studentList) {
-            if (element.studentModel.boardData.boardName == _selectedBoard) {
-              _searchedStudentList.add(element);
-            }
-          }
-        }
-      }
-      if(_selectedSubject.isNotEmpty){
-        if (_selectedClass.isNotEmpty || _selectedBoard.isNotEmpty){
-          List<CompleteStudentDetail> temp = [];
-          for(var element in _searchedStudentList){
-            for(var session in element.sessionList){
-              if(session.subjectModel.subjectName == _selectedSubject){
-                temp.add(element);
-              }
-            }
-          }
-          _searchedStudentList = temp;
-        }
-        else{
-          for(var element in _studentList){
-            for(var session in element.sessionList){
-              if(session.subjectModel.subjectName == _selectedSubject){
-                _searchedStudentList.add(element);
-              }
-            }
-          }
-        }
-      }
-
-      if(_selectedSubject.isEmpty && _selectedBoard.isEmpty && _selectedClass.isEmpty){
-        _searchedStudentList = _studentList;
-      }
-
-      _searchedStudentList = _searchedStudentList.toSet().toList();
     });
-  }*/
+  }
 
   Future<List<SessionModel>> _getSession(StudentModel student) async{
       return await SessionHelper.instance.getSession(student);
   }
-  Widget studentDetailWidget(int index){
-    CompleteStudentDetail _completeStudentDetail = _studentList[index];
-    //print("Session Length "+sessionList.length.toString());
+
+  Widget studentDetailWidget(CompleteStudentDetail _completeStudentDetail){
+
     return GestureDetector(
       onTap: (){
         Navigator.push(context,
@@ -175,7 +191,8 @@ class _StudentListPageState extends State<StudentListPage> {
       ),
     );
   }
-  /*Widget studentSearchWidget(){
+
+  Widget studentSearchWidget(){
     return Column(
       children: [
         Row(
@@ -259,7 +276,7 @@ class _StudentListPageState extends State<StudentListPage> {
                     _selectedClass = '';
                     _selectedSubject = '';
                     _selectedBoard = '';
-                    _searchedStudentList.clear();
+                    _getSearchedResults();
                   });
                 },
                 child: Text(
@@ -276,7 +293,7 @@ class _StudentListPageState extends State<StudentListPage> {
           child: _searchedStudentList.isNotEmpty? ListView.builder(
               itemCount: _searchedStudentList.length,
               itemBuilder: (context, index) {
-                return studentDetailWidget(index);
+                return studentDetailWidget(_searchedStudentList[index]);
               }):Container(
             child: Center(
               child: Text("No records found"),
@@ -285,7 +302,7 @@ class _StudentListPageState extends State<StudentListPage> {
         )
       ],
     );
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -313,23 +330,22 @@ class _StudentListPageState extends State<StudentListPage> {
             IconButton(
               icon: !_isSearching?Icon(Icons.search_rounded):Icon(Icons.close_rounded),
               onPressed:  (){
-              /*setState(() {
+              setState(() {
                 _isSearching = !_isSearching;
                 if(_isSearching){
-                  //_getSearchedResults();
+                  _getSearchedResults();
                 }
-              });*/
+              });
               }
             )
           ],
         ),
-        body: ListView.builder(
-          itemCount: _studentList.length,
+        body:!_isSearching? ListView.builder(
+          itemCount: _completeStudentDataList.length,
           itemBuilder: (context, index) {
-            return studentDetailWidget(index);
+            return studentDetailWidget(_completeStudentDataList[index]);
           })
-        /* !_isSearching?
-            :studentSearchWidget(),*/
+            :studentSearchWidget(),
       ),
     );
   }
@@ -344,5 +360,3 @@ class CompleteStudentDetail{
     this.sessionList = _sessionList;
   }
 }
-/*
-*/

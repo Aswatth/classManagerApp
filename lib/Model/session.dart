@@ -105,14 +105,14 @@ class SessionHelper{
     if(selectedSubjectData == null){
       return getAllSession();
     }
-    /*else{
+    else{
       String query = "";
-      List<int> queryParams = [];
-      query += "$selectedSubjectData = ?";
-      queryParams.add(selectedSubjectData);
+      List<String> queryParams = [];
+      query += "$_subjectData = ?";
+      queryParams.add(json.encode(selectedSubjectData.toMap()));
 
       data = await db.query(sessionTableName,where: query,whereArgs: queryParams);
-    }*/
+    }
 
     int dataCount = data.length;
 
