@@ -353,7 +353,7 @@ class _StudentDetailsState extends State<StudentDetails> {
           Divider(color: Colors.black87,),
           ListTile(
             onTap: (){
-              sessionPopUp();
+              addSessionPopUp();
               _getSession();
             },
             leading: Icon(Icons.more_time_rounded),
@@ -391,7 +391,7 @@ class _StudentDetailsState extends State<StudentDetails> {
                       padding: const EdgeInsets.all(8.0),
                       child: ListTile(
                         onTap: (){
-                          //sessionPopUp(_sessionData);
+                          updateSessionPopUp(_sessionData);
                         },
                         onLongPress: (){
                           setState(() {
@@ -413,13 +413,25 @@ class _StudentDetailsState extends State<StudentDetails> {
     );
   }
 
-  void sessionPopUp([SessionModel? sessionData]){
+  void addSessionPopUp([SessionModel? sessionData]){
     Alert(
       context: context,
-      content: AddSession(student: widget.studentModel),
+      content: AddSession(student: widget.studentModel, isEditing: false, sessionData: null,),
       style: AlertStyle(
         isButtonVisible: false
       )
+    ).show().then((value) {
+      _getSession();
+    });
+  }
+
+  void updateSessionPopUp(SessionModel _sessionData) {
+    Alert(
+        context: context,
+        content: AddSession(student: widget.studentModel, isEditing: true, sessionData: _sessionData,),
+        style: AlertStyle(
+            isButtonVisible: false
+        )
     ).show().then((value) {
       _getSession();
     });

@@ -73,13 +73,13 @@ class SessionHelper{
     //Check if session already exists
     List<Map<String,dynamic>> data = await db.query(
         sessionTableName,
-        where: '$_studentData = ?',
-        whereArgs: [session.studentData.toMap()]);
+        where: '$_studentData = ? and $_subjectData = ?',
+        whereArgs: [json.encode(session.studentData.toMap()),json.encode(session.subjectData.toMap())]);
 
     if(data.isNotEmpty){
       db.update(sessionTableName, session.toMap(),
-          where: '$_studentData = ?',
-          whereArgs: [json.encode(session.studentData.toMap())]);
+          where: '$_studentData = ? and $_subjectData = ?',
+          whereArgs: [json.encode(session.studentData.toMap()),json.encode(session.subjectData.toMap())]);
     }
   }
 
@@ -98,6 +98,7 @@ class SessionHelper{
 
     return data.map((json) => SessionModel.fromMap(json)).toList();
   }
+
   Future<List<SessionModel>> getSearchedSession({SubjectModel? selectedSubjectData})async{
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = [];
