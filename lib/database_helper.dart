@@ -48,10 +48,10 @@ class DatabaseHelper{
   _onCreate()
   {
     //Initializing all table
-    StudentHelper.instance;
+    //StudentHelper.instance;
     ClassHelper.instance;
     BoardHelper.instance;
     SubjectHelper.instance;
-    SessionHelper.instance;
+    //SessionHelper.instance;
   }
 }

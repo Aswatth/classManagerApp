@@ -4,7 +4,6 @@ import 'package:sqflite/sqflite.dart';
 class BoardHelper{
   final String boardTableName = 'BOARD';
 
-  final String id = 'id';
   final String _boardName = 'boardName';
 
   static final BoardHelper instance = BoardHelper._privateConstructor();
@@ -15,8 +14,7 @@ class BoardHelper{
   void _initialize()async{
     String createBoardTable ='''
     CREATE TABLE IF NOT EXISTS $boardTableName(
-    $id INTEGER PRIMARY KEY AUTOINCREMENT,
-    $_boardName VARCHAR(20)
+    $_boardName TEXT PRIMARY KEY
     )
      ''';
 
@@ -33,7 +31,7 @@ class BoardHelper{
     return instance;
   }
 
-  void insertBoard(BoardModel board)async {
+  insertBoard(BoardModel board)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -42,18 +40,19 @@ class BoardHelper{
 
     if(data.isEmpty)
       {
-        print(board.boardName+" does not already exists");
         board.boardName = board.boardName.toUpperCase();
 
         //Insert
         db.insert(boardTableName, board.toMap());
+
+        print(board.boardName+" inserted successfully");
       }
     else{
       print(board.boardName+" already exists");
     }
   }
 
-  void update(BoardModel board,String newBoardName)async {
+  update(BoardModel board,String newBoardName)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -64,12 +63,14 @@ class BoardHelper{
       String oldBoardName = board.boardName;
       board.boardName = newBoardName.toUpperCase();
       db.update(boardTableName, board.toMap(),where: '$_boardName = ?',whereArgs: [oldBoardName]);
+
+      print(oldBoardName + " successfully updated to " + newBoardName);
     }else{
       print(newBoardName + " already exists");
     }
   }
 
-  void delete(BoardModel board)async{
+  delete(BoardModel board)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -78,21 +79,13 @@ class BoardHelper{
 
     if(data.isNotEmpty) {
       db.delete(boardTableName,where: '$_boardName = ?',whereArgs: [board.boardName.toUpperCase()]);
+      print(board.toString() + " successfully deleted");
     }
   }
 
-  Future<int?> getBoardId(String boardName) async{
+  Future<BoardModel?> getBoard(String boardName)async{
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = await db.query(boardTableName,where: '$_boardName = ?',whereArgs: [boardName]);
-    if(data.length == 1){
-      return BoardModel.fromMap(data[0]).id;
-    }
-    return -1;
-  }
-
-  Future<BoardModel?> getBoard(int boardId)async{
-    Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(boardTableName,where: '$id = ?',whereArgs: [boardId]);
     if(data.length == 1){
       return BoardModel.fromMap(data[0]);
     }
@@ -108,27 +101,24 @@ class BoardHelper{
 }
 
 class BoardModel{
-  final int? id;
   String boardName;
 
-  BoardModel.createNewBoard({this.id,required this.boardName});
+  BoardModel.createNewBoard({required this.boardName});
 
-  BoardModel({required this.id,required this.boardName});
+  BoardModel({required this.boardName});
 
   factory BoardModel.fromMap(Map<String,dynamic> json) => BoardModel(
-    id: json['id'],
     boardName:  json['boardName']
   );
 
   Map<String,dynamic> toMap(){
     return {
-      'id':id,
       'boardName':boardName
     };
   }
 
   @override
   String toString() {
-    return 'BoardModel{id: $id, boardName: $boardName}';
+    return 'BoardModel{boardName: $boardName}';
   }
 }

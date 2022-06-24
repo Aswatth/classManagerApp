@@ -4,7 +4,6 @@ import 'package:sqflite/sqflite.dart';
 class SubjectHelper{
   final String subjectTableName = 'SUBJECT';
 
-  final String id = 'id';
   final String _subjectName = 'subjectName';
 
   static final SubjectHelper instance = SubjectHelper._privateConstructor();
@@ -16,8 +15,7 @@ class SubjectHelper{
   void _initialize()async{
     String createSubjectTable ='''
     CREATE TABLE IF NOT EXISTS $subjectTableName(
-    $id INTEGER PRIMARY KEY AUTOINCREMENT,
-    $_subjectName VARCHAR(20)
+    $_subjectName TEXT PRIMARY KEY
     )
      ''';
 
@@ -37,7 +35,7 @@ class SubjectHelper{
     return instance;
   }
 
-  void insertSubject(SubjectModel subject)async {
+  insertSubject(SubjectModel subject)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -46,17 +44,17 @@ class SubjectHelper{
 
     if(data.isEmpty)
     {
-      print(subject.subjectName+" does not already exists");
       subject.subjectName = subject.subjectName.toUpperCase();
       //Insert
       db.insert(subjectTableName, subject.toMap());
+      print(subject.subjectName+" successfully inserted");
     }
     else{
       print(subject.subjectName+" already exists");
     }
   }
 
-  void update(SubjectModel subject,String newSubjectName)async {
+  update(SubjectModel subject,String newSubjectName)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -67,12 +65,14 @@ class SubjectHelper{
       String oldSubjectName = subject.subjectName;
       subject.subjectName = newSubjectName.toUpperCase();
       db.update(subjectTableName, subject.toMap(),where: '$_subjectName = ?',whereArgs: [oldSubjectName]);
+
+      print(oldSubjectName + " successfully updated to " + newSubjectName);
     }else{
       print(newSubjectName + " already exists");
     }
   }
 
-  void delete(SubjectModel subject)async{
+  delete(SubjectModel subject)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -81,21 +81,13 @@ class SubjectHelper{
 
     if(data.isNotEmpty) {
       db.delete(subjectTableName,where: '$_subjectName = ?',whereArgs: [subject.subjectName.toUpperCase()]);
+      print(subject.toString() + " successfully deleted");
     }
   }
 
-  Future<int?> getSubjectId(String subjectName)async{
+  Future<SubjectModel?> getSubject(String subjectName)async{
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = await db.query(subjectTableName,where: '$_subjectName = ?',whereArgs: [subjectName]);
-    if(data.length == 1){
-      return SubjectModel.fromMap(data[0]).id;
-    }
-    return -1;
-  }
-
-  Future<SubjectModel?> getSubject(int subjectId)async{
-    Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(subjectTableName,where: '$id = ?',whereArgs: [subjectId]);
     if(data.length == 1){
       return SubjectModel.fromMap(data[0]);
     }
@@ -111,27 +103,24 @@ class SubjectHelper{
 
 }
 class SubjectModel{
-  final int? id;
   String subjectName;
 
-  SubjectModel.createNewSubject({this.id, required this.subjectName});
+  SubjectModel.createNewSubject({required this.subjectName});
 
-  SubjectModel({required this.id,required this.subjectName});
+  SubjectModel({required this.subjectName});
 
   factory SubjectModel.fromMap(Map<String,dynamic> json) => SubjectModel(
-      id: json['id'],
       subjectName:  json['subjectName']
   );
 
   Map<String,dynamic> toMap(){
     return {
-      'id':id,
       'subjectName':subjectName
     };
   }
 
   @override
   String toString() {
-    return 'SubjectModel{id: $id, subjectName: $subjectName}';
+    return 'SubjectModel{subjectName: $subjectName}';
   }
 }

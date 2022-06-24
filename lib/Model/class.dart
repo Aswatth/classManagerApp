@@ -4,7 +4,6 @@ import 'package:sqflite/sqflite.dart';
 class ClassHelper{
   final String classTableName = 'CLASS';
 
-  final String id = 'id';
   final String _className = 'className';
 
   static final ClassHelper instance = ClassHelper._privateConstructor();
@@ -16,8 +15,7 @@ class ClassHelper{
   void _initialize()async{
     String createClassObjTable ='''
     CREATE TABLE IF NOT EXISTS $classTableName(
-    $id INTEGER PRIMARY KEY AUTOINCREMENT,
-    $_className VARCHAR(20)
+    $_className TEXT PRIMARY KEY
     )
      ''';
 
@@ -43,7 +41,7 @@ class ClassHelper{
     return instance;
   }
 
-  void insertClass(ClassModel classObj)async {
+  insertClass(ClassModel classObj)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -52,17 +50,17 @@ class ClassHelper{
 
     if(data.isEmpty)
     {
-      print(classObj.className+" does not already exists");
       classObj.className = classObj.className.toUpperCase();
       //Insert
       db.insert(classTableName, classObj.toMap());
+      print(classObj.className+" successfully inserted");
     }
     else{
       print(classObj.className+" already exists");
     }
   }
 
-  void update(ClassModel classObj,String newClassName)async {
+  update(ClassModel classObj,String newClassName)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -73,12 +71,15 @@ class ClassHelper{
       String oldClassName = classObj.className;
       classObj.className = newClassName.toUpperCase();
       db.update(classTableName, classObj.toMap(),where: '$_className = ?',whereArgs: [oldClassName]);
+
+      print(oldClassName + " successfully updated to " + newClassName);
+
     }else{
       print(newClassName + " already exists");
     }
   }
 
-  void delete(ClassModel classObj)async{
+  delete(ClassModel classObj)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -87,21 +88,13 @@ class ClassHelper{
 
     if(data.isNotEmpty) {
       db.delete(classTableName,where: '$_className = ?',whereArgs: [classObj.className.toUpperCase()]);
+      print(classObj.toString() + " successfully deleted");
     }
   }
 
-  Future<int?> getClassId(String className) async{
+  Future<ClassModel?> getClass(String className)async{
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = await db.query(classTableName,where: '$_className = ?',whereArgs: [className]);
-    if(data.length == 1){
-      return ClassModel.fromMap(data[0]).id;
-    }
-    return -1;
-  }
-
-  Future<ClassModel?> getClass(int classId)async{
-    Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$id = ?',whereArgs: [classId]);
     if(data.length == 1){
       return ClassModel.fromMap(data[0]);
     }
@@ -117,27 +110,24 @@ class ClassHelper{
 
 }
 class ClassModel{
-  final int? id;
   String className;
 
-  ClassModel.createNewClass({this.id, required this.className});
+  ClassModel.createNewClass({required this.className});
 
-  ClassModel({required this.id,required this.className});
+  ClassModel({required this.className});
 
   factory ClassModel.fromMap(Map<String,dynamic> json) => ClassModel(
-      id: json['id'],
       className:  json['className']
   );
 
   Map<String,dynamic> toMap(){
     return {
-      'id':id,
       'className':className
     };
   }
 
   @override
   String toString() {
-    return 'ClassModel{id: $id, className: $className}';
+    return 'ClassModel{className: $className}';
   }
 }
