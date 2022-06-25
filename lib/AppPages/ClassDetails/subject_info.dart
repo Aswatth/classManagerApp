@@ -199,31 +199,29 @@ class _SubjectInfoState extends State<SubjectInfo> {
           isEditing = List.filled(subjectList.length, false);
         }
       },
-      child: MaterialApp(
-          home: RefreshIndicator(
-            onRefresh: getSubjectList,
-            child: Scaffold(
-                appBar: AppBar(
-                  leading: BackButton(
-                    onPressed: (){
-                      Navigator.pop(context);
-                    },
-                  ),
-                  title: Text("Subject info"),
-                  actions: [
-                    !isAdding?IconButton(
-                      icon: Icon(Icons.add),
-                      onPressed: (){
-                        setState(() {
-                          isAdding = true;
-                        });
-                      },
-                    ):Container()
-                  ],
-                ),
-                body: subjectListWidget()
+      child: RefreshIndicator(
+        onRefresh: getSubjectList,
+        child: Scaffold(
+            appBar: AppBar(
+              leading: BackButton(
+                onPressed: (){
+                  Navigator.pop(context);
+                },
+              ),
+              title: Text("Subject info"),
+              actions: [
+                !isAdding?IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: (){
+                    setState(() {
+                      isAdding = true;
+                    });
+                  },
+                ):Container()
+              ],
             ),
-          )
+            body: subjectListWidget()
+        ),
       ),
     );
   }

@@ -370,72 +370,73 @@ class _StudentProfileState extends State<StudentProfile> {
 
   Widget studentDrawer() {
     return Drawer(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Divider(color: Colors.black87,),
-          ListTile(
-            onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => AddSession(student: widget.studentModel),)).then((value){
-                setState(() {
-                  getSession();
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Divider(color: Colors.black87,),
+            ListTile(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AddSession(student: widget.studentModel),)).then((value){
+                  setState(() {
+                    getSession();
+                  });
                 });
-              });
-            },
-            leading: Icon(Icons.more_time_rounded),
-            title: Text("Add session"),
-          ),
-          ListTile(
-            leading: Icon(Icons.query_stats_rounded),
-            title: Text("Performance"),
-          ),
-          ListTile(
-            leading: Icon(Icons.attach_money_rounded),
-            title: Text("Fees"),
-          ),
-          Divider(color: Colors.black87,),
-          ListTile(
-            title: Text("Session list"),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blueAccent),
-                ),
-                child: FutureBuilder<List<SessionModel>>(
-                  future: getSession(),
-                  builder: (context, snapshot){
-                    if(snapshot.hasData){
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index){
-                          SessionModel session = snapshot.data![index];
-                          return ListTile(
-                            title: Text(session.subjectName),
-                            subtitle: Text(session.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
-                            trailing: Text(session.startTime + " - " + session.endTime),
-                            onTap: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => EditSession(student: widget.studentModel,session: session),));
-                            },
-                            onLongPress: (){
-                              deleteSession(session.subjectName);
-                            },
-                          );
-                        },
-                      );
-                    }
-                    else{
-                      return Container();
-                    }
-                  },
-                )
-              ),
+              },
+              leading: Icon(Icons.more_time_rounded),
+              title: Text("Add session",),
             ),
-          )
-        ],
+            ListTile(
+              leading: Icon(Icons.query_stats_rounded),
+              title: Text("Performance"),
+            ),
+            Divider(color: Colors.black87,),
+            Center(child: Text("Session list",
+              style: TextStyle(
+                fontSize: 20,
+                fontStyle: FontStyle.italic
+            ),)),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.blueAccent),
+                  ),
+                  child: FutureBuilder<List<SessionModel>>(
+                    future: getSession(),
+                    builder: (context, snapshot){
+                      if(snapshot.hasData){
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index){
+                            SessionModel session = snapshot.data![index];
+                            return ListTile(
+                              title: Text(session.subjectName),
+                              subtitle: Text(session.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
+                              trailing: Text(session.startTime + " - " + session.endTime),
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => EditSession(student: widget.studentModel,session: session),));
+                              },
+                              onLongPress: (){
+                                deleteSession(session.subjectName);
+                              },
+                            );
+                          },
+                        );
+                      }
+                      else{
+                        return Container();
+                      }
+                    },
+                  )
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -490,59 +491,57 @@ class _StudentProfileState extends State<StudentProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        drawer: studentDrawer(),
-        floatingActionButton: !_isEditing?FloatingActionButton(
-          child: Icon(Icons.edit),
+    return Scaffold(
+      drawer: studentDrawer(),
+      floatingActionButton: !_isEditing?FloatingActionButton(
+        child: Icon(Icons.edit),
+        onPressed: (){
+          setState(() {
+            _isEditing = !_isEditing;
+          });
+        },
+      ):null,
+      appBar: AppBar(
+        leading: BackButton(
           onPressed: (){
-            setState(() {
-              _isEditing = !_isEditing;
-            });
+            Navigator.pop(context);
           },
-        ):null,
-        appBar: AppBar(
-          leading: BackButton(
-            onPressed: (){
-              Navigator.pop(context);
-            },
-          ),
-          title: Text(widget.studentModel.name+"'s Profile"),
         ),
-        body: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                nameField(),
-                dobField(),
-                schoolNameField(),
-                classDropDown(),
-                boardDropDown(),
-                studentPhoneNumberField(),
-                parentPhoneNumber1Field(),
-                parentPhoneNumber2Field(),
-                locationField(),
-                _isEditing?Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                    child: ElevatedButton(
-                      onPressed: (){
-                        setState(() {
-                          //Save
-                          if(_formKey.currentState!.validate()){
-                            _save();
-                          }
-                        });
-                      },
-                      child: Text("Save"),
-                    ),
+        title: Text(widget.studentModel.name+"'s Profile"),
+      ),
+      body: Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              nameField(),
+              dobField(),
+              schoolNameField(),
+              classDropDown(),
+              boardDropDown(),
+              studentPhoneNumberField(),
+              parentPhoneNumber1Field(),
+              parentPhoneNumber2Field(),
+              locationField(),
+              _isEditing?Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: (){
+                      setState(() {
+                        //Save
+                        if(_formKey.currentState!.validate()){
+                          _save();
+                        }
+                      });
+                    },
+                    child: Text("Save"),
                   ),
-                ):Container()
-              ],
-            ),
+                ),
+              ):Container()
+            ],
           ),
         ),
       ),

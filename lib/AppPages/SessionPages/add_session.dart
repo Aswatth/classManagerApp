@@ -41,58 +41,64 @@ class _AddSessionState extends State<AddSession> {
 
   //Session details
   Widget subjectDropDown(){
-    return DropdownButtonFormField(
-      hint: Text("Select subject"),
-      validator: (value){
-        if(value == null){
-          return 'Select subject';
-        }else{
-          return null;
-        }
-      },
-      items: _subjectList.map<DropdownMenuItem<String>>((SubjectModel subjectModel){
-        return DropdownMenuItem(
-          value: subjectModel.subjectName,
-          child: Text(subjectModel.subjectName),
-        );
-      }).toList(),
-      //value: _selectedSubject,
-      onChanged: (_){
-        setState(() {
-          _selectedSubject = _ as String;
-        });
-      },
-      onSaved: (_){
-        setState(() {
-          _selectedSubject = _ as String;
-        });
-      },
+    return ListTile(
+      leading: Icon(Icons.architecture),
+      title: DropdownButtonFormField(
+        hint: Text("Select subject"),
+        validator: (value){
+          if(value == null){
+            return 'Select subject';
+          }else{
+            return null;
+          }
+        },
+        items: _subjectList.map<DropdownMenuItem<String>>((SubjectModel subjectModel){
+          return DropdownMenuItem(
+            value: subjectModel.subjectName,
+            child: Text(subjectModel.subjectName),
+          );
+        }).toList(),
+        //value: _selectedSubject,
+        onChanged: (_){
+          setState(() {
+            _selectedSubject = _ as String;
+          });
+        },
+        onSaved: (_){
+          setState(() {
+            _selectedSubject = _ as String;
+          });
+        },
+      ),
     );
   }
 
   Widget sessionDaySelector(){
-    return MultiSelectDialogField(
-      initialValue: _selectedSessionDays,
-      key: _multiSelectKey,
-      buttonIcon: Icon(Icons.add),
-      listType: MultiSelectListType.CHIP,
-      buttonText: Text("Select day"),
-      title: Text("Pick session day(s)"),
-      items: sessionDays.map((e) => MultiSelectItem<String>(e,e)).toList(),
-      onSaved: (values){
-        _selectedSessionDays = values!.map((e) => e.toString()).toList();
-      },
-      onConfirm: (values){
-        setState(() {
-          _selectedSessionDays = values.map((e) => e.toString()).toList();
-        });
-        //print(_selectedSessionDays);
-      },
-      validator: (value){
-        if(value == null || value.isEmpty){
-          return "Required session day";
-        }return null;
-      },
+    return ListTile(
+      leading: Icon(Icons.today),
+      title: MultiSelectDialogField(
+        initialValue: _selectedSessionDays,
+        key: _multiSelectKey,
+        buttonIcon: Icon(Icons.add),
+        listType: MultiSelectListType.CHIP,
+        buttonText: Text("Select day"),
+        title: Text("Pick session day(s)"),
+        items: sessionDays.map((e) => MultiSelectItem<String>(e,e)).toList(),
+        onSaved: (values){
+          _selectedSessionDays = values!.map((e) => e.toString()).toList();
+        },
+        onConfirm: (values){
+          setState(() {
+            _selectedSessionDays = values.map((e) => e.toString()).toList();
+          });
+          //print(_selectedSessionDays);
+        },
+        validator: (value){
+          if(value == null || value.isEmpty){
+            return "Required session day";
+          }return null;
+        },
+      ),
     );
   }
 
@@ -205,48 +211,43 @@ class _AddSessionState extends State<AddSession> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      supportedLocales: [
-        Locale('en', 'US')
-      ],
-      home: Scaffold(
-        appBar: AppBar(
-          leading: BackButton(
-            onPressed: (){
-              Navigator.pop(context);
-            },
-          ),
-          title: Text("Add Session"),
+    return Scaffold(
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: (){
+            Navigator.pop(context);
+          },
         ),
-        body: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView(
-              children: [
-                subjectDropDown(),
-                sessionDaySelector(),
-                startTimeField(),
-                endTimeField(),
-                feesField(),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                    child: ElevatedButton(
-                      onPressed: (){
-                        setState(() {
-                          //Save
-                          if(_formKey.currentState!.validate()){
-                            _save();
-                          }
-                        });
-                      },
-                      child: Text("Save"),
-                    ),
+        title: Text("Add Session"),
+      ),
+      body: Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView(
+            children: [
+              subjectDropDown(),
+              sessionDaySelector(),
+              startTimeField(),
+              endTimeField(),
+              feesField(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: (){
+                      setState(() {
+                        //Save
+                        if(_formKey.currentState!.validate()){
+                          _save();
+                        }
+                      });
+                    },
+                    child: Text("Save"),
                   ),
-                )
-              ],
-            ),
+                ),
+              )
+            ],
           ),
         ),
       ),

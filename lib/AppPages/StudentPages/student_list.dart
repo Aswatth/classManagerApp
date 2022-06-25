@@ -120,11 +120,7 @@ class _StudentListState extends State<StudentList> {
         return GestureDetector(
             child: studentWidget(_studentList[index]),
             onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfile(studentModel: _studentList[index]),)).then((value){
-                setState(() {
-                  getAllStudent();
-                });
-              });
+              Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfile(studentModel: _studentList[index]),)).then((value) => getAllStudent());
             },
           onLongPress: (){
               setState(() {
@@ -145,35 +141,21 @@ class _StudentListState extends State<StudentList> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: RefreshIndicator(
-        onRefresh: getAllStudent,
-        child: Scaffold(
-          appBar: AppBar(
-            leading: BackButton(
+    return RefreshIndicator(
+      onRefresh: getAllStudent,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Student List"),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.person_add),
               onPressed: (){
-                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AddStudent(),)).then((value) => getAllStudent());
               },
-            ),
-            title: Text("Student List"),
-            actions: [
-              IconButton(
-                icon: Icon(Icons.search),
-                onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => StudentSearch(),));
-                },
-              )
-            ],
-          ),
-          floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.person_add),
-            onPressed: (){
-              //Add new student
-              Navigator.push(context, MaterialPageRoute(builder:(context) => AddStudent(),)).then((value) => getAllStudent());
-            },
-          ),
-          body: studentListWidget(),
+            )
+          ],
         ),
+        body: studentListWidget(),
       ),
     );
   }

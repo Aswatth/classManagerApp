@@ -198,30 +198,28 @@ class _ClassInfoState extends State<ClassInfo> {
           isEditing = List.filled(classList.length, false);
         }
       },
-      child: MaterialApp(
-        home: RefreshIndicator(
-          onRefresh: getClassList,
-          child: Scaffold(
-              appBar: AppBar(
-                leading: BackButton(
-                  onPressed: (){
-                    Navigator.pop(context);
-                  },
-                ),
-                title: Text("Class info"),
-                actions: [
-                  !isAdding?IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: (){
-                      setState(() {
-                        isAdding = true;
-                      });
-                    },
-                  ):Container()
-                ],
+      child: RefreshIndicator(
+        onRefresh: getClassList,
+        child: Scaffold(
+            appBar: AppBar(
+              leading: BackButton(
+                onPressed: (){
+                  Navigator.pop(context);
+                },
               ),
+              title: Text("Class info"),
+              actions: [
+                !isAdding?IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: (){
+                    setState(() {
+                      isAdding = true;
+                    });
+                  },
+                ):Container()
+              ],
+            ),
             body: classListWidget()
-          ),
         ),
       ),
     );

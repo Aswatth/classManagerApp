@@ -199,31 +199,29 @@ class _BoardInfoState extends State<BoardInfo> {
           isEditing = List.filled(boardList.length, false);
         }
       },
-      child: MaterialApp(
-          home: RefreshIndicator(
-            onRefresh: getBoardList,
-            child: Scaffold(
-                appBar: AppBar(
-                  leading: BackButton(
-                    onPressed: (){
-                      Navigator.pop(context);
-                    },
-                  ),
-                  title: Text("Board info"),
-                  actions: [
-                    !isAdding?IconButton(
-                      icon: Icon(Icons.add),
-                      onPressed: (){
-                        setState(() {
-                          isAdding = true;
-                        });
-                      },
-                    ):Container()
-                  ],
-                ),
-                body: boardListWidget()
+      child: RefreshIndicator(
+        onRefresh: getBoardList,
+        child: Scaffold(
+            appBar: AppBar(
+              leading: BackButton(
+                onPressed: (){
+                  Navigator.pop(context);
+                },
+              ),
+              title: Text("Board info"),
+              actions: [
+                !isAdding?IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: (){
+                    setState(() {
+                      isAdding = true;
+                    });
+                  },
+                ):Container()
+              ],
             ),
-          )
+            body: boardListWidget()
+        ),
       ),
     );
   }

@@ -372,53 +372,48 @@ class _AddStudentState extends State<AddStudent> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      supportedLocales: [
-        Locale('en', 'US')
-      ],
-      home: Scaffold(
-        appBar: AppBar(
-          leading: BackButton(
-            onPressed: (){
-              Navigator.pop(context);
-            },
-          ),
-          title: Text("Add student"),
+    return Scaffold(
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: (){
+            Navigator.pop(context);
+          },
         ),
-        body: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                nameField(),
-                dobField(),
-                schoolNameField(),
-                classDropDown(),
-                boardDropDown(),
-                studentPhoneNumberField(),
-                parentPhoneNumber1Field(),
-                parentPhoneNumber2Field(),
-                locationField(),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                    child: ElevatedButton(
-                      onPressed: (){
-                        setState(() {
-                          //Save
-                          if(_formKey.currentState!.validate()){
-                            _save();
-                          }
-                        });
-                      },
-                      child: Text("Save"),
-                    ),
+        title: Text("Add student"),
+      ),
+      body: Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              nameField(),
+              dobField(),
+              schoolNameField(),
+              classDropDown(),
+              boardDropDown(),
+              studentPhoneNumberField(),
+              parentPhoneNumber1Field(),
+              parentPhoneNumber2Field(),
+              locationField(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: (){
+                      setState(() {
+                        //Save
+                        if(_formKey.currentState!.validate()){
+                          _save();
+                        }
+                      });
+                    },
+                    child: Text("Save"),
                   ),
-                )
-              ],
-            ),
+                ),
+              )
+            ],
           ),
         ),
       ),

@@ -325,54 +325,52 @@ class _StudentSearchState extends State<StudentSearch> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: RefreshIndicator(
-        onRefresh: !isSearching?getAllStudent:getSearchedStudent,
-        child: Scaffold(
-          appBar: AppBar(
-            leading: BackButton(
+    return RefreshIndicator(
+      onRefresh: !isSearching?getAllStudent:getSearchedStudent,
+      child: Scaffold(
+        appBar: AppBar(
+          /*leading: BackButton(
               onPressed: (){
                 Navigator.pop(context);
               },
+            ),*/
+          title: Text("Search"),
+        ),
+        body: Column(
+          children: [
+            classDropDown(),
+            boardDropDown(),
+            subjectDropDown(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  child: Text("Search"),
+                  onPressed: (){
+                    setState(() {
+                      isSearching = true;
+                    });
+                    getSearchedStudent();
+                  },
+                ),
+                ElevatedButton(
+                  child: Text("Clear"),
+                  onPressed: (){
+                    setState(() {
+                      isSearching = false;
+
+                      _selectedBoardName = '';
+                      _selectedClassName = '';
+                      _selectedSubject = '';
+
+                      getAllStudent();
+                    });
+                  },
+                ),
+              ],
             ),
-            title: Text("Search"),
-          ),
-          body: Column(
-            children: [
-              classDropDown(),
-              boardDropDown(),
-              subjectDropDown(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    child: Text("Search"),
-                    onPressed: (){
-                      setState(() {
-                        isSearching = true;
-                      });
-                      getSearchedStudent();
-                    },
-                  ),
-                  ElevatedButton(
-                    child: Text("Clear"),
-                    onPressed: (){
-                      setState(() {
-                        isSearching = false;
-
-                        _selectedBoardName = '';
-                        _selectedClassName = '';
-                        _selectedSubject = '';
-
-                        getAllStudent();
-                      });
-                    },
-                  ),
-                ],
-              ),
-              Expanded(child: studentListWidget())
-            ],
-          ),
+            Expanded(child: studentListWidget())
+          ],
         ),
       ),
     );

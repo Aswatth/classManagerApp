@@ -11,6 +11,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        supportedLocales: [
+          Locale('en', 'US')
+        ],
       title: 'Class Manager',
       home: HomePage()
     );
