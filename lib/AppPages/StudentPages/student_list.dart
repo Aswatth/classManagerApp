@@ -1,4 +1,5 @@
 import 'package:class_manager/AppPages/StudentPages/student_profile.dart';
+import 'package:class_manager/AppPages/StudentPages/student_search.dart';
 import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:flutter/material.dart';
@@ -157,9 +158,9 @@ class _StudentListState extends State<StudentList> {
             title: Text("Student List"),
             actions: [
               IconButton(
-                icon: Icon(Icons.filter_list),
+                icon: Icon(Icons.search),
                 onPressed: (){
-                  //TODO: Filter student details
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => StudentSearch(),));
                 },
               )
             ],

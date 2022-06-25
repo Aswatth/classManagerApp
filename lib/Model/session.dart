@@ -103,7 +103,14 @@ class SessionHelper{
 
   Future<List<SessionModel>> getSession(int studentId, String subjectName)async{
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_colStudentId = ? and $_colSubjectName',whereArgs: [studentId,subjectName]);
+    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_colStudentId = ? and $_colSubjectName = ?',whereArgs: [studentId,subjectName]);
+
+    return data.map((json) => SessionModel.fromMap(json)).toList();
+  }
+
+  Future<List<SessionModel>> getSessionBySubject(String subjectName)async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_colSubjectName = ?',whereArgs: [subjectName]);
 
     return data.map((json) => SessionModel.fromMap(json)).toList();
   }
