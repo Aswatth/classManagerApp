@@ -351,6 +351,45 @@ class _StudentProfileState extends State<StudentProfile> {
     );
   }
 
+  Widget studentDrawer() {
+    return Drawer(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Divider(color: Colors.black87,),
+          ListTile(
+            onTap: (){
+            },
+            leading: Icon(Icons.more_time_rounded),
+            title: Text("Add session"),
+          ),
+          ListTile(
+            leading: Icon(Icons.query_stats_rounded),
+            title: Text("Performance"),
+          ),
+          ListTile(
+            leading: Icon(Icons.attach_money_rounded),
+            title: Text("Fees"),
+          ),
+          Divider(color: Colors.black87,),
+          ListTile(
+            title: Text("Session list"),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blueAccent),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   updateStudent()async{
     await StudentHelper.instance.update(widget.studentModel);
   }
@@ -402,6 +441,7 @@ class _StudentProfileState extends State<StudentProfile> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        drawer: studentDrawer(),
         floatingActionButton: !_isEditing?FloatingActionButton(
           child: Icon(Icons.edit),
           onPressed: (){

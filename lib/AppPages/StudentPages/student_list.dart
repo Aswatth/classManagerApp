@@ -2,6 +2,7 @@ import 'package:class_manager/AppPages/StudentPages/student_profile.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 import 'add_student.dart';
 
@@ -21,6 +22,34 @@ class _StudentListState extends State<StudentList> {
     setState(() {
       _studentList = temp;
     });
+  }
+
+  deleteStudent(StudentModel student)async{
+    await StudentHelper.instance.delete(student);
+
+    getAllStudent();
+  }
+
+  deleteConfirmation(StudentModel student){
+    Alert(
+      context: context,
+      content: Text("Are you sure you want to delete ${student.name}'s details"),
+      buttons: [
+        DialogButton(
+          child: Text("No"),
+          onPressed: (){
+            Navigator.pop(context);
+          },
+        ),
+        DialogButton(
+          child: Text("Yes"),
+          onPressed: (){
+            deleteStudent(student);
+            Navigator.pop(context);
+          },
+        )
+      ]
+    ).show();
   }
 
   Widget studentWidget(StudentModel student){
@@ -56,8 +85,17 @@ class _StudentListState extends State<StudentList> {
         return GestureDetector(
             child: studentWidget(_studentList[index]),
             onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfile(studentModel: _studentList[index]),)).then((value) => getAllStudent());
+              Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfile(studentModel: _studentList[index]),)).then((value){
+                setState(() {
+                  getAllStudent();
+                });
+              });
             },
+          onLongPress: (){
+              setState(() {
+                deleteConfirmation(_studentList[index]);
+              });
+          },
         );
       },
     );

@@ -81,7 +81,7 @@ class StudentHelper{
     }
   }
 
-  void delete(StudentModel student)async{
+  delete(StudentModel student)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
