@@ -9,12 +9,12 @@ class SessionHelper{
   final String sessionTableName = 'SESSION';
 
   //Columns
-  final String _studentData = 'studentData';
-  final String _subjectData = 'subjectData';
-  final String _sessionSlot = 'sessionSlot';
-  final String _startTime = 'startTime';
-  final String _endTime = 'endTime';
-  final String _fees = 'fees';
+  final String _colStudentId = 'studentId';
+  final String _colSubjectName = 'subjectName';
+  final String _colSessionSlot = 'sessionSlot';
+  final String _colStartTime = 'startTime';
+  final String _colEndTime = 'endTime';
+  final String _colFees = 'fees';
 
   static final SessionHelper instance = SessionHelper._privateConstructor();
 
@@ -30,13 +30,15 @@ class SessionHelper{
   void _initialize()async{
     String _createStudentTable ='''
     CREATE TABLE IF NOT EXISTS $sessionTableName(
-    $_studentData TEXT,
-    $_subjectData TEXT,
-    $_sessionSlot VARCHAR(100),
-    $_startTime VARCHAR(10),
-    $_endTime VARCHAR(10),
-    $_fees FLOAT,
-    PRIMARY KEY($_studentData,$_subjectData)
+    $_colStudentId INT,
+    $_colSubjectName VARCHAR,
+    $_colSessionSlot VARCHAR,
+    $_colStartTime VARCHAR,
+    $_colEndTime VARCHAR,
+    $_colFees FLOAT,
+    PRIMARY KEY($_colStudentId,$_colSubjectName),
+    FOREIGN KEY($_colStudentId) REFERENCES ${StudentHelper.instance.studentTableName}(${StudentHelper.instance.colId}) ON UPDATE CASCADE ON DELETE NO ACTION,
+    FOREIGN KEY($_colSubjectName) REFERENCES ${SubjectHelper.instance.subjectTableName}(${SubjectHelper.instance.colSubjectName}) ON UPDATE CASCADE ON DELETE NO ACTION        
     );
      ''';
 
@@ -45,84 +47,65 @@ class SessionHelper{
     db.execute(_createStudentTable);
   }
 
-  void insertSession(SessionModel session)async {
+  insert(SessionModel session)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
     //Check if it already exists
     List<Map<String,dynamic>> data = await db.query(
         sessionTableName,
-        where: '$_studentData = ? and $_subjectData = ?',
-        whereArgs: [json.encode(session.studentData.toMap()),json.encode(session.subjectData.toMap())]);
+        where: '$_colStudentId = ? and $_colSubjectName = ?',
+        whereArgs: [session.studentId,session.subjectName]);
 
     if(data.isEmpty)
     {
-      print(session.toString()+" does not already exists");
       //Insert
       db.insert(sessionTableName, session.toMap());
+      print(session.toString()+" inserted successfully");
     }
     else{
       print(session.toString()+" already exists");
     }
   }
 
-  void update(SessionModel session)async {
+  update(SessionModel oldSession, SessionModel newSession)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
     //Check if session already exists
     List<Map<String,dynamic>> data = await db.query(
         sessionTableName,
-        where: '$_studentData = ? and $_subjectData = ?',
-        whereArgs: [json.encode(session.studentData.toMap()),json.encode(session.subjectData.toMap())]);
+        where: '$_colStudentId = ? and $_colSubjectName = ?',
+        whereArgs: [oldSession.studentId,oldSession.subjectName]);
 
     if(data.isNotEmpty){
-      db.update(sessionTableName, session.toMap(),
-          where: '$_studentData = ? and $_subjectData = ?',
-          whereArgs: [json.encode(session.studentData.toMap()),json.encode(session.subjectData.toMap())]);
+      db.update(sessionTableName, newSession.toMap(),
+          where: '$_colStudentId = ? and $_colSubjectName = ?',
+          whereArgs: [oldSession.studentId,oldSession.subjectName]);
     }
   }
 
-  void delete(StudentModel studentData, SubjectModel subjectData)async{
+  delete(int studentId, String subjectName)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
     await db.delete(
         sessionTableName,
-        where: '$_studentData = ? and $_subjectData = ?',
-        whereArgs: [json.encode(studentData.toMap()),json.encode(subjectData.toMap())]);
+        where: '$_colStudentId = ? and $_colSubjectName = ?',
+        whereArgs: [studentId,subjectName]);
   }
 
-  Future<List<SessionModel>> getSession(StudentModel studentData)async{
+  Future<List<SessionModel>> getSessionByStudentId(int studentId)async{
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_studentData = ?',whereArgs: [json.encode(studentData.toMap())]);
+    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_colStudentId = ?',whereArgs: [studentId]);
 
     return data.map((json) => SessionModel.fromMap(json)).toList();
   }
 
-  Future<List<SessionModel>> getSearchedSession({SubjectModel? selectedSubjectData})async{
+  Future<List<SessionModel>> getSession(int studentId, String subjectName)async{
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = [];
+    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_colStudentId = ? and $_colSubjectName',whereArgs: [studentId,subjectName]);
 
-    if(selectedSubjectData == null){
-      return getAllSession();
-    }
-    else{
-      String query = "";
-      List<String> queryParams = [];
-      query += "$_subjectData = ?";
-      queryParams.add(json.encode(selectedSubjectData.toMap()));
-
-      data = await db.query(sessionTableName,where: query,whereArgs: queryParams);
-    }
-
-    int dataCount = data.length;
-
-    List<SessionModel> sessionList = [];
-
-    for(int i = 0;i<dataCount;++i) {
-      sessionList.add(SessionModel.fromMap(data[i]));
-    }
-    return sessionList;
+    return data.map((json) => SessionModel.fromMap(json)).toList();
   }
 
   Future<List<SessionModel>> getAllSession() async {
@@ -134,16 +117,25 @@ class SessionHelper{
 }
 
 class SessionModel{
-  StudentModel studentData;
-  SubjectModel subjectData;
+  int studentId;
+  String subjectName;
   String startTime;
   String endTime;
   String sessionSlot;
   double fees;
 
+  SessionModel.createNewSession({
+    required this.studentId,
+    required this.subjectName,
+    required this.startTime,
+    required this.endTime,
+    required this.sessionSlot,
+    required this.fees
+  });
+
   SessionModel({
-    required this.studentData,
-    required this.subjectData,
+    required this.studentId,
+    required this.subjectName,
     required this.startTime,
     required this.endTime,
     required this.sessionSlot,
@@ -152,8 +144,8 @@ class SessionModel{
 
   Map<String,dynamic> toMap() {
     return {
-      'studentData': json.encode(studentData.toMap()),
-      'subjectData': json.encode(subjectData.toMap()),
+      'studentId': studentId,
+      'subjectName': subjectName,
       'startTime': startTime,
       'sessionSlot':sessionSlot,
       'endTime': endTime,
@@ -161,8 +153,8 @@ class SessionModel{
     };
   }
   factory SessionModel.fromMap(Map<String,dynamic> jsonString) => SessionModel(
-      studentData: StudentModel.fromMap(json.decode(jsonString['studentData'])),
-      subjectData: SubjectModel.fromMap(json.decode(jsonString['subjectData'])),
+      studentId: jsonString['studentId'],
+      subjectName: jsonString['subjectName'],
       startTime: jsonString['startTime'],
       endTime: jsonString['endTime'],
       sessionSlot: jsonString['sessionSlot'],
@@ -171,6 +163,6 @@ class SessionModel{
 
   @override
   String toString() {
-    return 'SessionModel{studentData: ${json.encode(studentData.toMap())}, subjectData: ${json.encode(subjectData.toMap())}, startTime: $startTime, endTime: $endTime, sessionSlot: $sessionSlot, fees: $fees}';
+    return 'SessionModel{studentId: $studentId, subjectName: $subjectName, startTime: $startTime, endTime: $endTime, sessionSlot: $sessionSlot, fees: $fees}';
   }
 }

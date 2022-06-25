@@ -1,4 +1,5 @@
 import 'package:class_manager/AppPages/StudentPages/student_profile.dart';
+import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -16,12 +17,23 @@ class StudentList extends StatefulWidget {
 class _StudentListState extends State<StudentList> {
 
   List<StudentModel> _studentList = [];
-  
+
+  List<SessionModel> _sessionList = [];
+
   Future<void> getAllStudent()async{
     List<StudentModel> temp = await StudentHelper.instance.getAllStudent();
     setState(() {
       _studentList = temp;
     });
+  }
+
+  Future<List<SessionModel>> getSession(int studentId)async{
+    List<SessionModel> temp = await SessionHelper.instance.getSessionByStudentId(studentId);
+
+    return temp;
+    /*setState(() {
+      _sessionList = temp;
+    });*/
   }
 
   deleteStudent(StudentModel student)async{
@@ -71,7 +83,29 @@ class _StudentListState extends State<StudentList> {
               title: Text(DateFormat('dd-MMM-yyyy').format(student.dob).toString()),
               trailing: Text(student.boardName),
             ),
-            Divider(color: Colors.black87,)
+            Divider(color: Colors.black87,),
+            FutureBuilder<List<SessionModel>>(
+              future: getSession(student.id!),
+              builder: (context, snapshot){
+                if(snapshot.hasData){
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index){
+                      SessionModel session = snapshot.data![index];
+                      return ListTile(
+                        title: Text(session.subjectName),
+                        subtitle: Text(session.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
+                        trailing: Text(session.startTime + " - " + session.endTime),
+                      );
+                    },
+                  );
+                }
+                else{
+                  return Container();
+                }
+              },
+            )
           ],
         ),
       ),

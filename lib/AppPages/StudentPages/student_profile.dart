@@ -1,8 +1,12 @@
+import 'package:class_manager/AppPages/SessionPages/add_session.dart';
+import 'package:class_manager/AppPages/SessionPages/edit_session.dart';
 import 'package:class_manager/Model/board.dart';
 import 'package:class_manager/Model/class.dart';
+import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class StudentProfile extends StatefulWidget {
   StudentModel studentModel;
@@ -50,6 +54,15 @@ class _StudentProfileState extends State<StudentProfile> {
     setState(() {
       _boardList = temp;
     });
+  }
+
+  Future<List<SessionModel>>getSession()async{
+    List<SessionModel> temp = await SessionHelper.instance.getSessionByStudentId(widget.studentModel.id!);
+
+    setState(() {
+
+    });
+    return temp;
   }
 
   Widget nameField() {
@@ -351,6 +364,10 @@ class _StudentProfileState extends State<StudentProfile> {
     );
   }
 
+  deleteSession(String subjectName)async{
+    await SessionHelper.instance.delete(widget.studentModel.id!, subjectName);
+  }
+
   Widget studentDrawer() {
     return Drawer(
       child: Column(
@@ -359,6 +376,11 @@ class _StudentProfileState extends State<StudentProfile> {
           Divider(color: Colors.black87,),
           ListTile(
             onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context) => AddSession(student: widget.studentModel),)).then((value){
+                setState(() {
+                  getSession();
+                });
+              });
             },
             leading: Icon(Icons.more_time_rounded),
             title: Text("Add session"),
@@ -382,6 +404,34 @@ class _StudentProfileState extends State<StudentProfile> {
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.blueAccent),
                 ),
+                child: FutureBuilder<List<SessionModel>>(
+                  future: getSession(),
+                  builder: (context, snapshot){
+                    if(snapshot.hasData){
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index){
+                          SessionModel session = snapshot.data![index];
+                          return ListTile(
+                            title: Text(session.subjectName),
+                            subtitle: Text(session.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
+                            trailing: Text(session.startTime + " - " + session.endTime),
+                            onTap: (){
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => EditSession(student: widget.studentModel,session: session),));
+                            },
+                            onLongPress: (){
+                              deleteSession(session.subjectName);
+                            },
+                          );
+                        },
+                      );
+                    }
+                    else{
+                      return Container();
+                    }
+                  },
+                )
               ),
             ),
           )
@@ -425,6 +475,7 @@ class _StudentProfileState extends State<StudentProfile> {
     super.initState();
     getAllClass();
     getAllBoard();
+    getSession();
 
     _nameController.text = widget.studentModel.name;
     _dobController.text = widget.studentModel.dob.toString();
