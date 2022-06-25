@@ -4,7 +4,7 @@ import 'package:sqflite/sqflite.dart';
 class ClassHelper{
   final String classTableName = 'CLASS';
 
-  final String _className = 'className';
+  final String colClassName = 'className';
 
   static final ClassHelper instance = ClassHelper._privateConstructor();
 
@@ -15,7 +15,7 @@ class ClassHelper{
   void _initialize()async{
     String createClassObjTable ='''
     CREATE TABLE IF NOT EXISTS $classTableName(
-    $_className TEXT PRIMARY KEY
+    $colClassName TEXT PRIMARY KEY
     )
      ''';
 
@@ -46,13 +46,13 @@ class ClassHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if it already exists
-    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$_className = ?',whereArgs: [classObj.className.toUpperCase()]);
+    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$colClassName = ?',whereArgs: [classObj.className.toUpperCase()]);
 
     if(data.isEmpty)
     {
       classObj.className = classObj.className.toUpperCase();
       //Insert
-      db.insert(classTableName, classObj.toMap());
+      await db.insert(classTableName, classObj.toMap());
       print(classObj.className+" successfully inserted");
     }
     else{
@@ -65,13 +65,12 @@ class ClassHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if new className already exists
-    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$_className = ?',whereArgs: [newClassName.toUpperCase()]);
+    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$colClassName = ?',whereArgs: [newClassName.toUpperCase()]);
 
     if(data.isEmpty){
       String oldClassName = classObj.className;
       classObj.className = newClassName.toUpperCase();
-      db.update(classTableName, classObj.toMap(),where: '$_className = ?',whereArgs: [oldClassName]);
-
+      await db.update(classTableName, classObj.toMap(),where: '$colClassName = ?',whereArgs: [oldClassName]);
       print(oldClassName + " successfully updated to " + newClassName);
 
     }else{
@@ -84,17 +83,17 @@ class ClassHelper{
     Database db = await DatabaseHelper.instance.database;
 
     //Check if new className already exists
-    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$_className = ?',whereArgs: [classObj.className.toUpperCase()]);
+    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$colClassName = ?',whereArgs: [classObj.className.toUpperCase()]);
 
     if(data.isNotEmpty) {
-      db.delete(classTableName,where: '$_className = ?',whereArgs: [classObj.className.toUpperCase()]);
+      await db.delete(classTableName,where: '$colClassName = ?',whereArgs: [classObj.className.toUpperCase()]);
       print(classObj.toString() + " successfully deleted");
     }
   }
 
   Future<ClassModel?> getClass(String className)async{
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$_className = ?',whereArgs: [className]);
+    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$colClassName = ?',whereArgs: [className]);
     if(data.length == 1){
       return ClassModel.fromMap(data[0]);
     }

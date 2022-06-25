@@ -1,4 +1,5 @@
 import 'package:class_manager/AppPages/class_details.dart';
+import 'package:class_manager/AppPages/student_info.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -24,9 +25,7 @@ class HomePage extends StatelessWidget {
           ),
           body: TabBarView(
             children: [
-             Center(
-               child: Text("Student Details"),
-             ),
+              StudentInfo(),
               ClassDetails(),
             ],
           )

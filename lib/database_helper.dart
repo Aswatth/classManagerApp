@@ -35,7 +35,9 @@ class DatabaseHelper{
     Directory dbPath = await getApplicationDocumentsDirectory();
     final path = join(dbPath.path,_dbName);
 
-    return await openDatabase(path,version: _version,onCreate: _onCreate());
+    Database db =  await openDatabase(path,version: _version,onCreate: _onCreate());
+    await db.execute('PRAGMA foreign_keys = ON');
+    return db;
   }
 
   dropDB()async{
@@ -48,7 +50,7 @@ class DatabaseHelper{
   _onCreate()
   {
     //Initializing all table
-    //StudentHelper.instance;
+    StudentHelper.instance;
     ClassHelper.instance;
     BoardHelper.instance;
     SubjectHelper.instance;
