@@ -43,6 +43,8 @@ class _StudentSearchState extends State<StudentSearch> {
 
   bool isSearching = false;
 
+  bool isExpanded = false;
+
   getAllClass()async{
     List<ClassModel> temp = await ClassHelper.instance.getAllClass();
     setState(() {
@@ -325,29 +327,52 @@ class _StudentSearchState extends State<StudentSearch> {
         ),
         body: Column(
           children: [
-            classDropDown(),
-            boardDropDown(),
-            subjectDropDown(),
-            studentNameSearchFiled(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            ExpansionPanelList(
+              expansionCallback: (id,_){
+                setState(() {
+                  isExpanded = !_;
+                });
+              },
               children: [
-                ElevatedButton(
-                  child: Text("Search"),
-                  onPressed: (){
-                    setState(() {
-                      search();
-                    });
+                ExpansionPanel(
+                  headerBuilder: (context, isExpanded) {
+                    return ListTile(
+                      title: Text("Search by"),
+                    );
                   },
-                ),
-                ElevatedButton(
-                  child: Text("Clear"),
-                  onPressed: (){
-                    setState(() {
-                      clearFilters();
-                    });
-                  },
-                ),
+                    isExpanded: isExpanded,
+                    body: Column(
+                      children: [
+                        classDropDown(),
+                        boardDropDown(),
+                        subjectDropDown(),
+                        studentNameSearchFiled(),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
+                                child: Text("Search"),
+                                onPressed: (){
+                                  setState(() {
+                                    search();
+                                  });
+                                },
+                              ),
+                              ElevatedButton(
+                                child: Text("Clear"),
+                                onPressed: (){
+                                  setState(() {
+                                    clearFilters();
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ))
               ],
             ),
             Expanded(child: studentListWidget())
@@ -357,3 +382,4 @@ class _StudentSearchState extends State<StudentSearch> {
     );
   }
 }
+
