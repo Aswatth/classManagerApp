@@ -8,6 +8,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'Model/student_session.dart';
+
 class DatabaseHelper{
 
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
@@ -54,6 +56,7 @@ class DatabaseHelper{
     ClassHelper.instance;
     BoardHelper.instance;
     SubjectHelper.instance;
-    //SessionHelper.instance;
+    SessionHelper.instance;
+    StudentSessionHelper.instance;
   }
 }

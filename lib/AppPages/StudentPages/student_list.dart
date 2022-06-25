@@ -2,6 +2,7 @@ import 'package:class_manager/AppPages/StudentPages/student_profile.dart';
 import 'package:class_manager/AppPages/StudentPages/student_search.dart';
 import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/Model/student.dart';
+import 'package:class_manager/Model/student_session.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -17,36 +18,26 @@ class StudentList extends StatefulWidget {
 
 class _StudentListState extends State<StudentList> {
 
-  List<StudentModel> _studentList = [];
+  List<StudentSessionModel> _completeDataList = [];
 
-  List<SessionModel> _sessionList = [];
+  Future<void> getAllData()async{
+    List<StudentSessionModel> temp = await StudentSessionHelper.instance.getAllData();
 
-  Future<void> getAllStudent()async{
-    List<StudentModel> temp = await StudentHelper.instance.getAllStudent();
     setState(() {
-      _studentList = temp;
+      _completeDataList = temp;
     });
   }
 
-  Future<List<SessionModel>> getSession(int studentId)async{
-    List<SessionModel> temp = await SessionHelper.instance.getSessionByStudentId(studentId);
+  deleteStudent(int studentId)async{
+    await StudentHelper.instance.delete(studentId);
 
-    return temp;
-    /*setState(() {
-      _sessionList = temp;
-    });*/
+    getAllData();
   }
 
-  deleteStudent(StudentModel student)async{
-    await StudentHelper.instance.delete(student);
-
-    getAllStudent();
-  }
-
-  deleteConfirmation(StudentModel student){
+  deleteConfirmation(int studentId, String studentName){
     Alert(
       context: context,
-      content: Text("Are you sure you want to delete ${student.name}'s details"),
+      content: Text("Are you sure you want to delete ${studentName}'s details"),
       buttons: [
         DialogButton(
           child: Text("No"),
@@ -57,7 +48,7 @@ class _StudentListState extends State<StudentList> {
         DialogButton(
           child: Text("Yes"),
           onPressed: (){
-            deleteStudent(student);
+            deleteStudent(studentId);
             Navigator.pop(context);
           },
         )
@@ -65,68 +56,41 @@ class _StudentListState extends State<StudentList> {
     ).show();
   }
 
-  Widget studentWidget(StudentModel student){
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.blueAccent),
-        ),
-        child: Column(
-          children: [
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text(student.name),
-              trailing: Text(student.className),
-            ),
-            ListTile(
-              leading: Icon(Icons.cake),
-              title: Text(DateFormat('dd-MMM-yyyy').format(student.dob).toString()),
-              trailing: Text(student.boardName),
-            ),
-            Divider(color: Colors.black87,),
-            FutureBuilder<List<SessionModel>>(
-              future: getSession(student.id!),
-              builder: (context, snapshot){
-                if(snapshot.hasData){
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index){
-                      SessionModel session = snapshot.data![index];
-                      return ListTile(
-                        title: Text(session.subjectName),
-                        subtitle: Text(session.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
-                        trailing: Text(session.startTime + " - " + session.endTime),
-                      );
-                    },
-                  );
-                }
-                else{
-                  return Container();
-                }
-              },
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget studentListWidget(){
     return ListView.builder(
-      itemCount: _studentList.length,
+      itemCount: _completeDataList.length,
       itemBuilder: (context, index){
-        return GestureDetector(
-            child: studentWidget(_studentList[index]),
+        StudentSessionModel completeData = _completeDataList[index];
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GestureDetector(
             onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfile(studentModel: _studentList[index]),)).then((value) => getAllStudent());
+              Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfile(studentId: completeData.id),)).then((value) => getAllData());
             },
-          onLongPress: (){
-              setState(() {
-                deleteConfirmation(_studentList[index]);
-              });
-          },
+            onLongPress: (){
+              deleteConfirmation(completeData.id, completeData.name);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.blueAccent),
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text(completeData.name),
+                    trailing: Text("${completeData.className} - ${completeData.boardName}"),
+                  ),
+                  Divider(color: Colors.black87,),
+                  completeData.studentId != -1?
+                  ListTile(
+                    title: Text(completeData.subjectName!),
+                    subtitle: Text(completeData.sessionSlot!.replaceAll("[", "").replaceAll("]", "")),
+                    trailing: Text("${completeData.startTime!} - ${completeData.endTime!}"),
+                  ):Container()
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
@@ -136,13 +100,13 @@ class _StudentListState extends State<StudentList> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getAllStudent();
+    getAllData();
   }
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: getAllStudent,
+      onRefresh: getAllData,
       child: Scaffold(
         appBar: AppBar(
           title: Text("Student List"),
@@ -150,7 +114,7 @@ class _StudentListState extends State<StudentList> {
             IconButton(
               icon: Icon(Icons.person_add),
               onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => AddStudent(),)).then((value) => getAllStudent());
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AddStudent(),)).then((value) => getAllData());
               },
             )
           ],

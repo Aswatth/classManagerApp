@@ -5,6 +5,7 @@ import 'package:class_manager/Model/board.dart';
 import 'package:class_manager/Model/class.dart';
 import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/Model/student.dart';
+import 'package:class_manager/Model/student_session.dart';
 import 'package:class_manager/Model/subject.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -19,7 +20,15 @@ class StudentSearch extends StatefulWidget {
 
 class _StudentSearchState extends State<StudentSearch> {
 
-  List<StudentModel> _studentList = [];
+  List<StudentSessionModel> _completeDataList = [];
+
+  Future<void> getAllData()async{
+    List<StudentSessionModel> temp = await StudentSessionHelper.instance.getAllData();
+
+    setState(() {
+      _completeDataList = temp;
+    });
+  }
 
   List<ClassModel> _classList = [];
   List<BoardModel> _boardList = [];
@@ -28,6 +37,9 @@ class _StudentSearchState extends State<StudentSearch> {
   String _selectedClassName = '';
   String _selectedBoardName = '';
   String _selectedSubject = '';
+
+  String _searchedStudentName = '';
+  TextEditingController _controller = TextEditingController();
 
   bool isSearching = false;
 
@@ -52,79 +64,31 @@ class _StudentSearchState extends State<StudentSearch> {
     });
   }
 
-  Future<void> getAllStudent()async{
-    List<StudentModel> temp = await StudentHelper.instance.getAllStudent();
-    setState(() {
-      _studentList = temp;
-    });
-  }
-
-  Future<void> getSearchedStudent()async{
-    if(_selectedClassName.isNotEmpty && _selectedBoardName.isNotEmpty){
-      List<StudentModel> temp = await StudentHelper.instance.getStudentByClassAndBoard(_selectedClassName, _selectedBoardName);
-      setState(() {
-        _studentList = temp;
-      });
+  Future<void> getSearchedStudent()async {
+    if(_selectedClassName.isNotEmpty){
+      _completeDataList.removeWhere((element) => element.className != _selectedClassName);
     }
-    else if(_selectedClassName.isNotEmpty){
-      List<StudentModel> temp = await StudentHelper.instance.getStudentByClass(_selectedClassName);
-      setState(() {
-        _studentList = temp;
-      });
+    if(_selectedBoardName.isNotEmpty){
+      _completeDataList.removeWhere((element) => element.boardName != _selectedBoardName);
     }
-    else if(_selectedBoardName.isNotEmpty){
-      List<StudentModel> temp = await StudentHelper.instance.getStudentByBoard(_selectedBoardName);
-      setState(() {
-        _studentList = temp;
-      });
-    }
-    else{
-      getAllStudent();
-    }
-
-    List<int> studentIdList = [];
-    for(int i=0; i<_studentList.length;++i){
-      studentIdList.add(_studentList[i].id!);
-    }
-
     if(_selectedSubject.isNotEmpty){
-      List<SessionModel> sessionList = await SessionHelper.instance.getSessionBySubject(_selectedSubject);
-      List<int> sessionStudentId = [];
-      for(int i=0; i<sessionList.length;++i){
-        sessionStudentId.add(sessionList[i].studentId);
-      }
-
-      List<int> commonIdList = studentIdList.toSet().intersection(sessionStudentId.toSet()).toList();
-
-      _studentList.removeWhere((element) => !commonIdList.contains(element.id!));
-
-      print(_studentList.length);
+      _completeDataList.removeWhere((element) => element.subjectName != null?element.subjectName! != _selectedSubject:true);
     }
+    _completeDataList = List.from(_completeDataList.where((element){
+      return element.name.toLowerCase().contains(_controller.text.toLowerCase());
+    }).toList());
   }
 
-  Future<List<SessionModel>> getSession(int studentId)async{
-    if(_selectedSubject.isEmpty){
-      List<SessionModel> temp = await SessionHelper.instance.getSessionByStudentId(studentId);
+  deleteStudent(int studentId)async{
+    await StudentHelper.instance.delete(studentId);
 
-      return temp;
-    }
-    else{
-      List<SessionModel> temp = await SessionHelper.instance.getSession(studentId,_selectedSubject);
-
-      return temp;
-    }
+    getAllData();
   }
 
-  deleteStudent(StudentModel student)async{
-    await StudentHelper.instance.delete(student);
-
-    getAllStudent();
-  }
-
-  deleteConfirmation(StudentModel student){
+  deleteConfirmation(int studentId, String studentName){
     Alert(
         context: context,
-        content: Text("Are you sure you want to delete ${student.name}'s details"),
+        content: Text("Are you sure you want to delete ${studentName}'s details"),
         buttons: [
           DialogButton(
             child: Text("No"),
@@ -135,7 +99,7 @@ class _StudentSearchState extends State<StudentSearch> {
           DialogButton(
             child: Text("Yes"),
             onPressed: (){
-              deleteStudent(student);
+              deleteStudent(studentId);
               Navigator.pop(context);
             },
           )
@@ -242,98 +206,114 @@ class _StudentSearchState extends State<StudentSearch> {
     );
   }
 
-  Widget studentWidget(StudentModel student){
+  Widget studentNameSearchFiled(){
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.blueAccent),
+      child: TextField(
+        controller: _controller,
+        decoration: InputDecoration(
+          prefixIcon: Icon(Icons.search),
+          hintText: "Student name",
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.blueAccent)
+          )
         ),
-        child: Column(
-          children: [
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text(student.name),
-              trailing: Text(student.className),
-            ),
-            ListTile(
-              leading: Icon(Icons.cake),
-              title: Text(DateFormat('dd-MMM-yyyy').format(student.dob).toString()),
-              trailing: Text(student.boardName),
-            ),
-            Divider(color: Colors.black87,),
-            FutureBuilder<List<SessionModel>>(
-              future: getSession(student.id!),
-              builder: (context, snapshot){
-                if(snapshot.hasData){
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index){
-                      SessionModel session = snapshot.data![index];
-                      return ListTile(
-                        title: Text(session.subjectName),
-                        subtitle: Text(session.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
-                        trailing: Text(session.startTime + " - " + session.endTime),
-                      );
-                    },
-                  );
-                }
-                else{
-                  return Container();
-                }
-              },
-            )
-          ],
-        ),
+        onChanged: (_){
+          setState(() {
+            _searchedStudentName = _;
+          });
+        },
       ),
     );
   }
 
   Widget studentListWidget(){
     return ListView.builder(
-      itemCount: _studentList.length,
+      itemCount: _completeDataList.length,
       itemBuilder: (context, index){
-        return GestureDetector(
-          child: studentWidget(_studentList[index]),
-          onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfile(studentModel: _studentList[index]),)).then((value){
-              setState(() {
-                getAllStudent();
-              });
-            });
-          },
-          onLongPress: (){
-            setState(() {
-              deleteConfirmation(_studentList[index]);
-            });
-          },
+        StudentSessionModel completeData = _completeDataList[index];
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GestureDetector(
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfile(studentId: completeData.id),)).then((value) => getAllData());
+            },
+            onLongPress: (){
+              deleteConfirmation(completeData.id, completeData.name);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.blueAccent),
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text(completeData.name),
+                    trailing: Text("${completeData.className} - ${completeData.boardName}"),
+                  ),
+                  Divider(color: Colors.black87,),
+                  completeData.studentId != -1?
+                  ListTile(
+                    title: Text(completeData.subjectName!),
+                    subtitle: Text(completeData.sessionSlot!.replaceAll("[", "").replaceAll("]", "")),
+                    trailing: Text("${completeData.startTime!} - ${completeData.endTime!}"),
+                  ):Container()
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
+  }
+
+  search(){
+    isSearching = true;
+
+    getSearchedStudent();
+
+    FocusScopeNode currentFocus = FocusScope.of(context);
+
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+  }
+
+  clearFilters(){
+    isSearching = false;
+
+    _selectedBoardName = '';
+    _selectedClassName = '';
+    _selectedSubject = '';
+    _controller.clear();
+    _searchedStudentName = _controller.text;
+
+    FocusScopeNode currentFocus = FocusScope.of(context);
+
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+
+    getAllData();
   }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    getAllData();
     getAllClass();
     getAllBoard();
     getAllSubject();
-    getAllStudent();
   }
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: !isSearching?getAllStudent:getSearchedStudent,
+      onRefresh: !isSearching?getAllData:getSearchedStudent,
       child: Scaffold(
         appBar: AppBar(
-          /*leading: BackButton(
-              onPressed: (){
-                Navigator.pop(context);
-              },
-            ),*/
           title: Text("Search"),
         ),
         body: Column(
@@ -341,6 +321,7 @@ class _StudentSearchState extends State<StudentSearch> {
             classDropDown(),
             boardDropDown(),
             subjectDropDown(),
+            studentNameSearchFiled(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -348,22 +329,15 @@ class _StudentSearchState extends State<StudentSearch> {
                   child: Text("Search"),
                   onPressed: (){
                     setState(() {
-                      isSearching = true;
+                      search();
                     });
-                    getSearchedStudent();
                   },
                 ),
                 ElevatedButton(
                   child: Text("Clear"),
                   onPressed: (){
                     setState(() {
-                      isSearching = false;
-
-                      _selectedBoardName = '';
-                      _selectedClassName = '';
-                      _selectedSubject = '';
-
-                      getAllStudent();
+                      clearFilters();
                     });
                   },
                 ),

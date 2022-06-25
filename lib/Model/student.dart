@@ -81,17 +81,17 @@ class StudentHelper{
     }
   }
 
-  delete(StudentModel student)async{
+  delete(int studentId)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
     //Check if newBoardName already exists
-    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$colId = ?',whereArgs: [student.id]);
+    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$colId = ?',whereArgs: [studentId]);
 
     if(data.isNotEmpty) {
-      await db.delete(studentTableName,where: '$colId = ?',whereArgs: [student.id]);
+      await db.delete(studentTableName,where: '$colId = ?',whereArgs: [studentId]);
 
-      print(student.toString() + " deleted successfully");
+      print("Deleted successfully");
     }
   }
 

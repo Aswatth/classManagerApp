@@ -9,7 +9,7 @@ class SessionHelper{
   final String sessionTableName = 'SESSION';
 
   //Columns
-  final String _colStudentId = 'studentId';
+  final String colStudentId = 'studentId';
   final String _colSubjectName = 'subjectName';
   final String _colSessionSlot = 'sessionSlot';
   final String _colStartTime = 'startTime';
@@ -30,14 +30,14 @@ class SessionHelper{
   void _initialize()async{
     String _createStudentTable ='''
     CREATE TABLE IF NOT EXISTS $sessionTableName(
-    $_colStudentId INT,
+    $colStudentId INT,
     $_colSubjectName VARCHAR,
     $_colSessionSlot VARCHAR,
     $_colStartTime VARCHAR,
     $_colEndTime VARCHAR,
     $_colFees FLOAT,
-    PRIMARY KEY($_colStudentId,$_colSubjectName),
-    FOREIGN KEY($_colStudentId) REFERENCES ${StudentHelper.instance.studentTableName}(${StudentHelper.instance.colId}) ON UPDATE CASCADE ON DELETE NO ACTION,
+    PRIMARY KEY($colStudentId,$_colSubjectName),
+    FOREIGN KEY($colStudentId) REFERENCES ${StudentHelper.instance.studentTableName}(${StudentHelper.instance.colId}) ON UPDATE CASCADE ON DELETE NO ACTION,
     FOREIGN KEY($_colSubjectName) REFERENCES ${SubjectHelper.instance.subjectTableName}(${SubjectHelper.instance.colSubjectName}) ON UPDATE CASCADE ON DELETE NO ACTION        
     );
      ''';
@@ -54,7 +54,7 @@ class SessionHelper{
     //Check if it already exists
     List<Map<String,dynamic>> data = await db.query(
         sessionTableName,
-        where: '$_colStudentId = ? and $_colSubjectName = ?',
+        where: '$colStudentId = ? and $_colSubjectName = ?',
         whereArgs: [session.studentId,session.subjectName]);
 
     if(data.isEmpty)
@@ -75,12 +75,12 @@ class SessionHelper{
     //Check if session already exists
     List<Map<String,dynamic>> data = await db.query(
         sessionTableName,
-        where: '$_colStudentId = ? and $_colSubjectName = ?',
+        where: '$colStudentId = ? and $_colSubjectName = ?',
         whereArgs: [oldSession.studentId,oldSession.subjectName]);
 
     if(data.isNotEmpty){
       db.update(sessionTableName, newSession.toMap(),
-          where: '$_colStudentId = ? and $_colSubjectName = ?',
+          where: '$colStudentId = ? and $_colSubjectName = ?',
           whereArgs: [oldSession.studentId,oldSession.subjectName]);
     }
   }
@@ -90,20 +90,20 @@ class SessionHelper{
     Database db = await DatabaseHelper.instance.database;
     await db.delete(
         sessionTableName,
-        where: '$_colStudentId = ? and $_colSubjectName = ?',
+        where: '$colStudentId = ? and $_colSubjectName = ?',
         whereArgs: [studentId,subjectName]);
   }
 
   Future<List<SessionModel>> getSessionByStudentId(int studentId)async{
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_colStudentId = ?',whereArgs: [studentId]);
+    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$colStudentId = ?',whereArgs: [studentId]);
 
     return data.map((json) => SessionModel.fromMap(json)).toList();
   }
 
   Future<List<SessionModel>> getSession(int studentId, String subjectName)async{
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$_colStudentId = ? and $_colSubjectName = ?',whereArgs: [studentId,subjectName]);
+    List<Map<String,dynamic>> data = await db.query(sessionTableName,where: '$colStudentId = ? and $_colSubjectName = ?',whereArgs: [studentId,subjectName]);
 
     return data.map((json) => SessionModel.fromMap(json)).toList();
   }
