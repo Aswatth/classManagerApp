@@ -28,6 +28,13 @@ class _StudentListState extends State<StudentList> {
     });
   }
 
+  getStudent(int studentId)async{
+
+    StudentModel? studentModel = await StudentHelper.instance.getStudent(studentId);
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfile(studentModel: studentModel!),)).then((value) => getAllData());
+  }
+
   deleteStudent(int studentId)async{
     await StudentHelper.instance.delete(studentId);
 
@@ -65,7 +72,7 @@ class _StudentListState extends State<StudentList> {
           padding: const EdgeInsets.all(8.0),
           child: GestureDetector(
             onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfile(studentId: completeData.id),)).then((value) => getAllData());
+              getStudent(completeData.id);
             },
             onLongPress: (){
               deleteConfirmation(completeData.id, completeData.name);

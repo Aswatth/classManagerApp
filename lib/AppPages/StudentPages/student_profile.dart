@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class StudentProfile extends StatefulWidget {
-  int studentId;
-  StudentProfile({Key? key,required this.studentId}) : super(key: key);
+  StudentModel studentModel;
+  StudentProfile({Key? key,required this.studentModel}) : super(key: key);
 
   @override
   _StudentProfileState createState() => _StudentProfileState();
@@ -18,8 +18,6 @@ class StudentProfile extends StatefulWidget {
 
 class _StudentProfileState extends State<StudentProfile> {
 
-  late StudentModel studentModel;
-  
   String _name = '';
   String _schoolName = '';
   String _studentPhoneNumber = '';
@@ -43,20 +41,6 @@ class _StudentProfileState extends State<StudentProfile> {
   final TextEditingController _parentPhnNum1Controller = TextEditingController();
   final TextEditingController _parentPhnNum2Controller = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-
-  getStudent()async{
-    studentModel = (await StudentHelper.instance.getStudent(widget.studentId))!;
-
-    _nameController.text = studentModel.name;
-    _dobController.text = studentModel.dob.toString();
-    _schoolNameController.text = studentModel.schoolName;
-    _className = studentModel.className;
-    _boardName = studentModel.boardName;
-    _studentPhnNumController.text = studentModel.studentPhoneNumber;
-    _parentPhnNum1Controller.text = studentModel.parentPhoneNumber1;
-    _parentPhnNum2Controller.text = studentModel.parentPhoneNumber2!;
-    _locationController.text = studentModel.location;
-  }
   
   getAllClass()async{
     List<ClassModel> temp = await ClassHelper.instance.getAllClass();
@@ -73,7 +57,7 @@ class _StudentProfileState extends State<StudentProfile> {
   }
 
   Future<List<SessionModel>>getSession()async{
-    List<SessionModel> temp = await SessionHelper.instance.getSessionByStudentId(studentModel.id!);
+    List<SessionModel> temp = await SessionHelper.instance.getSessionByStudentId(widget.studentModel.id!);
 
     setState(() {
 
@@ -381,7 +365,7 @@ class _StudentProfileState extends State<StudentProfile> {
   }
 
   deleteSession(String subjectName)async{
-    await SessionHelper.instance.delete(studentModel.id!, subjectName);
+    await SessionHelper.instance.delete(widget.studentModel.id!, subjectName);
   }
 
   Widget studentDrawer() {
@@ -394,7 +378,7 @@ class _StudentProfileState extends State<StudentProfile> {
             Divider(color: Colors.black87,),
             ListTile(
               onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => AddSession(student: studentModel),)).then((value){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AddSession(student: widget.studentModel),)).then((value){
                   setState(() {
                     getSession();
                   });
@@ -434,7 +418,7 @@ class _StudentProfileState extends State<StudentProfile> {
                               subtitle: Text(session.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
                               trailing: Text(session.startTime + " - " + session.endTime),
                               onTap: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => EditSession(student: studentModel,session: session),));
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => EditSession(student: widget.studentModel,session: session),));
                               },
                               onLongPress: (){
                                 deleteSession(session.subjectName);
@@ -458,14 +442,14 @@ class _StudentProfileState extends State<StudentProfile> {
   }
 
   updateStudent()async{
-    await StudentHelper.instance.update(studentModel);
+    await StudentHelper.instance.update(widget.studentModel);
   }
 
   _save(){
     print("SAVING");
     _formKey.currentState!.save();
 
-    StudentModel _student = studentModel;
+    StudentModel _student = widget.studentModel;
 
     _student.studentPhoneNumber = _studentPhoneNumber;
     _student.parentPhoneNumber1 = _parentPhoneNumber1;
@@ -480,7 +464,7 @@ class _StudentProfileState extends State<StudentProfile> {
     updateStudent();
 
     setState(() {
-      studentModel = _student;
+      widget.studentModel = _student;
       _isEditing = false;
     });
 
@@ -490,10 +474,19 @@ class _StudentProfileState extends State<StudentProfile> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getStudent();
     getAllClass();
     getAllBoard();
     getSession();
+
+    _nameController.text = widget.studentModel.name;
+    _dobController.text = widget.studentModel.dob.toString();
+    _schoolNameController.text = widget.studentModel.schoolName;
+    _className = widget.studentModel.className;
+    _boardName = widget.studentModel.boardName;
+    _studentPhnNumController.text = widget.studentModel.studentPhoneNumber;
+    _parentPhnNum1Controller.text = widget.studentModel.parentPhoneNumber1;
+    _parentPhnNum2Controller.text = widget.studentModel.parentPhoneNumber2!;
+    _locationController.text = widget.studentModel.location;
   }
 
   @override
@@ -514,7 +507,7 @@ class _StudentProfileState extends State<StudentProfile> {
             Navigator.pop(context);
           },
         ),
-        title: Text(studentModel.name+"'s Profile"),
+        title: Text(widget.studentModel.name+"'s Profile"),
       ),
       body: Form(
         key: _formKey,
