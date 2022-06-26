@@ -1,3 +1,4 @@
+import 'package:class_manager/Model/fee.dart';
 import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:class_manager/Model/subject.dart';
@@ -9,7 +10,8 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 class EditSession extends StatefulWidget {
   StudentModel student;
   SessionModel session;
-  EditSession({Key? key,required this.student, required this.session}) : super(key: key);
+  FeeModel feeModel;
+  EditSession({Key? key,required this.student, required this.session, required this.feeModel}) : super(key: key);
 
   @override
   _EditSessionState createState() => _EditSessionState();
@@ -26,11 +28,11 @@ class _EditSessionState extends State<EditSession> {
   List<String> _selectedSessionDays = [];
   String _startTime = '';
   String _endTime = '';
-  double _fees = 0.0;
+  double _fees = 0;
 
-  late final TextEditingController _sessionStartTimeController;
-  late final TextEditingController _sessionEndTimeController;
-  late final TextEditingController _feesController;
+  late TextEditingController _sessionStartTimeController;
+  late TextEditingController _sessionEndTimeController;
+  late TextEditingController _feesController;
 
   getAllSubject() async{
     List<SubjectModel> _temp = await SubjectHelper.instance.getAllSubject();
@@ -155,7 +157,15 @@ class _EditSessionState extends State<EditSession> {
       controller: _feesController,
       decoration: InputDecoration(
           icon: Icon(Icons.attach_money_rounded),
-          labelText: "Fees"
+          labelText: "Fees",
+          suffixIcon: IconButton(
+            icon: Icon(Icons.clear,color: Colors.grey,size: 15,),
+            onPressed: (){
+              setState(() {
+                _feesController.clear();
+              });
+            },
+          )
       ),
       keyboardType: TextInputType.number,
       validator: (value){
@@ -174,15 +184,25 @@ class _EditSessionState extends State<EditSession> {
     );
   }
 
-  updateSession()async{
-    SessionModel session = SessionModel.createNewSession(studentId: widget.student.id!, subjectName: _selectedSubject, startTime: _startTime, endTime: _endTime, sessionSlot: _selectedSessionDays.toString(), fees: _fees);
+  updateFee()async{
+    List<FeeModel> feeModelList = await FeeHelper.instance.getPendingFee(widget.student.id!, widget.session.subjectName);
+    FeeModel oldFeeModel = feeModelList.first;
+    FeeModel newFeeModel = FeeModel.createNewFeeData(feeStudentId: widget.student.id!, feeSubjectName: _selectedSubject, fees: _fees, month: oldFeeModel.month, year: oldFeeModel.year, paidOn: oldFeeModel.paidOn);
 
-    await SessionHelper.instance.update(widget.session,session);
+    await FeeHelper.instance.update(oldFeeModel, newFeeModel);
   }
 
-  _save() {
+  updateSession()async{
+    SessionModel session = SessionModel.createNewSession(studentId: widget.student.id!, subjectName: _selectedSubject, startTime: _startTime, endTime: _endTime, sessionSlot: _selectedSessionDays.toString());
+
+    await SessionHelper.instance.update(widget.session,session);
+
+    updateFee();
+  }
+
+  _save() async{
     _formKey.currentState!.save();
-    updateSession();
+    await updateSession();
     Navigator.pop(context);
   }
 
@@ -192,11 +212,12 @@ class _EditSessionState extends State<EditSession> {
 
     getAllSubject();
 
+    _feesController = TextEditingController(text: widget.feeModel.fees.toString());
     _selectedSubject = widget.session.subjectName;
     _selectedSessionDays = widget.session.sessionSlot.replaceAll(",", "").replaceAll("[", "").replaceAll("]", "").split(" ").toList();
     _sessionStartTimeController = TextEditingController(text: widget.session.startTime.split(" ")[0]);
     _sessionEndTimeController = TextEditingController(text: widget.session.endTime.split(" ")[0]);
-    _feesController = TextEditingController(text: widget.session.fees.toString());
+
   }
 
   @override

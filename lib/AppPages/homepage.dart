@@ -1,6 +1,7 @@
 import 'package:class_manager/AppPages/StudentPages/student_list.dart';
 import 'package:class_manager/AppPages/StudentPages/student_search.dart';
 import 'package:class_manager/AppPages/class_details.dart';
+import 'package:class_manager/AppPages/statistics.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,6 +20,7 @@ class _HomePageState extends State<HomePage> {
     StudentList(),
     StudentSearch(),
     ClassDetails(),
+    Statistics()
   ];
 
   void onPageChanged(int index){
@@ -49,7 +51,7 @@ class _HomePageState extends State<HomePage> {
         //selectedItemColor: Colors.blueAccent,
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
-        items: [
+        items: const [
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.list,
@@ -67,6 +69,10 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
               icon: Icon(Icons.class_),
               label: "Class details"
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.pie_chart),
+              label: "Statistics"
           ),
         ],
       ),

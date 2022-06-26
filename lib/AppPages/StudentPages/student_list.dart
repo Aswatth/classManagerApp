@@ -1,10 +1,8 @@
-import 'package:class_manager/AppPages/StudentPages/student_profile.dart';
-import 'package:class_manager/AppPages/StudentPages/student_search.dart';
-import 'package:class_manager/Model/session.dart';
+import 'package:class_manager/AppPages/StudentPages/student_home.dart';
+import 'package:class_manager/Model/fee.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:class_manager/Model/student_session.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 import 'add_student.dart';
@@ -20,8 +18,14 @@ class _StudentListState extends State<StudentList> {
 
   List<StudentSessionModel> _completeDataList = [];
 
+  int _totalStudents = -1;
+  double _totalFees = -1;
+
   Future<void> getAllData()async{
     List<StudentSessionModel> temp = await StudentSessionHelper.instance.getAllData();
+
+    _totalStudents = await StudentHelper.instance.getStudentCount();
+    _totalFees = await FeeHelper.instance.getCurrentFeeSum();
 
     setState(() {
       _completeDataList = temp;
@@ -32,7 +36,7 @@ class _StudentListState extends State<StudentList> {
 
     StudentModel? studentModel = await StudentHelper.instance.getStudent(studentId);
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfile(studentModel: studentModel!),)).then((value) => getAllData());
+    Navigator.push(context, MaterialPageRoute(builder: (context) => StudentHome(studentModel: studentModel!),)).then((value) => getAllData());
   }
 
   deleteStudent(int studentId)async{
@@ -64,42 +68,54 @@ class _StudentListState extends State<StudentList> {
   }
 
   Widget studentListWidget(){
-    return ListView.builder(
-      itemCount: _completeDataList.length,
-      itemBuilder: (context, index){
-        StudentSessionModel completeData = _completeDataList[index];
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: GestureDetector(
-            onTap: (){
-              getStudent(completeData.id);
-            },
-            onLongPress: (){
-              deleteConfirmation(completeData.id, completeData.name);
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.blueAccent),
-              ),
-              child: Column(
-                children: [
-                  ListTile(
-                    title: Text(completeData.name),
-                    trailing: Text("${completeData.className} - ${completeData.boardName}"),
+    return Column(
+      children: [
+        ListTile(
+          title: Text("Total students: ${_totalStudents}"),
+        ),
+        ListTile(
+          title: Text("Fees for this month: ${_totalFees}"),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _completeDataList.length,
+            itemBuilder: (context, index){
+              StudentSessionModel completeData = _completeDataList[index];
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: (){
+                    getStudent(completeData.id);
+                  },
+                  onLongPress: (){
+                    deleteConfirmation(completeData.id, completeData.name);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blueAccent),
+                    ),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: Text(completeData.name),
+                          trailing: Text("${completeData.className} - ${completeData.boardName}"),
+                        ),
+                        Divider(color: Colors.black87,),
+                        completeData.studentId != -1?
+                        ListTile(
+                          title: Text(completeData.subjectName!),
+                          subtitle: Text(completeData.sessionSlot!.replaceAll("[", "").replaceAll("]", "")),
+                          trailing: Text("${completeData.startTime!} - ${completeData.endTime!}"),
+                        ):Container()
+                      ],
+                    ),
                   ),
-                  Divider(color: Colors.black87,),
-                  completeData.studentId != -1?
-                  ListTile(
-                    title: Text(completeData.subjectName!),
-                    subtitle: Text(completeData.sessionSlot!.replaceAll("[", "").replaceAll("]", "")),
-                    trailing: Text("${completeData.startTime!} - ${completeData.endTime!}"),
-                  ):Container()
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
-        );
-      },
+        )
+      ],
     );
   }
 

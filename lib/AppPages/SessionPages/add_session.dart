@@ -1,3 +1,4 @@
+import 'package:class_manager/Model/fee.dart';
 import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:class_manager/Model/subject.dart';
@@ -161,7 +162,15 @@ class _AddSessionState extends State<AddSession> {
       controller: _feesController,
       decoration: InputDecoration(
           icon: Icon(Icons.attach_money_rounded),
-          labelText: "Fees"
+          labelText: "Fees",
+          suffixIcon: IconButton(
+            icon: Icon(Icons.clear,color: Colors.grey,size: 15,),
+            onPressed: (){
+              setState(() {
+                _feesController.clear();
+              });
+            },
+          )
       ),
       keyboardType: TextInputType.number,
       validator: (value){
@@ -181,14 +190,17 @@ class _AddSessionState extends State<AddSession> {
   }
 
   insertSession()async{
-    SessionModel session = SessionModel.createNewSession(studentId: widget.student.id!, subjectName: _selectedSubject, startTime: _startTime, endTime: _endTime, sessionSlot: _selectedSessionDays.toString(), fees: _fees);
+    SessionModel session = SessionModel.createNewSession(studentId: widget.student.id!, subjectName: _selectedSubject, startTime: _startTime, endTime: _endTime, sessionSlot: _selectedSessionDays.toString());
+
+    FeeModel feeModel = FeeModel.createNewFeeData(feeStudentId: widget.student.id!, feeSubjectName: _selectedSubject, fees: _fees, month: DateTime.now().month, year: DateTime.now().year, paidOn: null);
 
     await SessionHelper.instance.insert(session);
+    await FeeHelper.instance.insert(feeModel);
   }
 
-  _save() {
+  _save() async{
     _formKey.currentState!.save();
-    insertSession();
+    await insertSession();
     Navigator.pop(context);
   }
 

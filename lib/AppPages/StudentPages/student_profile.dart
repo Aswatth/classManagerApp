@@ -368,7 +368,7 @@ class _StudentProfileState extends State<StudentProfile> {
     await SessionHelper.instance.delete(widget.studentModel.id!, subjectName);
   }
 
-  Widget studentDrawer() {
+  /*Widget studentDrawer() {
     return Drawer(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -439,7 +439,7 @@ class _StudentProfileState extends State<StudentProfile> {
         ),
       ),
     );
-  }
+  }*/
 
   updateStudent()async{
     await StudentHelper.instance.update(widget.studentModel);
@@ -492,7 +492,7 @@ class _StudentProfileState extends State<StudentProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: studentDrawer(),
+      //drawer: studentDrawer(),
       floatingActionButton: !_isEditing?FloatingActionButton(
         child: Icon(Icons.edit),
         onPressed: (){

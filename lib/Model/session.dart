@@ -14,7 +14,6 @@ class SessionHelper{
   final String _colSessionSlot = 'sessionSlot';
   final String _colStartTime = 'startTime';
   final String _colEndTime = 'endTime';
-  final String _colFees = 'fees';
 
   static final SessionHelper instance = SessionHelper._privateConstructor();
 
@@ -35,7 +34,6 @@ class SessionHelper{
     $_colSessionSlot VARCHAR,
     $_colStartTime VARCHAR,
     $_colEndTime VARCHAR,
-    $_colFees FLOAT,
     PRIMARY KEY($colStudentId,$_colSubjectName),
     FOREIGN KEY($colStudentId) REFERENCES ${StudentHelper.instance.studentTableName}(${StudentHelper.instance.colId}) ON UPDATE CASCADE ON DELETE NO ACTION,
     FOREIGN KEY($_colSubjectName) REFERENCES ${SubjectHelper.instance.subjectTableName}(${SubjectHelper.instance.colSubjectName}) ON UPDATE CASCADE ON DELETE NO ACTION        
@@ -129,15 +127,13 @@ class SessionModel{
   String startTime;
   String endTime;
   String sessionSlot;
-  double fees;
 
   SessionModel.createNewSession({
     required this.studentId,
     required this.subjectName,
     required this.startTime,
     required this.endTime,
-    required this.sessionSlot,
-    required this.fees
+    required this.sessionSlot
   });
 
   SessionModel({
@@ -145,8 +141,7 @@ class SessionModel{
     required this.subjectName,
     required this.startTime,
     required this.endTime,
-    required this.sessionSlot,
-    required this.fees
+    required this.sessionSlot
   });
 
   Map<String,dynamic> toMap() {
@@ -155,8 +150,7 @@ class SessionModel{
       'subjectName': subjectName,
       'startTime': startTime,
       'sessionSlot':sessionSlot,
-      'endTime': endTime,
-      'fees': fees.toString()
+      'endTime': endTime
     };
   }
   factory SessionModel.fromMap(Map<String,dynamic> jsonString) => SessionModel(
@@ -164,12 +158,11 @@ class SessionModel{
       subjectName: jsonString['subjectName'],
       startTime: jsonString['startTime'],
       endTime: jsonString['endTime'],
-      sessionSlot: jsonString['sessionSlot'],
-      fees:  jsonString['fees']
+      sessionSlot: jsonString['sessionSlot']
   );
 
   @override
   String toString() {
-    return 'SessionModel{studentId: $studentId, subjectName: $subjectName, startTime: $startTime, endTime: $endTime, sessionSlot: $sessionSlot, fees: $fees}';
+    return 'SessionModel{studentId: $studentId, subjectName: $subjectName, startTime: $startTime, endTime: $endTime, sessionSlot: $sessionSlot}';
   }
 }

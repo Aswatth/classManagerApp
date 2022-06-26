@@ -129,6 +129,11 @@ class StudentHelper{
 
     return data.map((json) => StudentModel.fromMap(json)).toList();
   }
+  Future<int> getStudentCount()async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map> data = await db.rawQuery("SELECT COUNT(*) FROM $studentTableName");
+    return data.first.values.first;
+  }
 }
 
 class StudentModel{
