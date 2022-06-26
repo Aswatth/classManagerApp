@@ -37,7 +37,7 @@ class _SessionListState extends State<SessionList> {
   editSession(SessionModel session)async
   {
     List<FeeModel> feeModelList = await FeeHelper.instance.getPendingFee(widget.studentModel.id!, session.subjectName);
-
+    print("Pending fee list: ${feeModelList.length}");
     Navigator.push(context, MaterialPageRoute(builder: (context) => EditSession(student: widget.studentModel,session: session, feeModel: feeModelList.first,),)).then((value){
       setState(() {
         getSession();

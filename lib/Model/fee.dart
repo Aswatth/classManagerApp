@@ -169,6 +169,20 @@ class FeeHelper{
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = await db.query(feeTableName,where: '$colStudentId = ? and $colSubjectName = ? and $_colMonth = ? and $_colYear = ? and $_colPaidOn IS NULL',whereArgs: [feeStudentId,feeSubjectName,DateTime.now().month,DateTime.now().year]);
 
+    if(data.length == 0){
+      int nextMonth = -1;
+      int nextYear = -1;
+      int month = DateTime.now().month;
+      int year = DateTime.now().year;
+      if((month+1)%13==0){
+        nextYear = year + 1;
+        nextMonth = 1;
+      }else{
+        nextMonth = month + 1;
+        nextYear = year;
+      }
+      data = await db.query(feeTableName,where: '$colStudentId = ? and $colSubjectName = ? and $_colMonth = ? and $_colYear = ? and $_colPaidOn IS NULL',whereArgs: [feeStudentId,feeSubjectName,nextMonth,nextYear]);
+    }
     return data.map((json) => FeeModel.fromMap(json)).toList();
   }
 
