@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:class_manager/AppPages/StudentPages/student_home.dart';
 import 'package:class_manager/AppPages/StudentPages/student_profile.dart';
 import 'package:class_manager/Model/board.dart';
 import 'package:class_manager/Model/class.dart';
@@ -274,7 +275,7 @@ class _StudentSearchState extends State<StudentSearch> {
 
     StudentModel? studentModel = await StudentHelper.instance.getStudent(studentId);
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfile(studentModel: studentModel!),)).then((value) => getAllData());
+    Navigator.push(context, MaterialPageRoute(builder: (context) => StudentHome(studentModel: studentModel!),)).then((value) => getAllData());
   }
 
   search(){
