@@ -140,7 +140,7 @@ class FeeHelper{
       await insert(FeeModel.createNewFeeData(feeStudentId: studentId, feeSubjectName: subjectList[i], fees: feesList[i], month: nextMonth, year: nextYear, paidOn: null));
     }
 
-    await db.rawUpdate("UPDATE $feeTableName SET ${_colPaidOn} = ? WHERE ${colStudentId} = ? AND ${_colMonth} = ? AND ${_colYear} = ?",
+    await db.rawUpdate("UPDATE $feeTableName SET ${_colPaidOn} = ? WHERE ${colStudentId} = ? AND ${_colMonth} = ? AND ${_colYear} = ? AND ${_colPaidOn} IS NULL",
         [paidOn,studentId,month,year]);
 
     getAllFee();
