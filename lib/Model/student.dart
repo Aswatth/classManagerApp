@@ -17,8 +17,8 @@ class StudentHelper{
   final String _name = 'name';
   final String _dob = 'dob';
   final String _schoolName = 'schoolName';
-  final String _colClassName = 'className';
-  final String _colBoardName = 'boardName';
+  final String colClassName = 'className';
+  final String colBoardName = 'boardName';
   final String _location = 'location';
 
   static final StudentHelper instance = StudentHelper._privateConstructor();
@@ -36,11 +36,11 @@ class StudentHelper{
     $_name VARCHAR,
     $_dob VARCHAR,
     $_schoolName VARCHAR,
-    $_colClassName VARCHAR,
-    $_colBoardName VARCHAR,
+    $colClassName VARCHAR,
+    $colBoardName VARCHAR,
     $_location VARCHAR,    
-    FOREIGN KEY($_colClassName) REFERENCES ${ClassHelper.instance.classTableName}(${ClassHelper.instance.colClassName}) ON UPDATE CASCADE ON DELETE NO ACTION,
-    FOREIGN KEY($_colBoardName) REFERENCES ${BoardHelper.instance.boardTableName}(${BoardHelper.instance.colBoardName}) ON UPDATE CASCADE ON DELETE NO ACTION        
+    FOREIGN KEY($colClassName) REFERENCES ${ClassHelper.instance.classTableName}(${ClassHelper.instance.colClassName}) ON UPDATE CASCADE ON DELETE NO ACTION,
+    FOREIGN KEY($colBoardName) REFERENCES ${BoardHelper.instance.boardTableName}(${BoardHelper.instance.colBoardName}) ON UPDATE CASCADE ON DELETE NO ACTION        
     )
      ''';
 
@@ -106,19 +106,19 @@ class StudentHelper{
 
   Future<List<StudentModel>> getStudentByClass(String className)async{
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$_colClassName = ?',whereArgs: [className]);
+    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$colClassName = ?',whereArgs: [className]);
 
     return data.map((json) => StudentModel.fromMap(json)).toList();
   }
   Future<List<StudentModel>> getStudentByBoard(String boardName)async{
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$_colBoardName = ?',whereArgs: [boardName]);
+    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$colBoardName = ?',whereArgs: [boardName]);
 
     return data.map((json) => StudentModel.fromMap(json)).toList();
   }
   Future<List<StudentModel>> getStudentByClassAndBoard(String className,String boardName)async{
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$_colClassName = ? and $_colBoardName = ?',whereArgs: [className,boardName]);
+    List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$colClassName = ? and $colBoardName = ?',whereArgs: [className,boardName]);
 
     return data.map((json) => StudentModel.fromMap(json)).toList();
   }

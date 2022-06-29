@@ -12,9 +12,9 @@ class FeeHelper{
   //Columns
   final String colStudentId = 'feeStudentId';
   final String colSubjectName = 'feeSubjectName';
-  final String _colFees = 'fees';
-  final String _colMonth = 'month';
-  final String _colYear = 'year';
+  final String colFees = 'fees';
+  final String colMonth = 'month';
+  final String colYear = 'year';
   final String _colPaidOn = 'paidOn';
 
   static final FeeHelper instance = FeeHelper._privateConstructor();
@@ -33,11 +33,11 @@ class FeeHelper{
     CREATE TABLE IF NOT EXISTS $feeTableName(
     $colStudentId INT,
     $colSubjectName VARCHAR,
-    $_colFees FLOAT,
-    $_colMonth INT,
-    $_colYear INT,
+    $colFees FLOAT,
+    $colMonth INT,
+    $colYear INT,
     $_colPaidOn VARCHAR,    
-    PRIMARY KEY($colStudentId,$colSubjectName,$_colMonth,$_colYear),
+    PRIMARY KEY($colStudentId,$colSubjectName,$colMonth,$colYear),
     FOREIGN KEY($colStudentId) REFERENCES ${StudentHelper.instance.studentTableName}(${StudentHelper.instance.colId}) ON UPDATE CASCADE ON DELETE NO ACTION,
     FOREIGN KEY($colSubjectName) REFERENCES ${SubjectHelper.instance.subjectTableName}(${SubjectHelper.instance.colSubjectName}) ON UPDATE CASCADE ON DELETE NO ACTION        
     );
@@ -55,7 +55,7 @@ class FeeHelper{
     //Check if it already exists
     List<Map<String,dynamic>> data = await db.query(
         feeTableName,
-        where: '$colStudentId = ? and $colSubjectName = ? and ${_colMonth} = ? and ${_colYear} = ?',
+        where: '$colStudentId = ? and $colSubjectName = ? and ${colMonth} = ? and ${colYear} = ?',
         whereArgs: [fees.feeStudentId,fees.feeSubjectName,fees.month,fees.year]);
 
     if(data.isEmpty)
@@ -76,18 +76,18 @@ class FeeHelper{
     //Check if fees already exists
     List<Map<String,dynamic>> data = await db.query(
         feeTableName,
-        where: '$colStudentId = ? and $colSubjectName = ? AND $_colMonth = ? AND $_colYear = ?',
+        where: '$colStudentId = ? and $colSubjectName = ? AND $colMonth = ? AND $colYear = ?',
         whereArgs: [oldFeeData.feeStudentId,oldFeeData.feeSubjectName,DateTime.now().month,DateTime.now().year]);
 
     if(data.isNotEmpty){
       print("Updating..");
-      /*db.rawUpdate("UPDATE ${feeTableName} SET ${colSubjectName} = ? AND ${_colFees} = ? WHERE ${colStudentId} = ? AND ${colSubjectName} = ? AND $_colMonth = ? AND $_colYear = ?",
+      /*db.rawUpdate("UPDATE ${feeTableName} SET ${colSubjectName} = ? AND ${colFees} = ? WHERE ${colStudentId} = ? AND ${colSubjectName} = ? AND $colMonth = ? AND $colYear = ?",
           [newFeeData.feeSubjectName,newFeeData.fees,
             oldFeeData.feeStudentId,oldFeeData.feeSubjectName,DateTime.now().month,DateTime.now().year]);*/
 
       if(oldFeeData.feeSubjectName == newFeeData.feeSubjectName){
         db.update(feeTableName, newFeeData.toMap(),
-            where: '$colStudentId = ? and $colSubjectName = ? and $_colMonth = ? and $_colYear = ?',
+            where: '$colStudentId = ? and $colSubjectName = ? and $colMonth = ? and $colYear = ?',
             whereArgs: [oldFeeData.feeStudentId,oldFeeData.feeSubjectName,oldFeeData.month,oldFeeData.year]);
       }
       else{
@@ -109,13 +109,13 @@ class FeeHelper{
   setPaidOn(int studentId, int month,int year,String paidOn) async{
     Database db = await DatabaseHelper.instance.database;
 
-    /*List<Map> year  = await db.rawQuery("SELECT MAX(${_colYear}) FROM ${feeTableName}");
+    /*List<Map> year  = await db.rawQuery("SELECT MAX(${colYear}) FROM ${feeTableName}");
     int latestYear = year.first.values.first;
 
-    List<Map> month  = await db.rawQuery("SELECT MAX(${_colMonth}) FROM ${feeTableName} WHERE ${_colYear} = ${latestYear}");
+    List<Map> month  = await db.rawQuery("SELECT MAX(${colMonth}) FROM ${feeTableName} WHERE ${colYear} = ${latestYear}");
     int latestMonth = month.first.values.first;*/
 
-    List<Map> subject = await db.rawQuery("SELECT ${colSubjectName},${_colFees} FROM ${feeTableName} WHERE ${colStudentId} = ? AND ${_colMonth} = ? AND ${_colYear} = ? AND ${_colPaidOn} IS NULL",[studentId,month,year]);
+    List<Map> subject = await db.rawQuery("SELECT ${colSubjectName},${colFees} FROM ${feeTableName} WHERE ${colStudentId} = ? AND ${colMonth} = ? AND ${colYear} = ? AND ${_colPaidOn} IS NULL",[studentId,month,year]);
     List<String> subjectList = [];
     List<double> feesList = [];
 
@@ -140,7 +140,7 @@ class FeeHelper{
       await insert(FeeModel.createNewFeeData(feeStudentId: studentId, feeSubjectName: subjectList[i], fees: feesList[i], month: nextMonth, year: nextYear, paidOn: null));
     }
 
-    await db.rawUpdate("UPDATE $feeTableName SET ${_colPaidOn} = ? WHERE ${colStudentId} = ? AND ${_colMonth} = ? AND ${_colYear} = ? AND ${_colPaidOn} IS NULL",
+    await db.rawUpdate("UPDATE $feeTableName SET ${_colPaidOn} = ? WHERE ${colStudentId} = ? AND ${colMonth} = ? AND ${colYear} = ? AND ${_colPaidOn} IS NULL",
         [paidOn,studentId,month,year]);
 
     getAllFee();
@@ -148,7 +148,7 @@ class FeeHelper{
 
   Future<List<FeeModel>> getFeeByStudentId(int feeStudentId)async{
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(feeTableName,where: '$colStudentId = ?',whereArgs: [feeStudentId],orderBy: "${_colMonth},${_colYear} DESC");
+    List<Map<String,dynamic>> data = await db.query(feeTableName,where: '$colStudentId = ?',whereArgs: [feeStudentId],orderBy: "${colMonth},${colYear} DESC");
 
     data.forEach((element) {
       print(element);
@@ -160,14 +160,14 @@ class FeeHelper{
   Future<List<FeeModel>> getLatestFeeByStudentId(int feeStudentId)async{
     Database db = await DatabaseHelper.instance.database;
 
-    List<Map<String,dynamic>> data = await db.query(feeTableName,where: '$colStudentId = ? AND $_colMonth <= ? AND $_colYear <= ? AND $_colPaidOn IS NULL',whereArgs: [feeStudentId,DateTime.now().month,DateTime.now().year]);
+    List<Map<String,dynamic>> data = await db.query(feeTableName,where: '$colStudentId = ? AND $colMonth <= ? AND $colYear <= ? AND $_colPaidOn IS NULL',whereArgs: [feeStudentId,DateTime.now().month,DateTime.now().year]);
 
     return data.map((json) => FeeModel.fromMap(json)).toList();
   }
 
   Future<List<FeeModel>> getPendingFee(int feeStudentId, String feeSubjectName)async{
     Database db = await DatabaseHelper.instance.database;
-    List<Map<String,dynamic>> data = await db.query(feeTableName,where: '$colStudentId = ? and $colSubjectName = ? and $_colMonth = ? and $_colYear = ? and $_colPaidOn IS NULL',whereArgs: [feeStudentId,feeSubjectName,DateTime.now().month,DateTime.now().year]);
+    List<Map<String,dynamic>> data = await db.query(feeTableName,where: '$colStudentId = ? and $colSubjectName = ? and $colMonth = ? and $colYear = ? and $_colPaidOn IS NULL',whereArgs: [feeStudentId,feeSubjectName,DateTime.now().month,DateTime.now().year]);
 
     if(data.length == 0){
       int nextMonth = -1;
@@ -181,7 +181,7 @@ class FeeHelper{
         nextMonth = month + 1;
         nextYear = year;
       }
-      data = await db.query(feeTableName,where: '$colStudentId = ? and $colSubjectName = ? and $_colMonth = ? and $_colYear = ? and $_colPaidOn IS NULL',whereArgs: [feeStudentId,feeSubjectName,nextMonth,nextYear]);
+      data = await db.query(feeTableName,where: '$colStudentId = ? and $colSubjectName = ? and $colMonth = ? and $colYear = ? and $_colPaidOn IS NULL',whereArgs: [feeStudentId,feeSubjectName,nextMonth,nextYear]);
     }
     return data.map((json) => FeeModel.fromMap(json)).toList();
   }
@@ -207,7 +207,7 @@ class FeeHelper{
   Future<double> getCurrentFeeSum()async{
     Database db = await DatabaseHelper.instance.database;
 
-    List<Map> data = await db.rawQuery("SELECT SUM(${_colFees}) FROM ${feeTableName} WHERE ${_colMonth} = ? AND ${_colYear} = ?",[DateTime.now().month,DateTime.now().year]);
+    List<Map> data = await db.rawQuery("SELECT SUM(${colFees}) FROM ${feeTableName} WHERE ${colMonth} = ? AND ${colYear} = ?",[DateTime.now().month,DateTime.now().year]);
 
     return data.first.values.first??0;
   }

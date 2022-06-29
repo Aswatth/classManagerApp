@@ -18,14 +18,8 @@ class _StudentListState extends State<StudentList> {
 
   List<StudentSessionModel> _completeDataList = [];
 
-  int _totalStudents = -1;
-  double _totalFees = -1;
-
   Future<void> getAllData()async{
     List<StudentSessionModel> temp = await StudentSessionHelper.instance.getAllData();
-
-    _totalStudents = await StudentHelper.instance.getStudentCount();
-    _totalFees = await FeeHelper.instance.getCurrentFeeSum();
 
     setState(() {
       _completeDataList = temp;
@@ -70,12 +64,6 @@ class _StudentListState extends State<StudentList> {
   Widget studentListWidget(){
     return Column(
       children: [
-        ListTile(
-          title: Text("Total students: ${_totalStudents}"),
-        ),
-        ListTile(
-          title: Text("Fees for this month: ${_totalFees}"),
-        ),
         Expanded(
           child: ListView.builder(
             itemCount: _completeDataList.length,
@@ -124,6 +112,12 @@ class _StudentListState extends State<StudentList> {
     // TODO: implement initState
     super.initState();
     getAllData();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override

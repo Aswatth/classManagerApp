@@ -2,7 +2,7 @@ import 'package:class_manager/AppPages/StudentPages/student_list.dart';
 import 'package:class_manager/AppPages/StudentPages/student_search.dart';
 import 'package:class_manager/AppPages/backup.dart';
 import 'package:class_manager/AppPages/class_details.dart';
-import 'package:class_manager/AppPages/statistics.dart';
+import 'package:class_manager/AppPages/statistics_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
     StudentList(),
     StudentSearch(),
     ClassDetails(),
-    Statistics(),
+    StatisticsPage(),
     BackUp()
   ];
 
