@@ -146,13 +146,29 @@ class FeeHelper{
     getAllFee();
   }
 
+  Future<List<String>> getMonthYearByStudentId(int feeStudentId)async{
+    Database db = await DatabaseHelper.instance.database;
+    List<Map<String,dynamic>> data = await db.rawQuery('''
+    SELECT DISTINCT ${colMonth},${colYear} FROM ${feeTableName} WHERE $colStudentId = ? ORDER BY ${colMonth},${colYear} 
+    ''',[feeStudentId]);
+    //List<Map<String,dynamic>> data = await db.query(feeTableName,where: '$colStudentId = ?',whereArgs: [feeStudentId],orderBy: "${colMonth},${colYear} DESC");
+
+    List<String> dataToReturn = [];
+
+    data.forEach((element) {
+      dataToReturn.add("${DateFormat("MMM").format(DateTime(0,element.values.first))}-${element.values.last}");
+    });
+
+    return dataToReturn;
+  }
+
   Future<List<FeeModel>> getFeeByStudentId(int feeStudentId)async{
     Database db = await DatabaseHelper.instance.database;
     List<Map<String,dynamic>> data = await db.query(feeTableName,where: '$colStudentId = ?',whereArgs: [feeStudentId],orderBy: "${colMonth},${colYear} DESC");
 
-    data.forEach((element) {
+    /*data.forEach((element) {
       print(element);
-    });
+    });*/
 
     return data.map((json) => FeeModel.fromMap(json)).toList();
   }

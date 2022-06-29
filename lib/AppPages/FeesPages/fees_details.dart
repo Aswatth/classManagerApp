@@ -1,4 +1,4 @@
-import 'package:class_manager/AppPages/FeesPages/fee_list.dart';
+import 'package:class_manager/AppPages/FeesPages/fee_summary.dart';
 import 'package:class_manager/Model/fee.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:date_time_picker/date_time_picker.dart';
@@ -43,54 +43,6 @@ class _FeesDetailsState extends State<FeesDetails> {
       yearList = yearList.toSet().toList();*/
     });
   }
-
-  /*Widget monthDropDown(){
-    return DropdownButtonFormField(
-      hint: Text("Select month"),
-      validator: (value){
-        if(value == null){
-          return 'Select subject';
-        }else{
-          return null;
-        }
-      },
-      items: monthList.map<DropdownMenuItem<String>>((String data){
-        return DropdownMenuItem(
-          value: data,
-          child: Text(data),
-        );
-      }).toList(),
-      onChanged: (_){
-        setState(() {
-          _selectedMonth = _ as String;
-        });
-      },
-    );
-  }
-
-  Widget yearDropDown(){
-    return DropdownButtonFormField(
-      hint: Text("Select year"),
-      validator: (value){
-        if(value == null){
-          return 'Select subject';
-        }else{
-          return null;
-        }
-      },
-      items: yearList.map<DropdownMenuItem<int>>((int data){
-        return DropdownMenuItem(
-          value: data,
-          child: Text(data.toString()),
-        );
-      }).toList(),
-      onChanged: (_){
-        setState(() {
-          _selectedYear = _ as int;
-        });
-      },
-    );
-  }*/
 
   Widget dateTimeField() {
     return DateTimePicker(

@@ -1,4 +1,4 @@
-import 'package:class_manager/AppPages/FeesPages/fee_list.dart';
+import 'package:class_manager/AppPages/FeesPages/fee_summary.dart';
 import 'package:class_manager/AppPages/FeesPages/fees_details.dart';
 import 'package:class_manager/AppPages/SessionPages/session_list.dart';
 import 'package:class_manager/AppPages/StudentPages/student_profile.dart';
