@@ -47,7 +47,6 @@ class StudentSessionModel{
   String? startTime;
   String? endTime;
   String? sessionSlot;
-  double? fees;
 
   StudentSessionModel({
     required this.id,
@@ -64,8 +63,7 @@ class StudentSessionModel{
     required this.subjectName,
     required this.startTime,
     required this.endTime,
-    required this.sessionSlot,
-    required this.fees
+    required this.sessionSlot
   });
 
   Map<String,dynamic> toMap() {
@@ -84,8 +82,7 @@ class StudentSessionModel{
       'subjectName': subjectName,
       'startTime': startTime,
       'sessionSlot':sessionSlot,
-      'endTime': endTime,
-      'fees': fees.toString()
+      'endTime': endTime
     };
   }
 
@@ -104,12 +101,11 @@ class StudentSessionModel{
       subjectName: jsonToParse['subjectName'],
       startTime: jsonToParse['startTime'],
       endTime: jsonToParse['endTime'],
-      sessionSlot: jsonToParse['sessionSlot'],
-      fees:  jsonToParse['fees']
+      sessionSlot: jsonToParse['sessionSlot']
   );
 
   @override
   String toString() {
-    return 'StudentSessionModel{id: $id, studentPhoneNumber: $studentPhoneNumber, parentPhoneNumber1: $parentPhoneNumber1, parentPhoneNumber2: $parentPhoneNumber2, schoolName: $schoolName, name: $name, dob: $dob, className: $className, boardName: $boardName, location: $location, studentId: $studentId, subjectName: $subjectName, startTime: $startTime, endTime: $endTime, sessionSlot: $sessionSlot, fees: $fees}';
+    return 'StudentSessionModel{id: $id, studentPhoneNumber: $studentPhoneNumber, parentPhoneNumber1: $parentPhoneNumber1, parentPhoneNumber2: $parentPhoneNumber2, schoolName: $schoolName, name: $name, dob: $dob, className: $className, boardName: $boardName, location: $location, studentId: $studentId, subjectName: $subjectName, startTime: $startTime, endTime: $endTime, sessionSlot: $sessionSlot}';
   }
 }
