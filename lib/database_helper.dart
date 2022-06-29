@@ -24,7 +24,7 @@ class DatabaseHelper{
     _initDB();
   }
 
-  final _dbName = "temp28.db";
+  final String dbName = "temp28.db";
   final _version = 1;
 
   Future<Database> get database async{
@@ -35,7 +35,7 @@ class DatabaseHelper{
   Future<Database> _initDB() async
   {
     Directory dbPath = await getApplicationDocumentsDirectory();
-    final path = join(dbPath.path,_dbName);
+    final path = join(dbPath.path,dbName);
 
     Database db =  await openDatabase(path,version: _version,onCreate: _onCreate());
     await db.execute('PRAGMA foreign_keys = ON');
@@ -44,7 +44,7 @@ class DatabaseHelper{
 
   dropDB()async{
     Directory dbPath = await getApplicationDocumentsDirectory();
-    final path = join(dbPath.path,_dbName);
+    final path = join(dbPath.path,dbName);
     deleteDatabase(path);
     _initDB();
   }
