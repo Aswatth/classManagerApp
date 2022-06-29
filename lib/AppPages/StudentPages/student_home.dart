@@ -42,8 +42,7 @@ class _StudentHomeState extends State<StudentHome> {
     _screens = [
       StudentProfile(studentModel: widget.studentModel),
       SessionList(studentModel: widget.studentModel),
-      FeesDetails(studentModel: widget.studentModel),
-      FeeList(studentModel: widget.studentModel)
+      FeesDetails(studentModel: widget.studentModel)
     ];
   }
 
@@ -84,10 +83,10 @@ class _StudentHomeState extends State<StudentHome> {
           ),
           BottomNavigationBarItem(
               icon: Icon(
-                Icons.table_chart,
+                Icons.show_chart,
                 //color: _selectedIndex==1?Colors.blueAccent:Colors.grey,
               ),
-              label: "Fees list"
+              label: "Performance"
           ),
         ],
       ),

@@ -54,7 +54,12 @@ class _FeeListState extends State<FeeList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Fees list"),
+        leading: BackButton(
+          onPressed: (){
+            Navigator.pop(context);
+          },
+        ),
+        title: Text("Fees summary"),
       ),
       body: InteractiveViewer(
         constrained: false,

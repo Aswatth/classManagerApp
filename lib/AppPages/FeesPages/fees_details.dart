@@ -1,3 +1,4 @@
+import 'package:class_manager/AppPages/FeesPages/fee_list.dart';
 import 'package:class_manager/Model/fee.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:date_time_picker/date_time_picker.dart';
@@ -185,6 +186,13 @@ class _FeesDetailsState extends State<FeesDetails> {
     return RefreshIndicator(
       onRefresh: getFeeData,
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.table_chart),
+          onPressed: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context) => FeeList(studentModel: widget.studentModel,)));
+          },
+
+        ),
         appBar: AppBar(
           title: Text("${widget.studentModel.name} ${widget.studentModel.className} ${widget.studentModel.boardName} fees"),
         ),
@@ -201,7 +209,7 @@ class _FeesDetailsState extends State<FeesDetails> {
                     saveAlert();
                   }:null,
                   child: Text("Save")),
-            ):Container()
+            ):Container(),
           ],
         ),
       ),
