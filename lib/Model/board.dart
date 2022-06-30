@@ -31,7 +31,7 @@ class BoardHelper{
     return instance;
   }
 
-  insertBoard(BoardModel board)async {
+  Future<bool> insertBoard(BoardModel board)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -46,13 +46,15 @@ class BoardHelper{
         await db.insert(boardTableName, board.toMap());
 
         print(board.boardName+" inserted successfully");
+        return true;
       }
     else{
       print(board.boardName+" already exists");
+      return false;
     }
   }
 
-  update(BoardModel board,String newBoardName)async {
+  Future<bool> update(BoardModel board,String newBoardName)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -65,12 +67,14 @@ class BoardHelper{
       await db.update(boardTableName, board.toMap(),where: '$colBoardName = ?',whereArgs: [oldBoardName]);
 
       print(oldBoardName + " successfully updated to " + newBoardName);
+      return true;
     }else{
       print(newBoardName + " already exists");
+      return false;
     }
   }
 
-  delete(BoardModel board)async{
+  Future<bool> delete(BoardModel board)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -80,7 +84,9 @@ class BoardHelper{
     if(data.isNotEmpty) {
       await db.delete(boardTableName,where: '$colBoardName = ?',whereArgs: [board.boardName.toUpperCase()]);
       print(board.toString() + " successfully deleted");
+      return true;
     }
+    return false;
   }
 
   Future<BoardModel?> getBoard(String boardName)async{

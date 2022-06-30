@@ -1,6 +1,6 @@
 import 'package:class_manager/Model/board.dart';
 import 'package:flutter/material.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 class BoardInfo extends StatefulWidget {
   const BoardInfo({Key? key}) : super(key: key);
@@ -28,24 +28,43 @@ class _BoardInfoState extends State<BoardInfo> {
 
   addBoard()async{
     BoardModel board = BoardModel.createNewBoard(boardName: boardName);
-    await BoardHelper.instance.insertBoard(board);
+    bool isSuccessful = await BoardHelper.instance.insertBoard(board);
 
-    getBoardList();
+    if(isSuccessful){
+      getBoardList();
 
-    controller.clear();
+      controller.clear();
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("${boardName} added successfully!"),
+      ),);
+    }
   }
 
   updateBoard(BoardModel board, String newBoardName)async{
-    await BoardHelper.instance.update(board, newBoardName);
+    String oldBoardName = board.boardName;
+    bool isSuccessful = await BoardHelper.instance.update(board, newBoardName);
 
-    getBoardList();
-    controller.clear();
+    if(isSuccessful){
+      getBoardList();
+      controller.clear();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Updated ${oldBoardName} -> ${newBoardName} successfully!"),
+      ),);
+    }
   }
 
   deleteBoard(BoardModel board) async{
-    await BoardHelper.instance.delete(board);
+    bool isSuccessful = await BoardHelper.instance.delete(board);
 
-    getBoardList();
+    if(isSuccessful){
+
+      getBoardList();
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Deleted ${board.boardName} successfully!"),
+      ),);
+    }
   }
 
   Widget boardTextField(){
@@ -190,37 +209,39 @@ class _BoardInfoState extends State<BoardInfo> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: (){
-        FocusScopeNode currentFocus = FocusScope.of(context);
+    return OverlaySupport.global(
+      child: GestureDetector(
+        onTap: (){
+          FocusScopeNode currentFocus = FocusScope.of(context);
 
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
-          isEditing = List.filled(boardList.length, false);
-        }
-      },
-      child: RefreshIndicator(
-        onRefresh: getBoardList,
-        child: Scaffold(
-            appBar: AppBar(
-              leading: BackButton(
-                onPressed: (){
-                  Navigator.pop(context);
-                },
-              ),
-              title: Text("Board info"),
-              actions: [
-                !isAdding?IconButton(
-                  icon: Icon(Icons.add),
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+            isEditing = List.filled(boardList.length, false);
+          }
+        },
+        child: RefreshIndicator(
+          onRefresh: getBoardList,
+          child: Scaffold(
+              appBar: AppBar(
+                leading: BackButton(
                   onPressed: (){
-                    setState(() {
-                      isAdding = true;
-                    });
+                    Navigator.pop(context);
                   },
-                ):Container()
-              ],
-            ),
-            body: boardListWidget()
+                ),
+                title: Text("Board info"),
+                actions: [
+                  !isAdding?IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: (){
+                      setState(() {
+                        isAdding = true;
+                      });
+                    },
+                  ):Container()
+                ],
+              ),
+              body: boardListWidget()
+          ),
         ),
       ),
     );
