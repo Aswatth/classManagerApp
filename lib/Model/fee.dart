@@ -48,7 +48,7 @@ class FeeHelper{
     db.execute(_createStudentTable);
   }
 
-  insert(FeeModel fees)async {
+  Future<bool> insert(FeeModel fees)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -61,15 +61,17 @@ class FeeHelper{
     if(data.isEmpty)
     {
       //Insert
-      db.insert(feeTableName, fees.toMap());
+      await db.insert(feeTableName, fees.toMap());
       print(fees.toString()+" inserted successfully");
+      return true;
     }
     else{
       print(fees.toString()+" already exists");
+      return false;
     }
   }
 
-  update(FeeModel oldFeeData, FeeModel newFeeData)async {
+  Future<bool> update(FeeModel oldFeeData, FeeModel newFeeData)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -86,24 +88,28 @@ class FeeHelper{
             oldFeeData.feeStudentId,oldFeeData.feeSubjectName,DateTime.now().month,DateTime.now().year]);*/
 
       if(oldFeeData.feeSubjectName == newFeeData.feeSubjectName){
-        db.update(feeTableName, newFeeData.toMap(),
+        await db.update(feeTableName, newFeeData.toMap(),
             where: '$colStudentId = ? and $colSubjectName = ? and $colMonth = ? and $colYear = ?',
             whereArgs: [oldFeeData.feeStudentId,oldFeeData.feeSubjectName,oldFeeData.month,oldFeeData.year]);
+        return true;
       }
       else{
-        delete(oldFeeData.feeStudentId, oldFeeData.feeSubjectName);
-        insert(newFeeData);
+        await delete(oldFeeData.feeStudentId, oldFeeData.feeSubjectName);
+        await insert(newFeeData);
+        return true;
       }
     }
+    return false;
   }
 
-  delete(int feeStudentId, String feeSubjectName)async{
+  Future<bool> delete(int feeStudentId, String feeSubjectName)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
     await db.delete(
         feeTableName,
         where: '$colStudentId = ? and $colSubjectName = ? and $_colPaidOn IS NULL',
         whereArgs: [feeStudentId,feeSubjectName]);
+    return true;
   }
 
   setPaidOn(int studentId, int month,int year,String paidOn) async{

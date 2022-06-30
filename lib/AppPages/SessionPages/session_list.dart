@@ -28,11 +28,11 @@ class _SessionListState extends State<SessionList> {
   }
 
   deleteSession(String subjectName)async{
-    bool isSuccessful = await SessionHelper.instance.delete(widget.studentModel.id!, subjectName);
+    bool isSessionDeletionSuccessful = await SessionHelper.instance.delete(widget.studentModel.id!, subjectName);
 
-    await FeeHelper.instance.delete(widget.studentModel.id!, subjectName);
+    bool isFeeDeletionSuccessful = await FeeHelper.instance.delete(widget.studentModel.id!, subjectName);
 
-    if(isSuccessful){
+    if(isSessionDeletionSuccessful && isFeeDeletionSuccessful){
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Session deleted successfully!"),
       ),);

@@ -184,26 +184,26 @@ class _EditSessionState extends State<EditSession> {
     );
   }
 
-  updateFee()async{
+  Future<bool> updateFee()async{
     List<FeeModel> feeModelList = await FeeHelper.instance.getPendingFee(widget.student.id!, widget.session.subjectName);
     FeeModel oldFeeModel = feeModelList.first;
     FeeModel newFeeModel = FeeModel.createNewFeeData(feeStudentId: widget.student.id!, feeSubjectName: _selectedSubject, fees: _fees, month: oldFeeModel.month, year: oldFeeModel.year, paidOn: oldFeeModel.paidOn);
 
-    await FeeHelper.instance.update(oldFeeModel, newFeeModel);
+    return await FeeHelper.instance.update(oldFeeModel, newFeeModel);
   }
 
   updateSession()async{
     SessionModel session = SessionModel.createNewSession(studentId: widget.student.id!, subjectName: _selectedSubject, startTime: _startTime, endTime: _endTime, sessionSlot: _selectedSessionDays.toString());
 
-    bool isSuccessful = await SessionHelper.instance.update(widget.session,session);
+    bool isSessionUpdateSuccessful = await SessionHelper.instance.update(widget.session,session);
 
-    if(isSuccessful){
+    bool isFeeUpdateSuccessful = await updateFee();
+
+    if(isSessionUpdateSuccessful && isFeeUpdateSuccessful){
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Session updated successfully!"),
       ),);
     }
-
-    updateFee();
   }
 
   _save() async{
