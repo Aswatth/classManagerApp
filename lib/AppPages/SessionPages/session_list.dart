@@ -1,3 +1,4 @@
+import 'package:class_manager/AppPages/PerformancePages/performance_page.dart';
 import 'package:class_manager/AppPages/SessionPages/add_session.dart';
 import 'package:class_manager/Model/fee.dart';
 import 'package:class_manager/Model/session.dart';
@@ -79,16 +80,34 @@ class _SessionListState extends State<SessionList> {
           itemCount: _sessionList.length,
           itemBuilder: (context, index){
             SessionModel session = _sessionList[index];
-            return ListTile(
-              title: Text(session.subjectName),
-              subtitle: Text(session.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
-              trailing: Text(session.startTime + " - " + session.endTime),
-              onTap: (){
-                editSession(session);
-              },
-              onLongPress: (){
-                deleteSession(session.subjectName);
-              },
+            return Container(
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text(session.subjectName),
+                    subtitle: Text(session.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
+                    trailing: Text(session.startTime + " - " + session.endTime),
+                    onTap: (){
+                      editSession(session);
+                    },
+                    onLongPress: (){
+                      deleteSession(session.subjectName);
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: ElevatedButton(
+                          onPressed: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => PerformancePage(studentModel: widget.studentModel,subjectName: session.subjectName),));
+                          },
+                          child: Text("Visualize performance")
+                      ),
+                    ),
+                  )
+                ],
+              ),
             );
           },
         )

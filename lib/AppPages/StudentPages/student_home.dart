@@ -1,5 +1,6 @@
 import 'package:class_manager/AppPages/FeesPages/fee_summary.dart';
 import 'package:class_manager/AppPages/FeesPages/fees_details.dart';
+import 'package:class_manager/AppPages/PerformancePages/performance_page.dart';
 import 'package:class_manager/AppPages/SessionPages/session_list.dart';
 import 'package:class_manager/AppPages/StudentPages/student_profile.dart';
 import 'package:class_manager/Model/student.dart';
@@ -42,7 +43,7 @@ class _StudentHomeState extends State<StudentHome> {
     _screens = [
       StudentProfile(studentModel: widget.studentModel),
       SessionList(studentModel: widget.studentModel),
-      FeesDetails(studentModel: widget.studentModel)
+      FeesDetails(studentModel: widget.studentModel),
     ];
   }
 
@@ -80,13 +81,6 @@ class _StudentHomeState extends State<StudentHome> {
                 //color: _selectedIndex==1?Colors.blueAccent:Colors.grey,
               ),
               label: "Fees details"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.show_chart,
-                //color: _selectedIndex==1?Colors.blueAccent:Colors.grey,
-              ),
-              label: "Performance"
           ),
         ],
       ),

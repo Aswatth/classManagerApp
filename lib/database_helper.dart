@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:class_manager/Model/board.dart';
 import 'package:class_manager/Model/class.dart';
+import 'package:class_manager/Model/fee.dart';
+import 'package:class_manager/Model/performance.dart';
 import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:class_manager/Model/subject.dart';
@@ -58,5 +60,7 @@ class DatabaseHelper{
     SubjectHelper.instance;
     SessionHelper.instance;
     StudentSessionHelper.instance;
+    FeeHelper.instance;
+    PerformanceHelper.instance;
   }
 }
