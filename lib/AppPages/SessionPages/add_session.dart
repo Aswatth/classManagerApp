@@ -194,8 +194,16 @@ class _AddSessionState extends State<AddSession> {
 
     FeeModel feeModel = FeeModel.createNewFeeData(feeStudentId: widget.student.id!, feeSubjectName: _selectedSubject, fees: _fees, month: DateTime.now().month, year: DateTime.now().year, paidOn: null);
 
-    await SessionHelper.instance.insert(session);
+    bool isSessionSaveSuccessful = await SessionHelper.instance.insert(session);
     await FeeHelper.instance.insert(feeModel);
+
+    if(isSessionSaveSuccessful){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Session created successfully!"),
+      ),);
+    }
+
+
   }
 
   _save() async{

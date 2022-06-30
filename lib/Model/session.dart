@@ -45,7 +45,7 @@ class SessionHelper{
     db.execute(_createStudentTable);
   }
 
-  insert(SessionModel session)async {
+  Future<bool> insert(SessionModel session)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -58,15 +58,17 @@ class SessionHelper{
     if(data.isEmpty)
     {
       //Insert
-      db.insert(sessionTableName, session.toMap());
+      await db.insert(sessionTableName, session.toMap());
       print(session.toString()+" inserted successfully");
+      return true;
     }
     else{
       print(session.toString()+" already exists");
+      return false;
     }
   }
 
-  update(SessionModel oldSession, SessionModel newSession)async {
+  Future<bool> update(SessionModel oldSession, SessionModel newSession)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -77,19 +79,22 @@ class SessionHelper{
         whereArgs: [oldSession.studentId,oldSession.subjectName]);
 
     if(data.isNotEmpty){
-      db.update(sessionTableName, newSession.toMap(),
+      await db.update(sessionTableName, newSession.toMap(),
           where: '$colStudentId = ? and $_colSubjectName = ?',
           whereArgs: [oldSession.studentId,oldSession.subjectName]);
+      return true;
     }
+    return false;
   }
 
-  delete(int studentId, String subjectName)async{
+  Future<bool> delete(int studentId, String subjectName)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
     await db.delete(
         sessionTableName,
         where: '$colStudentId = ? and $_colSubjectName = ?',
         whereArgs: [studentId,subjectName]);
+    return true;
   }
 
   Future<List<SessionModel>> getSessionByStudentId(int studentId)async{

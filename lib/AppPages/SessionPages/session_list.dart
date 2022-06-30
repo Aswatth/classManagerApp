@@ -28,9 +28,15 @@ class _SessionListState extends State<SessionList> {
   }
 
   deleteSession(String subjectName)async{
-    await SessionHelper.instance.delete(widget.studentModel.id!, subjectName);
+    bool isSuccessful = await SessionHelper.instance.delete(widget.studentModel.id!, subjectName);
 
     await FeeHelper.instance.delete(widget.studentModel.id!, subjectName);
+
+    if(isSuccessful){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Session deleted successfully!"),
+      ),);
+    }
 
     getSession();
   }

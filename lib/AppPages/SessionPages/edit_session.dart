@@ -195,7 +195,13 @@ class _EditSessionState extends State<EditSession> {
   updateSession()async{
     SessionModel session = SessionModel.createNewSession(studentId: widget.student.id!, subjectName: _selectedSubject, startTime: _startTime, endTime: _endTime, sessionSlot: _selectedSessionDays.toString());
 
-    await SessionHelper.instance.update(widget.session,session);
+    bool isSuccessful = await SessionHelper.instance.update(widget.session,session);
+
+    if(isSuccessful){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Session updated successfully!"),
+      ),);
+    }
 
     updateFee();
   }
