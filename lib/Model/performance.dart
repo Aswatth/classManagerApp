@@ -48,7 +48,7 @@ class PerformanceHelper{
     await db.execute(_createStudentTable);
   }
 
-  insert(PerformanceModel performanceModel)async {
+  Future<bool> insert(PerformanceModel performanceModel)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -63,38 +63,51 @@ class PerformanceHelper{
       //Insert
       await db.insert(performanceTableName, performanceModel.toMap());
       print(performanceModel.toString()+" inserted successfully");
+      return true;
     }
     else{
       print(performanceModel.toString()+" already exists");
+      return false;
     }
   }
 
-  update(PerformanceModel olderPerformanceModel, PerformanceModel newPerformanceData)async {
+  Future<bool> update(PerformanceModel olderPerformanceModel, PerformanceModel newPerformanceData)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
     //Check if fees already exists
     List<Map<String,dynamic>> data = await db.query(
         performanceTableName,
-        where: '$colTestId = ?',
-        whereArgs: [olderPerformanceModel.testId]);
+        where: '${colStudentId} = ? and ${colSubjectName} = ? and ${colTestDate} = ?',
+        whereArgs: [olderPerformanceModel.performanceStudentId,olderPerformanceModel.performanceSubjectName,DateFormat("dd-MMM-yyy").format(newPerformanceData.testDate)]);
 
-    if(data.isNotEmpty){
+    if(data.isEmpty){
       print("Updating..");
 
       await db.update(performanceTableName, newPerformanceData.toMap(),
           where: '$colTestId = ?',
           whereArgs: [olderPerformanceModel.testId]);
+      return true;
     }
+    else{
+      if(olderPerformanceModel.testDate == newPerformanceData.testDate){
+        await db.update(performanceTableName, newPerformanceData.toMap(),
+            where: '$colTestId = ?',
+            whereArgs: [olderPerformanceModel.testId]);
+        return true;
+      }
+    }
+    return false;
   }
 
-  delete(PerformanceModel performanceModel)async{
+  Future<bool> delete(PerformanceModel performanceModel)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
     await db.delete(
         performanceTableName,
         where: '$colTestId = ?',
         whereArgs: [performanceModel.testId]);
+    return true;
   }
 
   Future<List<PerformanceModel>> getPerformanceList(int studentId, String subjectName)async{

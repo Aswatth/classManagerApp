@@ -167,19 +167,38 @@ class _PerformancePageState extends State<PerformancePage> {
     _formKey.currentState!.save();
 
     PerformanceModel performanceModel = PerformanceModel.createNew(performanceStudentId: widget.studentModel.id!, performanceSubjectName: widget.subjectName, testDate: _selectedTestDate, marksScored: _marksScored, maxMarks: _totalMarks, isTuitionTest: _isTuitionTest);
-    await PerformanceHelper.instance.insert(performanceModel);
+    bool isSuccessful = await PerformanceHelper.instance.insert(performanceModel);
 
-    _testDateController.clear();
-    _marksScoredController.clear();
-    _totalMarksController.clear();
+    if(isSuccessful){
+      _testDateController.clear();
+      _marksScoredController.clear();
+      _totalMarksController.clear();
 
-    getPerformance();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Test created successfully!"),
+      ),);
+
+      getPerformance();
+
+      Navigator.pop(context);
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Test already exists!"),
+      ),);
+    }
   }
 
   _delete(PerformanceModel performanceModel)async{
-    await PerformanceHelper.instance.delete(performanceModel);
+    bool isSuccessful = await PerformanceHelper.instance.delete(performanceModel);
 
-    getPerformance();
+    if(isSuccessful){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Deleted test successfully!"),
+      ),);
+
+      getPerformance();
+    }
   }
 
   _update(PerformanceModel oldPerformanceModel)async{
@@ -187,13 +206,26 @@ class _PerformancePageState extends State<PerformancePage> {
 
     PerformanceModel newPerformance = PerformanceModel(testId: oldPerformanceModel.testId,performanceStudentId: widget.studentModel.id!, performanceSubjectName: widget.subjectName, testDate: _selectedTestDate, marksScored: _marksScored, maxMarks: _totalMarks, isTuitionTest: _isTuitionTest);
 
-    await PerformanceHelper.instance.update(oldPerformanceModel , newPerformance);
+    bool isSuccessful = await PerformanceHelper.instance.update(oldPerformanceModel , newPerformance);
 
-    _testDateController.clear();
-    _marksScoredController.clear();
-    _totalMarksController.clear();
+    if(isSuccessful){
+      _testDateController.clear();
+      _marksScoredController.clear();
+      _totalMarksController.clear();
 
-    getPerformance();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Updated test successfully!"),
+      ),);
+
+      getPerformance();
+
+      Navigator.pop(context);
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Test already exists!"),
+      ),);
+    }
   }
   
   edit(PerformanceModel performanceModel){
@@ -250,7 +282,6 @@ class _PerformancePageState extends State<PerformancePage> {
                     _update(oldPerformanceModel!);
                   }
                 });
-                Navigator.pop(context);
               }
             },
             child: Text(
