@@ -41,15 +41,15 @@ class _StudentListState extends State<StudentList> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("Deleted successfully!"),
         ),);
+        getAllData();
       }
     }
     catch(e){
+      print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Delete student session first."),
+        content: Text("Delete student session/fee details first."),
       ),);
     }
-
-    getAllData();
   }
 
   deleteConfirmation(int studentId, String studentName){

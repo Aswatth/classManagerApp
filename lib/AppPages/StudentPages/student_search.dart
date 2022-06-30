@@ -83,9 +83,22 @@ class _StudentSearchState extends State<StudentSearch> {
   }
 
   deleteStudent(int studentId)async{
-    await StudentHelper.instance.delete(studentId);
+    try {
+      bool isSuccessful = await StudentHelper.instance.delete(studentId);
 
-    getAllData();
+      if(isSuccessful){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Deleted successfully!"),
+        ),);
+        getAllData();
+      }
+    }
+    catch(e){
+      print(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Delete student session/fee details first."),
+      ),);
+    }
   }
 
   deleteConfirmation(int studentId, String studentName){
