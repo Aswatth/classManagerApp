@@ -34,7 +34,20 @@ class _StudentListState extends State<StudentList> {
   }
 
   deleteStudent(int studentId)async{
-    await StudentHelper.instance.delete(studentId);
+    try {
+      bool isSuccessful = await StudentHelper.instance.delete(studentId);
+
+      if(isSuccessful){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Deleted successfully!"),
+        ),);
+      }
+    }
+    catch(e){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Delete student session first."),
+      ),);
+    }
 
     getAllData();
   }

@@ -48,7 +48,7 @@ class StudentHelper{
     db.execute(_createStudentTable);
   }
 
-  insertStudent(StudentModel student)async {
+  Future<bool> insertStudent(StudentModel student)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -60,14 +60,15 @@ class StudentHelper{
       //Insert
       await db.insert(studentTableName, student.toMap());
       print(student.toMap().toString()+" inserted successfully");
-
+      return true;
     }
     else{
       print(student.toString()+" already exists");
+      return false;
     }
   }
 
-  update(StudentModel student)async {
+  Future<bool> update(StudentModel student)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -78,10 +79,12 @@ class StudentHelper{
       await db.update(studentTableName, student.toMap(),where: '$colId = ?',whereArgs: [student.id]);
 
       print(student.toString() + " updated successfully");
+      return true;
     }
+    return false;
   }
 
-  delete(int studentId)async{
+  Future<bool> delete(int studentId)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -92,7 +95,9 @@ class StudentHelper{
       await db.delete(studentTableName,where: '$colId = ?',whereArgs: [studentId]);
 
       print("Deleted successfully");
+      return true;
     }
+    return false;
   }
 
   Future<StudentModel?> getStudent(int studentId)async{

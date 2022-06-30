@@ -353,7 +353,14 @@ class _AddStudentState extends State<AddStudent> {
         boardName: _boardName,
         location: _location
     );
-    await StudentHelper.instance.insertStudent(student);
+    bool isSuccessful = await StudentHelper.instance.insertStudent(student);
+
+    if(isSuccessful){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Added new student ${student.name} successfully!"),
+      ),);
+      Navigator.pop(context);
+    }
   }
 
   _save(){

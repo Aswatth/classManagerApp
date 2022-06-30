@@ -368,81 +368,14 @@ class _StudentProfileState extends State<StudentProfile> {
     await SessionHelper.instance.delete(widget.studentModel.id!, subjectName);
   }
 
-  /*Widget studentDrawer() {
-    return Drawer(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Divider(color: Colors.black87,),
-            ListTile(
-              onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => AddSession(student: widget.studentModel),)).then((value){
-                  setState(() {
-                    getSession();
-                  });
-                });
-              },
-              leading: Icon(Icons.more_time_rounded),
-              title: Text("Add session",),
-            ),
-            ListTile(
-              leading: Icon(Icons.query_stats_rounded),
-              title: Text("Performance"),
-            ),
-            Divider(color: Colors.black87,),
-            Center(child: Text("Session list",
-              style: TextStyle(
-                fontSize: 20,
-                fontStyle: FontStyle.italic
-            ),)),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blueAccent),
-                  ),
-                  child: FutureBuilder<List<SessionModel>>(
-                    future: getSession(),
-                    builder: (context, snapshot){
-                      if(snapshot.hasData){
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index){
-                            SessionModel session = snapshot.data![index];
-                            return ListTile(
-                              title: Text(session.subjectName),
-                              subtitle: Text(session.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
-                              trailing: Text(session.startTime + " - " + session.endTime),
-                              onTap: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => EditSession(student: widget.studentModel,session: session),));
-                              },
-                              onLongPress: (){
-                                deleteSession(session.subjectName);
-                              },
-                            );
-                          },
-                        );
-                      }
-                      else{
-                        return Container();
-                      }
-                    },
-                  )
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }*/
-
   updateStudent()async{
-    await StudentHelper.instance.update(widget.studentModel);
+    bool isSuccessful = await StudentHelper.instance.update(widget.studentModel);
+
+    if(isSuccessful){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Updated successfully!"),
+      ),);
+    }
   }
 
   _save(){
