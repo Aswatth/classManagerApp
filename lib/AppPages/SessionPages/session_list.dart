@@ -5,6 +5,7 @@ import 'package:class_manager/Model/performance.dart';
 import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 import 'edit_session.dart';
 
@@ -42,6 +43,28 @@ class _SessionListState extends State<SessionList> {
     }
 
     getSession();
+  }
+
+  deleteConfirmation(String subjectName){
+    Alert(
+        context: context,
+        content: Text("Are you sure you want to delete ${subjectName} session?"),
+        buttons: [
+          DialogButton(
+            child: Text("No"),
+            onPressed: (){
+              Navigator.pop(context);
+            },
+          ),
+          DialogButton(
+            child: Text("Yes"),
+            onPressed: (){
+              deleteSession(subjectName);
+              Navigator.pop(context);
+            },
+          )
+        ]
+    ).show();
   }
 
   editSession(SessionModel session)async
@@ -98,7 +121,7 @@ class _SessionListState extends State<SessionList> {
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
                           onPressed: (){
-                            deleteSession(session.subjectName);
+                            deleteConfirmation(session.subjectName);
                           },
                           child: Row(
                             children: [
