@@ -47,8 +47,15 @@ class _BackUpState extends State<BackUp> {
       File dbFile = File(dbPath+"/${DatabaseHelper.instance.dbName}");
       await toStoreDir.create();
       await dbFile.copy("${toStoreDir.path}/${DatabaseHelper.instance.dbName}");
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Backup successful to ${toStoreDir}"),
+      ),);
+
     }catch(e){
-      //print("Cannot backup ${e.toString()}");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Backup unsuccessful!"),
+      ),);
     }
   }
 
@@ -60,8 +67,14 @@ class _BackUpState extends State<BackUp> {
 
       await savedDB.copy(dbPath+"/${DatabaseHelper.instance.dbName}");
 
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Successfully restored!"),
+      ),);
+
     }catch(e) {
-      //print("Cannot backup ${e.toString()}");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Restore unsuccessfuly!"),
+      ),);
     }
   }
 
