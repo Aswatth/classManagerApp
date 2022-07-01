@@ -19,7 +19,6 @@ class _HomePageState extends State<HomePage> {
   PageController _pageController = PageController();
   List<Widget> _screens = [
     StudentList(),
-    StudentSearch(),
     ClassDetails(),
     StatisticsPage(),
     BackUp()
@@ -60,13 +59,6 @@ class _HomePageState extends State<HomePage> {
                 //color: _selectedIndex==0?Colors.blueAccent:Colors.grey,
               ),
               label: "Student List"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(
-                  Icons.search,
-                  //color: _selectedIndex==1?Colors.blueAccent:Colors.grey,
-              ),
-              label: "Search"
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.class_),

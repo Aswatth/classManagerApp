@@ -458,21 +458,39 @@ class _StudentProfileState extends State<StudentProfile> {
               parentPhoneNumber1Field(),
               parentPhoneNumber2Field(),
               locationField(),
-              _isEditing?Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: ElevatedButton(
-                    onPressed: (){
-                      setState(() {
-                        //Save
-                        if(_formKey.currentState!.validate()){
-                          _save();
-                        }
-                      });
-                    },
-                    child: Text("Save"),
+              _isEditing?Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: ElevatedButton(
+                        onPressed: (){
+                          setState(() {
+                            //Save
+                            if(_formKey.currentState!.validate()){
+                              _save();
+                            }
+                          });
+                        },
+                        child: Text("Save"),
+                      ),
+                    ),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: ElevatedButton(
+                        onPressed: (){
+                          setState(() {
+                            _isEditing = false;
+                          });
+                        },
+                        child: Text("Cancel"),
+                      ),
+                    ),
+                  )
+                ],
               ):Container()
             ],
           ),

@@ -336,61 +336,65 @@ class _StudentSearchState extends State<StudentSearch> {
     return RefreshIndicator(
       onRefresh: !isSearching?getAllData:getSearchedStudent,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text("Search"),
-        ),
-        body: Column(
-          children: [
-            ExpansionPanelList(
-              expansionCallback: (id,_){
-                setState(() {
-                  isExpanded = !_;
-                });
-              },
-              children: [
-                ExpansionPanel(
-                  headerBuilder: (context, isExpanded) {
-                    return ListTile(
-                      title: Text("Search by"),
-                    );
-                  },
-                    isExpanded: isExpanded,
-                    body: Column(
-                      children: [
-                        classDropDown(),
-                        boardDropDown(),
-                        subjectDropDown(),
-                        studentNameSearchFiled(),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              ElevatedButton(
-                                child: Text("Search"),
-                                onPressed: (){
-                                  setState(() {
-                                    search();
-                                  });
-                                },
-                              ),
-                              ElevatedButton(
-                                child: Text("Clear"),
-                                onPressed: (){
-                                  setState(() {
-                                    clearFilters();
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ))
-              ],
-            ),
-            Expanded(child: studentListWidget())
+        body: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            SliverAppBar(
+              title: Text("Search"),
+            )
           ],
+          body: Column(
+            children: [
+              ExpansionPanelList(
+                expansionCallback: (id,_){
+                  setState(() {
+                    isExpanded = !_;
+                  });
+                },
+                children: [
+                  ExpansionPanel(
+                      headerBuilder: (context, isExpanded) {
+                        return ListTile(
+                          title: Text("Search by"),
+                        );
+                      },
+                      isExpanded: isExpanded,
+                      body: Column(
+                        children: [
+                          classDropDown(),
+                          boardDropDown(),
+                          subjectDropDown(),
+                          studentNameSearchFiled(),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                ElevatedButton(
+                                  child: Text("Search"),
+                                  onPressed: (){
+                                    setState(() {
+                                      search();
+                                    });
+                                  },
+                                ),
+                                ElevatedButton(
+                                  child: Text("Clear"),
+                                  onPressed: (){
+                                    setState(() {
+                                      clearFilters();
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ))
+                ],
+              ),
+              Expanded(child: studentListWidget())
+            ],
+          ),
         ),
       ),
     );

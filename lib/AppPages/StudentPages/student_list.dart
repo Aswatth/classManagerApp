@@ -1,8 +1,10 @@
 import 'package:class_manager/AppPages/StudentPages/student_home.dart';
+import 'package:class_manager/AppPages/StudentPages/student_search.dart';
 import 'package:class_manager/Model/fee.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:class_manager/Model/student_session.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 import 'add_student.dart';
@@ -17,6 +19,8 @@ class StudentList extends StatefulWidget {
 class _StudentListState extends State<StudentList> {
 
   List<StudentSessionModel> _completeDataList = [];
+
+  bool showFloatingActionButton = true;
 
   Future<void> getAllData()async{
     List<StudentSessionModel> temp = await StudentSessionHelper.instance.getAllData();
@@ -138,19 +142,43 @@ class _StudentListState extends State<StudentList> {
     return RefreshIndicator(
       onRefresh: getAllData,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text("Student List"),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.person_add),
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => AddStudent(),)).then((value) => getAllData());
-              },
-            )
+        floatingActionButton: showFloatingActionButton?FloatingActionButton(
+          onPressed: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context) =>AddStudent() ,));
+          },
+          child: Icon(Icons.person_add),
+        ):null,
+        body: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            SliverAppBar(
+              title: Text("Student List"),
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => StudentSearch(),));
+                  },
+                )
+              ],
+            ),
           ],
+          body: NotificationListener<UserScrollNotification>(
+            onNotification: (notification){
+              if(notification.direction == ScrollDirection.forward){
+                if(!showFloatingActionButton) setState(() {
+                  showFloatingActionButton = true;
+                });
+              }
+              else if(notification.direction == ScrollDirection.reverse){
+                if(showFloatingActionButton) setState(() {
+                  showFloatingActionButton = false;
+                });
+              }
+              return true;
+            },
+            child: studentListWidget(),),
+          )
         ),
-        body: studentListWidget(),
-      ),
-    );
+      );
   }
 }

@@ -145,7 +145,7 @@ class _FeeListState extends State<FeeList> {
             Navigator.pop(context);
           },
         ),
-        title: Text("Fees summary"),
+        title: Text("${widget.studentModel.name}'s fees summary"),
       ),
       body: Column(
         children: [
