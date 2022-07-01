@@ -102,6 +102,15 @@ class FeeHelper{
     return false;
   }
 
+  Future<bool> deleteSummary(int feeStudentId)async{
+    Database db = await DatabaseHelper.instance.database;
+    await db.delete(
+        feeTableName,
+        where: '$colStudentId = ?',
+        whereArgs: [feeStudentId]);
+    return true;
+  }
+
   Future<bool> delete(int feeStudentId, String feeSubjectName)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;

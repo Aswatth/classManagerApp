@@ -2,6 +2,7 @@ import 'package:class_manager/Model/fee.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class FeeList extends StatefulWidget {
   StudentModel studentModel;
@@ -67,6 +68,7 @@ class _FeeListState extends State<FeeList> {
 
   Widget monthDropDown(){
     return DropdownButtonFormField(
+      value: _selectedMonthYear.isEmpty?null:_selectedMonthYear,
       hint: Text("Select Month-Year"),
       items: monthYearList.map<DropdownMenuItem<String>>((String data){
         return DropdownMenuItem(
@@ -83,6 +85,48 @@ class _FeeListState extends State<FeeList> {
       },
     );
   }
+
+
+  delete() async{
+    bool isSuccessful = await FeeHelper.instance.deleteSummary(widget.studentModel.id!);
+
+    if(isSuccessful){
+      if(_feeList.length != 0){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Fees summary deleted successfully!"),
+        ),);
+        getFeeData();
+      }
+      else{
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Fees summary empty"),
+        ),);
+      }
+    }
+  }
+
+  deleteConfirmation(){
+    Alert(
+        context: context,
+        content: Text("Are you sure you want to delete ${widget.studentModel.name}'s  fee summary"),
+        buttons: [
+          DialogButton(
+            child: Text("No"),
+            onPressed: (){
+              Navigator.pop(context);
+            },
+          ),
+          DialogButton(
+            child: Text("Yes"),
+            onPressed: (){
+              delete();
+              Navigator.pop(context);
+            },
+          )
+        ]
+    ).show();
+  }
+
 
   @override
   void initState() {
@@ -108,6 +152,31 @@ class _FeeListState extends State<FeeList> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: monthDropDown(),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: (){
+                  //Clear dropdown
+                  setState(() {
+                    _selectedMonthYear = '';
+
+                    getFeeData();
+                  });
+                },
+                child: Text("Clear"),
+              ),
+              ElevatedButton(
+                onPressed: (){
+                  //Delete summary
+                  setState(() {
+                    deleteConfirmation();
+                  });
+                },
+                child: Text("Delete summary"),
+              )
+            ],
           ),
           Expanded(
             child: Padding(
