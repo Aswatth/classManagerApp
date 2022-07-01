@@ -144,7 +144,11 @@ class _StudentListState extends State<StudentList> {
       child: Scaffold(
         floatingActionButton: showFloatingActionButton?FloatingActionButton(
           onPressed: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context) =>AddStudent() ,));
+            Navigator.push(context, MaterialPageRoute(builder: (context) =>AddStudent() ,)).then((value){
+              setState(() {
+                getAllData();
+              });
+            });
           },
           child: Icon(Icons.person_add),
         ):null,

@@ -68,6 +68,7 @@ class _StudentSearchState extends State<StudentSearch> {
   }
 
   Future<void> getSearchedStudent()async {
+    await getAllData();
     if(_selectedClassName.isNotEmpty){
       _completeDataList.removeWhere((element) => element.className != _selectedClassName);
     }
@@ -78,6 +79,7 @@ class _StudentSearchState extends State<StudentSearch> {
       _completeDataList.removeWhere((element) => element.subjectName != null?element.subjectName! != _selectedSubject:true);
     }
     _completeDataList = List.from(_completeDataList.where((element){
+      print(_controller.text);
       return element.name.toLowerCase().contains(_controller.text.toLowerCase());
     }).toList());
   }

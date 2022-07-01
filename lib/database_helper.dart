@@ -26,7 +26,7 @@ class DatabaseHelper{
     _initDB();
   }
 
-  final String dbName = "temp28.db";
+  final String dbName = "classManager.db";
   final _version = 1;
 
   Future<Database> get database async{
