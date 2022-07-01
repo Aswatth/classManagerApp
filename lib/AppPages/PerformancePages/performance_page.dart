@@ -7,8 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class PerformancePage extends StatefulWidget {
-  StudentModel studentModel;
-  String subjectName;
+  final StudentModel studentModel;
+  final String subjectName;
   PerformancePage({Key? key,required this.studentModel,required this.subjectName}) : super(key: key);
 
   @override
@@ -41,7 +41,7 @@ class _PerformancePageState extends State<PerformancePage> {
       //_testList.forEach((element) {print(element.toString());});
       _testList.forEach((element) {
         print(element.toString());
-        _chartData.add(FlSpot(_testList.indexOf(element).toDouble() + 1, (element.marksScored/element.maxMarks)*100));
+        _chartData.add(FlSpot(_testList.indexOf(element).toDouble() + 1, (element.marksScored/element.maxMarks)*100,));
       });
     });
   }
@@ -54,7 +54,7 @@ class _PerformancePageState extends State<PerformancePage> {
         if(value!.isEmpty){
           return "Marks scored cannot be empty";
         }
-        else if(double.parse(value!) < 0){
+        else if(double.parse(value) < 0){
           return "Marks cannot be < 0";
         }
       },
@@ -77,7 +77,7 @@ class _PerformancePageState extends State<PerformancePage> {
       },
       onSaved: (_){
         setState(() {
-          _marksScored = _!.isEmpty?0:double.parse(_!);
+          _marksScored = _!.isEmpty?0:double.parse(_);
         });
       },
     );
@@ -91,7 +91,7 @@ class _PerformancePageState extends State<PerformancePage> {
         if(value!.isEmpty){
           return "Marks scored cannot be empty";
         }
-        else if(double.parse(value!) < 0){
+        else if(double.parse(value) < 0){
           return "Marks cannot be < 0";
         }
       },
@@ -109,12 +109,12 @@ class _PerformancePageState extends State<PerformancePage> {
       ),
       onChanged: (_){
         setState(() {
-          _totalMarks = _.isEmpty?0:double.parse(_!);
+          _totalMarks = _.isEmpty?0:double.parse(_);
         });
       },
       onSaved: (_){
         setState(() {
-          _totalMarks = _!.isEmpty?0:double.parse(_!);
+          _totalMarks = _!.isEmpty?0:double.parse(_);
         });
       },
     );
@@ -334,14 +334,14 @@ class _PerformancePageState extends State<PerformancePage> {
                     bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
                             showTitles: true,
-                            reservedSize: 50,
+                            reservedSize: 30,
                             interval: 1,
                             getTitlesWidget: chartTitleWidgets
                         )
                     ),
                     leftTitles: AxisTitles(
                         sideTitles: SideTitles(
-                            reservedSize: 50,
+                            reservedSize: 30,
                             showTitles: true,
                             getTitlesWidget: chartTitleWidgets
                         )
@@ -354,7 +354,7 @@ class _PerformancePageState extends State<PerformancePage> {
                       isCurved: true,
                       belowBarData: BarAreaData(
                           show: true
-                      )
+                      ),
                   )
                 ]
             ),
@@ -369,23 +369,34 @@ class _PerformancePageState extends State<PerformancePage> {
       itemCount: _testList.length,
       itemBuilder: (context, index){
         PerformanceModel performance = _testList[index];
-        return ListTile(
-          leading: Text((index+1).toString()),
-          title: Text("Scored:\t ${performance.marksScored} / ${performance.maxMarks}"),
-          subtitle: Text(DateFormat("dd-MMM-yyyy").format(performance.testDate)),
-          trailing: IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: (){
-              setState(() {
-                _delete(performance);
-              });
-            },
-          ),
-          onLongPress: (){
-            setState(() {
-              edit(performance);
-            });
-          },
+        return Column(
+          children: [
+            ListTile(
+              leading: Text((index+1).toString()),
+              title: Text("Scored:\t ${performance.marksScored} / ${performance.maxMarks}"),
+              subtitle: Text(DateFormat("dd-MMM-yyyy").format(performance.testDate)),
+              trailing: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: (){
+                  setState(() {
+                    _delete(performance);
+                  });
+                },
+              ),
+              onLongPress: (){
+                setState(() {
+                  edit(performance);
+                });
+              },
+            ),
+            ListTile(
+              title: Text("Tuition test: "),
+              trailing: Checkbox(
+                value: performance.isTuitionTest, onChanged: null,
+              ),
+            ),
+            Divider(color: Colors.black87,)
+          ],
         );
       },
     );
@@ -402,7 +413,7 @@ class _PerformancePageState extends State<PerformancePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("${widget.subjectName} performance"),
+        title: Text("${widget.studentModel.name}'s ${widget.subjectName} stats"),
       ),
       body: Column(
         children: [
