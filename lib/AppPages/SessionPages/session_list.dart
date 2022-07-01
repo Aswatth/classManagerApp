@@ -1,6 +1,7 @@
 import 'package:class_manager/AppPages/PerformancePages/performance_page.dart';
 import 'package:class_manager/AppPages/SessionPages/add_session.dart';
 import 'package:class_manager/Model/fee.dart';
+import 'package:class_manager/Model/performance.dart';
 import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,9 @@ class _SessionListState extends State<SessionList> {
 
     bool isFeeDeletionSuccessful = await FeeHelper.instance.delete(widget.studentModel.id!, subjectName);
 
-    if(isSessionDeletionSuccessful && isFeeDeletionSuccessful){
+    bool isPerformanceDeletionSuccessful = await PerformanceHelper.instance.deleteData(widget.studentModel.id!,subjectName);
+
+    if(isSessionDeletionSuccessful && isFeeDeletionSuccessful && isPerformanceDeletionSuccessful){
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Session deleted successfully!"),
       ),);

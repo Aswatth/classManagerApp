@@ -100,6 +100,16 @@ class PerformanceHelper{
     return false;
   }
 
+  Future<bool> deleteData(int studentId,String subjectName)async{
+    Database db = await DatabaseHelper.instance.database;
+    await db.delete(
+        performanceTableName,
+        where: '$colStudentId = ? and $colSubjectName = ?',
+        whereArgs: [studentId,subjectName]);
+
+    return true;
+  }
+
   Future<bool> delete(PerformanceModel performanceModel)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
