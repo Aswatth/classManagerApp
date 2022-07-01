@@ -25,26 +25,49 @@ class _ClassInfoState extends State<ClassInfo> {
     });
   }
 
-  addBoard()async{
+  addClass()async{
     ClassModel classObj = ClassModel.createNewClass(className: className);
-    await ClassHelper.instance.insertClass(classObj);
+    bool isSuccessful = await ClassHelper.instance.insertClass(classObj);
 
-    getClassList();
-
-    controller.clear();
+    if(isSuccessful){
+      getClassList();
+      controller.clear();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Added ${classObj.className} successfully!"),
+      ),);
+    }
   }
 
-  updateBoard(ClassModel classObj, String newClassName)async{
-    await ClassHelper.instance.update(classObj, newClassName);
+  updateClass(ClassModel classObj, String newClassName)async{
+    String oldClassName = classObj.className;
+    bool isSuccessful = await ClassHelper.instance.update(classObj, newClassName);
 
-    getClassList();
-    controller.clear();
+    if(isSuccessful){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Updated ${oldClassName} -> ${newClassName} successfully!"),
+      ),);
+      getClassList();
+      controller.clear();
+    }
   }
 
-  deleteBoard(ClassModel classObj) async{
-    await ClassHelper.instance.delete(classObj);
+  deleteClass(ClassModel classObj) async{
+    try{
+      bool isSuccessful = await ClassHelper.instance.delete(classObj);
 
-    getClassList();
+      if(isSuccessful){
+        getClassList();
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Deleted ${classObj.className} successfully!"),
+        ),);
+      }
+    }
+    catch(e){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Cannot delete ${classObj.className} as some students are present for this class!"),
+      ),);
+    }
   }
 
   Widget classTextField(){
@@ -104,7 +127,7 @@ class _ClassInfoState extends State<ClassInfo> {
                   onPressed: (){
                     setState(() {
                       if(_errorText == null){
-                        addBoard();
+                        addClass();
                         isAdding = false;
                       }
                     });
@@ -147,7 +170,7 @@ class _ClassInfoState extends State<ClassInfo> {
                           setState(() {
                             if(_errorText == null){
                               isEditing[index] = !isEditing[index];
-                              updateBoard(classList[index],className);
+                              updateClass(classList[index],className);
                             }
                           });
                         }
@@ -155,7 +178,7 @@ class _ClassInfoState extends State<ClassInfo> {
                     IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: (){
-                        deleteBoard(classList[index]);
+                        deleteClass(classList[index]);
                       },
                     ),
                     onLongPress: (){

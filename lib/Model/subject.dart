@@ -35,7 +35,7 @@ class SubjectHelper{
     return instance;
   }
 
-  insertSubject(SubjectModel subject)async {
+  Future<bool> insertSubject(SubjectModel subject)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -48,13 +48,15 @@ class SubjectHelper{
       //Insert
       await db.insert(subjectTableName, subject.toMap());
       print(subject.subjectName+" successfully inserted");
+      return true;
     }
     else{
       print(subject.subjectName+" already exists");
+      return false;
     }
   }
 
-  update(SubjectModel subject,String newSubjectName)async {
+  Future<bool> update(SubjectModel subject,String newSubjectName)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -67,22 +69,20 @@ class SubjectHelper{
       await db.update(subjectTableName, subject.toMap(),where: '$colSubjectName = ?',whereArgs: [oldSubjectName]);
 
       print(oldSubjectName + " successfully updated to " + newSubjectName);
+      return true;
     }else{
       print(newSubjectName + " already exists");
+      return false;
     }
   }
 
-  delete(SubjectModel subject)async{
+  Future<bool> delete(SubjectModel subject)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
-    //Check if new subjectName already exists
-    List<Map<String,dynamic>> data = await db.query(subjectTableName,where: '$colSubjectName = ?',whereArgs: [subject.subjectName.toUpperCase()]);
-
-    if(data.isNotEmpty) {
-      await db.delete(subjectTableName,where: '$colSubjectName = ?',whereArgs: [subject.subjectName.toUpperCase()]);
-      print(subject.toString() + " successfully deleted");
-    }
+    await db.delete(subjectTableName,where: '$colSubjectName = ?',whereArgs: [subject.subjectName.toUpperCase()]);
+    print(subject.toString() + " successfully deleted");
+    return true;
   }
 
   Future<SubjectModel?> getSubject(String subjectName)async{

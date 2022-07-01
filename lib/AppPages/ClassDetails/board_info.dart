@@ -55,14 +55,20 @@ class _BoardInfoState extends State<BoardInfo> {
   }
 
   deleteBoard(BoardModel board) async{
-    bool isSuccessful = await BoardHelper.instance.delete(board);
+    try{
+      bool isSuccessful = await BoardHelper.instance.delete(board);
+      if(isSuccessful){
 
-    if(isSuccessful){
+        getBoardList();
 
-      getBoardList();
-
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Deleted ${board.boardName} successfully!"),
+        ),);
+      }
+    }
+    catch(e){
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Deleted ${board.boardName} successfully!"),
+        content: Text("Cannot delete ${board.boardName} as some students are present for this board!"),
       ),);
     }
   }

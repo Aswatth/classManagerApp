@@ -26,26 +26,47 @@ class _SubjectInfoState extends State<SubjectInfo> {
     });
   }
 
-  addBoard()async{
+  addSubject()async{
     SubjectModel subject = SubjectModel.createNewSubject(subjectName: subjectName);
-    await SubjectHelper.instance.insertSubject(subject);
+    bool isSuccessful = await SubjectHelper.instance.insertSubject(subject);
 
-    getSubjectList();
-
-    controller.clear();
+    if(isSuccessful){
+      getSubjectList();
+      controller.clear();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Added ${subject.subjectName} successfully!"),
+      ),);
+    }
   }
 
-  updateBoard(SubjectModel board, String newBoardName)async{
-    await SubjectHelper.instance.update(board, newBoardName);
+  updateSubject(SubjectModel subject, String newSubjectName)async{
+    String oldSubjectName = subject.subjectName;
+    bool isSuccessful = await SubjectHelper.instance.update(subject, newSubjectName);
 
-    getSubjectList();
-    controller.clear();
+    if(isSuccessful){
+      getSubjectList();
+      controller.clear();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Updated ${oldSubjectName} -> ${newSubjectName} successfully!"),
+      ),);
+    }
   }
 
-  deleteBoard(SubjectModel board) async{
-    await SubjectHelper.instance.delete(board);
-
-    getSubjectList();
+  deleteSubject(SubjectModel subject) async{
+    try{
+      bool isSuccessful = await SubjectHelper.instance.delete(subject);
+      if(isSuccessful){
+        getSubjectList();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Deleted ${subject.subjectName} successfully!"),
+        ),);
+      }
+    }
+    catch(e){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Cannot delete ${subject.subjectName} as some sessions are present for this subject!"),
+      ),);
+    }
   }
 
   Widget subjectTextField(){
@@ -105,7 +126,7 @@ class _SubjectInfoState extends State<SubjectInfo> {
                   onPressed: (){
                     setState(() {
                       if(_errorText == null){
-                        addBoard();
+                        addSubject();
                         isAdding = false;
                       }
                     });
@@ -148,7 +169,7 @@ class _SubjectInfoState extends State<SubjectInfo> {
                           setState(() {
                             if(_errorText == null){
                               isEditing[index] = !isEditing[index];
-                              updateBoard(subjectList[index],subjectName);
+                              updateSubject(subjectList[index],subjectName);
                             }
                           });
                         }
@@ -156,7 +177,7 @@ class _SubjectInfoState extends State<SubjectInfo> {
                     IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: (){
-                        deleteBoard(subjectList[index]);
+                        deleteSubject(subjectList[index]);
                       },
                     ),
                     onLongPress: (){

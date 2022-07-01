@@ -41,7 +41,7 @@ class ClassHelper{
     return instance;
   }
 
-  insertClass(ClassModel classObj)async {
+  Future<bool> insertClass(ClassModel classObj)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -54,13 +54,15 @@ class ClassHelper{
       //Insert
       await db.insert(classTableName, classObj.toMap());
       print(classObj.className+" successfully inserted");
+      return true;
     }
     else{
       print(classObj.className+" already exists");
+      return false;
     }
   }
 
-  update(ClassModel classObj,String newClassName)async {
+  Future<bool> update(ClassModel classObj,String newClassName)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -72,23 +74,21 @@ class ClassHelper{
       classObj.className = newClassName.toUpperCase();
       await db.update(classTableName, classObj.toMap(),where: '$colClassName = ?',whereArgs: [oldClassName]);
       print(oldClassName + " successfully updated to " + newClassName);
-
-    }else{
+      return true;
+    }
+    else{
       print(newClassName + " already exists");
+      return false;
     }
   }
 
-  delete(ClassModel classObj)async{
+  Future<bool> delete(ClassModel classObj)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
-    //Check if new className already exists
-    List<Map<String,dynamic>> data = await db.query(classTableName,where: '$colClassName = ?',whereArgs: [classObj.className.toUpperCase()]);
-
-    if(data.isNotEmpty) {
-      await db.delete(classTableName,where: '$colClassName = ?',whereArgs: [classObj.className.toUpperCase()]);
-      print(classObj.toString() + " successfully deleted");
-    }
+    await db.delete(classTableName,where: '$colClassName = ?',whereArgs: [classObj.className.toUpperCase()]);
+    print(classObj.toString() + " successfully deleted");
+    return true;
   }
 
   Future<ClassModel?> getClass(String className)async{

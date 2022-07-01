@@ -78,15 +78,9 @@ class BoardHelper{
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
-    //Check if newBoardName already exists
-    List<Map<String,dynamic>> data = await db.query(boardTableName,where: '$colBoardName = ?',whereArgs: [board.boardName.toUpperCase()]);
-
-    if(data.isNotEmpty) {
-      await db.delete(boardTableName,where: '$colBoardName = ?',whereArgs: [board.boardName.toUpperCase()]);
-      print(board.toString() + " successfully deleted");
-      return true;
-    }
-    return false;
+    await db.delete(boardTableName,where: '$colBoardName = ?',whereArgs: [board.boardName.toUpperCase()]);
+    print(board.toString() + " successfully deleted");
+    return true;
   }
 
   Future<BoardModel?> getBoard(String boardName)async{
