@@ -55,6 +55,69 @@ class _SessionListState extends State<SessionList> {
     });
   }
 
+  Widget sessionListWidget(){
+    return ListView.builder(
+      itemCount: _sessionList.length,
+      itemBuilder: (context, index){
+        SessionModel session = _sessionList[index];
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.blueAccent)
+            ),
+            child: Column(
+              children: [
+                ListTile(
+                  title: Text(session.subjectName),
+                  subtitle: Text(session.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
+                  trailing: Text("${session.startTime} - ${session.endTime}"),
+                  onLongPress: (){
+                    editSession(session);
+                  },
+                ),
+                Divider(color: Colors.black87,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                          onPressed: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => PerformancePage(studentModel: widget.studentModel,subjectName: session.subjectName),));
+                          },
+                          child: Row(
+                            children: [
+                              Icon(Icons.show_chart),
+                              Text("View performance")
+                            ],
+                          )
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                          onPressed: (){
+                            deleteSession(session.subjectName);
+                          },
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete),
+                              Text("Delete session")
+                            ],
+                          )
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -85,41 +148,7 @@ class _SessionListState extends State<SessionList> {
             });
           },
         ),
-        body: ListView.builder(
-          itemCount: _sessionList.length,
-          itemBuilder: (context, index){
-            SessionModel session = _sessionList[index];
-            return Container(
-              child: Column(
-                children: [
-                  ListTile(
-                    title: Text(session.subjectName),
-                    subtitle: Text(session.sessionSlot.replaceAll("[", "").replaceAll("]", "")),
-                    trailing: Text(session.startTime + " - " + session.endTime),
-                    onTap: (){
-                      editSession(session);
-                    },
-                    onLongPress: (){
-                      deleteSession(session.subjectName);
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: ElevatedButton(
-                          onPressed: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => PerformancePage(studentModel: widget.studentModel,subjectName: session.subjectName),));
-                          },
-                          child: Text("Visualize performance")
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            );
-          },
-        )
+        body: sessionListWidget()
       ),
     );
   }
