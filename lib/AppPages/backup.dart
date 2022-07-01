@@ -1,11 +1,8 @@
 import 'dart:io';
-
 import 'package:class_manager/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-//import 'package:permission_handler/permission_handler.dart';
-import 'package:sqflite/sqflite.dart';
 
 class BackUp extends StatefulWidget {
   const BackUp({Key? key}) : super(key: key);
@@ -17,7 +14,7 @@ class BackUp extends StatefulWidget {
 class _BackUpState extends State<BackUp> {
 
   String dbPath = '';
-  Directory toStoreDir = Directory("/storage/emulated/0/ClassManagerDB");
+  Directory toStoreDir = Directory("/storage/emulated/0/ClassManagerBackUp");
 
   _getPath()async{
     Directory dir = await getApplicationDocumentsDirectory();
@@ -42,7 +39,7 @@ class _BackUpState extends State<BackUp> {
 
   _backupDB()async{
     _requestPermission();
-    
+
     try{
       File dbFile = File(dbPath+"/${DatabaseHelper.instance.dbName}");
       await toStoreDir.create();
@@ -73,7 +70,7 @@ class _BackUpState extends State<BackUp> {
 
     }catch(e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Restore unsuccessfuly!"),
+        content: Text("Restore unsuccessful!"),
       ),);
     }
   }
