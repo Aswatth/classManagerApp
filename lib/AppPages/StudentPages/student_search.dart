@@ -8,6 +8,7 @@ import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:class_manager/Model/student_session.dart';
 import 'package:class_manager/Model/subject.dart';
+import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -41,6 +42,11 @@ class _StudentSearchState extends State<StudentSearch> {
 
   String _searchedStudentName = '';
   TextEditingController _controller = TextEditingController();
+
+  String _startTime = '';
+  String _endTime = '';
+  TextEditingController _sessionStartTimeController = TextEditingController();
+  TextEditingController _sessionEndTimeController = TextEditingController();
 
   bool isSearching = false;
 
@@ -78,8 +84,30 @@ class _StudentSearchState extends State<StudentSearch> {
     if(_selectedSubject.isNotEmpty){
       _completeDataList.removeWhere((element) => element.subjectName != null?element.subjectName! != _selectedSubject:true);
     }
+    if(_startTime.isNotEmpty){
+      DateTime startTime = DateFormat("hh:mm").parse(_startTime);
+
+      _completeDataList.removeWhere((element){
+        if(element.studentId != -1){
+          DateTime sessionStartTime = DateFormat("hh:mm").parse(element.startTime!);
+          return sessionStartTime.isBefore(startTime);
+        }
+        return false;
+      });
+    }
+    if(_endTime.isNotEmpty){
+      DateTime endTime = DateFormat("hh:mm").parse(_endTime);
+
+      _completeDataList.removeWhere((element){
+        if(element.studentId != -1){
+          DateTime sessionEndTime = DateFormat("hh:mm").parse(element.endTime!);
+          return sessionEndTime.isAfter(endTime);
+        }
+        return false;
+      });
+    }
+
     _completeDataList = List.from(_completeDataList.where((element){
-      print(_controller.text);
       return element.name.toLowerCase().contains(_controller.text.toLowerCase());
     }).toList());
   }
@@ -246,6 +274,60 @@ class _StudentSearchState extends State<StudentSearch> {
     );
   }
 
+  Widget startTimeField() {
+    return DateTimePicker(
+      controller: _sessionStartTimeController,
+      type: DateTimePickerType.time,
+      locale: Locale('en', 'US'),
+      use24HourFormat: false,
+      decoration: InputDecoration(
+        icon: Icon(Icons.access_time_rounded),
+        labelText: "Session start time",
+      ),
+      validator: (value){
+        if(value!.isEmpty){
+          return 'Session start time cannot be empty';
+        }else{
+          return null;
+        }
+      },
+      firstDate: DateTime(1999),
+      lastDate: DateTime(2100),
+      onChanged: (value){
+        setState(() {
+          _startTime = DateFormat.jm().format(DateFormat("hh:mm").parse(value));
+        });
+      },
+    );
+  }
+
+  Widget endTimeField() {
+    return DateTimePicker(
+      controller: _sessionEndTimeController,
+      type: DateTimePickerType.time,
+      locale: Locale('en', 'US'),
+      use24HourFormat: false,
+      decoration: InputDecoration(
+        icon: Icon(Icons.access_time_rounded),
+        labelText: "Session end time",
+      ),
+      validator: (value){
+        if(value!.isEmpty){
+          return 'Session end time cannot be empty';
+        }else{
+          return null;
+        }
+      },
+      firstDate: DateTime(1999),
+      lastDate: DateTime(2100),
+      onChanged: (value){
+        setState(() {
+          _endTime = DateFormat.jm().format(DateFormat("hh:mm").parse(value));
+        });
+      },
+    );
+  }
+
   Widget studentListWidget(){
     return ListView.builder(
       itemCount: _completeDataList.length,
@@ -312,6 +394,8 @@ class _StudentSearchState extends State<StudentSearch> {
     _selectedClassName = '';
     _selectedSubject = '';
     _controller.clear();
+    _sessionStartTimeController.clear();
+    _sessionEndTimeController.clear();
     _searchedStudentName = _controller.text;
 
     FocusScopeNode currentFocus = FocusScope.of(context);
@@ -366,6 +450,14 @@ class _StudentSearchState extends State<StudentSearch> {
                           boardDropDown(),
                           subjectDropDown(),
                           studentNameSearchFiled(),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: startTimeField(),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: endTimeField(),
+                          ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
