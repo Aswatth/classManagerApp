@@ -42,7 +42,7 @@ dependencies:
   fl_chart: ^0.55.0
   date_time_picker: ^2.1.0
   intl: ^0.17.0
-  overlay_support: ^2.0.1
+  intl_phone_field: ^3.1.0
 
 dev_dependencies:
   flutter_test:

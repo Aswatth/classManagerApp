@@ -3,6 +3,8 @@ import 'package:class_manager/Model/class.dart';
 import 'package:class_manager/Model/student.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 class AddStudent extends StatefulWidget {
   const AddStudent({Key? key}) : super(key: key);
@@ -213,7 +215,7 @@ class _AddStudentState extends State<AddStudent> {
     );
   }
 
-  Widget studentPhoneNumberField() {
+  /*Widget studentPhoneNumberField() {
     return TextFormField(
       controller: _studentPhnNumController,
       decoration: InputDecoration(
@@ -243,69 +245,95 @@ class _AddStudentState extends State<AddStudent> {
         });
       },
     );
+  }*/
+
+  Widget studentPhoneNumberField(){
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: IntlPhoneField(
+        controller: _studentPhnNumController,
+        decoration: InputDecoration(
+          labelText: 'Student phone number',
+          border: OutlineInputBorder(
+            borderSide: BorderSide(),
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(Icons.clear,color: Colors.grey,size: 15,),
+            onPressed: (){
+              setState(() {
+                _studentPhnNumController.clear();
+              });
+            },
+          ),
+        ),
+        initialCountryCode: 'IN',
+        onSaved: (value){
+          setState(() {
+            _studentPhoneNumber = value!.number.toString();
+          });
+        },
+      ),
+    );
   }
 
   Widget parentPhoneNumber1Field(){
-    return TextFormField(
-      controller: _parentPhnNum1Controller,
-      decoration: InputDecoration(
-        icon: Icon(Icons.call),
-        labelText: "Parent phone number 1",
-        suffixIcon: IconButton(
-          icon: Icon(Icons.clear,color: Colors.grey,size: 15,),
-          onPressed: (){
-            setState(() {
-              _parentPhnNum1Controller.clear();
-            });
-          },
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: IntlPhoneField(
+        controller: _parentPhnNum1Controller,
+        decoration: InputDecoration(
+          labelText: 'Parent phone number 1',
+          border: OutlineInputBorder(
+            borderSide: BorderSide(),
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(Icons.clear,color: Colors.grey,size: 15,),
+            onPressed: (){
+              setState(() {
+                _parentPhnNum1Controller.clear();
+              });
+            },
+          ),
         ),
+        initialCountryCode: 'IN',
+        onSaved: (value){
+          setState(() {
+            _parentPhoneNumber1 = value!.number.toString();
+          });
+        },
       ),
-      keyboardType: TextInputType.number,
-      maxLength: 10,
-      validator: (value){
-        if(value!.isEmpty || value.length < 10){
-          return 'Invalid Parent number';
-        }else{
-          return null;
-        }
-      },
-      onSaved: (value){
-        setState(() {
-          _parentPhoneNumber1 = value!;
-        });
-      },
     );
   }
 
   Widget parentPhoneNumber2Field(){
-    return TextFormField(
-      controller: _parentPhnNum2Controller,
-      decoration: InputDecoration(
-        icon: Icon(Icons.call),
-        labelText: "Parent phone number 2",
-        suffixIcon: IconButton(
-          icon: Icon(Icons.clear,color: Colors.grey,size: 15,),
-          onPressed: (){
-            setState(() {
-              _parentPhnNum2Controller.clear();
-            });
-          },
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: IntlPhoneField(
+        controller: _parentPhnNum2Controller,
+        decoration: InputDecoration(
+          labelText: 'Parent phone number 2',
+          border: OutlineInputBorder(
+            borderSide: BorderSide(),
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(Icons.clear,color: Colors.grey,size: 15,),
+            onPressed: (){
+              setState(() {
+                _parentPhnNum2Controller.clear();
+              });
+            },
+          ),
         ),
+        initialCountryCode: 'IN',
+        onChanged: (value){
+          print(value.completeNumber);
+        },
+        onSaved: (value){
+          setState(() {
+            _parentPhoneNumber2 = value!.number.toString();
+          });
+        },
       ),
-      keyboardType: TextInputType.number,
-      maxLength: 10,
-      validator: (value){
-        if(value!.isNotEmpty && value.length < 10) {
-          return 'Invalid Parent phone number';
-        } else {
-          return null;
-        }
-      },
-      onSaved: (value){
-        setState(() {
-          _parentPhoneNumber2 = value!;
-        });
-      },
     );
   }
 
