@@ -108,7 +108,7 @@ class _AddSessionState extends State<AddSession> {
       controller: _sessionStartTimeController,
       type: DateTimePickerType.time,
       locale: Locale('en', 'US'),
-      use24HourFormat: false,
+      use24HourFormat: true,
       decoration: InputDecoration(
         icon: Icon(Icons.access_time_rounded),
         labelText: "Session start time",
@@ -122,6 +122,12 @@ class _AddSessionState extends State<AddSession> {
       },
       firstDate: DateTime(1999),
       lastDate: DateTime(2100),
+      onChanged: (value){
+        setState(() {
+          _startTime = DateFormat.jm().format(DateFormat("hh:mm").parse(value));
+          //print(_startTime);
+        });
+      },
       onSaved: (value){
         setState(() {
           _startTime = DateFormat.jm().format(DateFormat("hh:mm").parse(value!));
@@ -135,7 +141,7 @@ class _AddSessionState extends State<AddSession> {
       controller: _sessionEndTimeController,
       type: DateTimePickerType.time,
       locale: Locale('en', 'US'),
-      use24HourFormat: false,
+      use24HourFormat: true,
       decoration: InputDecoration(
         icon: Icon(Icons.access_time_rounded),
         labelText: "Session end time",
@@ -149,6 +155,12 @@ class _AddSessionState extends State<AddSession> {
       },
       firstDate: DateTime(1999),
       lastDate: DateTime(2100),
+      onChanged: (value){
+        setState(() {
+          _endTime = DateFormat.jm().format(DateFormat("hh:mm").parse(value));
+          //print(_endTime);
+        });
+      },
       onSaved: (value){
         setState(() {
           _endTime = DateFormat.jm().format(DateFormat("hh:mm").parse(value!));
