@@ -1,6 +1,5 @@
 import 'package:class_manager/Model/board.dart';
 import 'package:flutter/material.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 class BoardInfo extends StatefulWidget {
   const BoardInfo({Key? key}) : super(key: key);
@@ -215,39 +214,37 @@ class _BoardInfoState extends State<BoardInfo> {
 
   @override
   Widget build(BuildContext context) {
-    return OverlaySupport.global(
-      child: GestureDetector(
-        onTap: (){
-          FocusScopeNode currentFocus = FocusScope.of(context);
+    return GestureDetector(
+      onTap: (){
+        FocusScopeNode currentFocus = FocusScope.of(context);
 
-          if (!currentFocus.hasPrimaryFocus) {
-            currentFocus.unfocus();
-            isEditing = List.filled(boardList.length, false);
-          }
-        },
-        child: RefreshIndicator(
-          onRefresh: getBoardList,
-          child: Scaffold(
-              appBar: AppBar(
-                leading: BackButton(
-                  onPressed: (){
-                    Navigator.pop(context);
-                  },
-                ),
-                title: Text("Board info"),
-                actions: [
-                  !isAdding?IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: (){
-                      setState(() {
-                        isAdding = true;
-                      });
-                    },
-                  ):Container()
-                ],
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+          isEditing = List.filled(boardList.length, false);
+        }
+      },
+      child: RefreshIndicator(
+        onRefresh: getBoardList,
+        child: Scaffold(
+            appBar: AppBar(
+              leading: BackButton(
+                onPressed: (){
+                  Navigator.pop(context);
+                },
               ),
-              body: boardListWidget()
-          ),
+              title: Text("Board info"),
+              actions: [
+                !isAdding?IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: (){
+                    setState(() {
+                      isAdding = true;
+                    });
+                  },
+                ):Container()
+              ],
+            ),
+            body: boardListWidget()
         ),
       ),
     );
