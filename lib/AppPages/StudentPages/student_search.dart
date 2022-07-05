@@ -279,7 +279,7 @@ class _StudentSearchState extends State<StudentSearch> {
       controller: _sessionStartTimeController,
       type: DateTimePickerType.time,
       locale: Locale('en', 'US'),
-      use24HourFormat: false,
+      use24HourFormat: true,
       decoration: InputDecoration(
         icon: Icon(Icons.access_time_rounded),
         labelText: "Session start time",
@@ -306,7 +306,7 @@ class _StudentSearchState extends State<StudentSearch> {
       controller: _sessionEndTimeController,
       type: DateTimePickerType.time,
       locale: Locale('en', 'US'),
-      use24HourFormat: false,
+      use24HourFormat: true,
       decoration: InputDecoration(
         icon: Icon(Icons.access_time_rounded),
         labelText: "Session end time",
