@@ -4,6 +4,7 @@ import 'package:class_manager/Model/student.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl_phone_field/countries.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 class AddStudent extends StatefulWidget {
@@ -269,7 +270,7 @@ class _AddStudentState extends State<AddStudent> {
         initialCountryCode: 'IN',
         onSaved: (value){
           setState(() {
-            _studentPhoneNumber = value!.number.toString();
+            _studentPhoneNumber = value!.number;
           });
         },
       ),
@@ -298,7 +299,7 @@ class _AddStudentState extends State<AddStudent> {
         initialCountryCode: 'IN',
         onSaved: (value){
           setState(() {
-            _parentPhoneNumber1 = value!.number.toString();
+            _parentPhoneNumber1 = value!.number;
           });
         },
       ),
@@ -309,6 +310,15 @@ class _AddStudentState extends State<AddStudent> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: IntlPhoneField(
+        disableLengthCheck: true,
+        validator: (value){
+          //print(value!.number);
+          if(value!.number.isNotEmpty && value.number.length != countries.firstWhere((element) => element.code == value.countryISOCode).maxLength){
+            //countries.firstWhere((element) => element.code == value.countryISOCode).maxLengths
+            return "Invalid phone number";
+          }
+          return null;
+        },
         controller: _parentPhnNum2Controller,
         decoration: InputDecoration(
           labelText: 'Parent phone number 2',
@@ -326,11 +336,11 @@ class _AddStudentState extends State<AddStudent> {
         ),
         initialCountryCode: 'IN',
         onChanged: (value){
-          print(value.completeNumber);
+          //print(value.completeNumber);
         },
         onSaved: (value){
           setState(() {
-            _parentPhoneNumber2 = value!.number.toString();
+            _parentPhoneNumber2 = value!.number;
           });
         },
       ),
