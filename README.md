@@ -1,6 +1,6 @@
 # class_manager
 
-A new Flutter project.
+A Flutter project to manage and track student informatio and progress.
 
 ## Getting Started
 
