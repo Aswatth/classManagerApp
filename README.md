@@ -28,7 +28,6 @@ A Flutter project to manage and track student information and progress using in 
   <img src='/Images/Screenshot_1667227518.png' width = 200, height = 400>
   <img src='/Images/Screenshot_1667227532.png' width = 200, height = 400>
   <img src='/Images/Screenshot_1667227554.png' width = 200, height = 400>
-  <br>
   </p>
   
   <p>
@@ -43,7 +42,7 @@ A Flutter project to manage and track student information and progress using in 
   <img src='/Images/Screenshot_20221101-224122.png' width = 200, height = 400>
   </p>
 - ### Class details: 
-  Contains list of Classes, Boards, and Subjects. Users can add/remove items which will then be reflected in student or session page. Press the Plus button on the appbar to add new items to the respective list and delete icon to remove item.
+  Contains unique list of Classes, Boards, and Subjects. Users can add/remove items which will then be reflected in student or session page. Press the Plus button on the appbar to add new items to the respective list, delete icon to remove item and long press to edit existing items.
   <p>
     <img src='/Images/Screenshot_1667227245.png' width = 200, height = 400>
     <img src='/Images/Screenshot_1667227261.png' width = 200, height = 400>
@@ -73,12 +72,25 @@ A Flutter project to manage and track student information and progress using in 
   </p>
 
 #### Session:
-A session is created by selecting the subject, time slot and fees for a particular student. Once a session is created it will be shown under student list for the respective student. 
+A session is created by selecting the subject, time slot and fees for a particular student. Once a session is created it will be shown under student list for the respective student.
 <p>
   Session creation:<br>
   <img src='/Images/Screenshot_1667227581.png' width = 200, height = 400>  
   <img src='/Images/Screenshot_1667227600.png' width = 200, height = 400>  
   <img src='/Images/Screenshot_1667227608.png' width = 200, height = 400>  
+  <br>
+  After session creation:<br>
   <img src='/Images/Screenshot_1667227630.png' width = 200, height = 400>  
+  <img src='/Images/Screenshot_1667227789.png' width = 200, height = 400>
+  <br>
+  After creating a session user's can edit the session by long pressing the respective session. By clicking on user <i>View performance</i> can add test scores to visualize scores for respective student's session.
+  <br>
+  <img src='/Images/Screenshot_1667227637.png' width = 200, height = 400>  
+  <img src='/Images/Screenshot_1667227640.png' width = 200, height = 400>  
+  <img src='/Images/Screenshot_1667227653.png' width = 200, height = 400>  
+  <img src='/Images/Screenshot_1667227658.png' width = 200, height = 400>  
+  <img src='/Images/Screenshot_1667227679.png' width = 200, height = 400>   
+  <br>
+  All scores are normalized to a scale of 0-100. Users can remove added tests or long press the test to edit it. <i> Tution test</i> checkbox can be used to differentiate the actual tests and tuition tests.
 </p>
 ### Fees
