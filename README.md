@@ -1,12 +1,13 @@
 # class_manager
 
-A Flutter project to manage and track student informatio and progress.
+A Flutter project to manage and track student information and progress using in app SQLite DB.
 
 ## Feature
 - Manage student information
 - Assign/ Remove session for each student
 - Visualize student progress
 - Track student fees payment history
+- Create and restore from local backup
 
 ## Working
 - ### Student List page: 
