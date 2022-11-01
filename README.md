@@ -71,3 +71,14 @@ A Flutter project to manage and track student information and progress using in 
   <p>
     <img src='/Images/Screenshot_1667227251.png' width = 200, height = 400>  
   </p>
+
+#### Session:
+A session is created by selecting the subject, time slot and fees for a particular student. Once a session is created it will be shown under student list for the respective student. 
+<p>
+  Session creation:<br>
+  <img src='/Images/Screenshot_1667227581.png' width = 200, height = 400>  
+  <img src='/Images/Screenshot_1667227600.png' width = 200, height = 400>  
+  <img src='/Images/Screenshot_1667227608.png' width = 200, height = 400>  
+  <img src='/Images/Screenshot_1667227630.png' width = 200, height = 400>  
+</p>
+### Fees
