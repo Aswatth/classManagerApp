@@ -32,19 +32,19 @@ A Flutter project to manage and track student informatio and progress.
     <img src='/Images/Screenshot_1667227267.png' width = 100, height = 200>
   
     <p>
-      Addition:<br>
+      Addition of items:<br>
       <img src='/Images/Screenshot_1667227868.png' width = 100, height = 200>
       <img src='/Images/Screenshot_1667227874.png' width = 100, height = 200>
       <img src='/Images/Screenshot_1667227878.png' width = 100, height = 200><br>
-      Deletion:<br>
+      Deletion of items:<br>
       <img src='/Images/Screenshot_1667227909.png' width = 100, height = 200>
     </p>
   </p>
-- Statistics: 
+- ### Statistics: 
   <p>
     <img src='/Images/Screenshot_1667227248.png' width = 100, height = 200>  
   </p>
-- Backup: 
+- ### Backup: 
   <p>
     <img src='/Images/Screenshot_1667227251.png' width = 100, height = 200>  
   </p>
