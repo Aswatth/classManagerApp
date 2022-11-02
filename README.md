@@ -117,3 +117,6 @@ A session is created by selecting the subject, time slot and fees for a particul
  <img src='/Images/Screenshot_1667227778.png' width = 200, height = 400>
  </p>
  
+ <hr>
+ ### Future work:
+ - Extend student creation across all countries
