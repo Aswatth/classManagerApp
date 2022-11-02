@@ -118,5 +118,6 @@ A session is created by selecting the subject, time slot and fees for a particul
  </p>
  
  <hr>
- ### Future work:
+ 
+#### Future work:
  - Extend student creation across all countries
