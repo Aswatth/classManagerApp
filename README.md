@@ -83,14 +83,37 @@ A session is created by selecting the subject, time slot and fees for a particul
   <img src='/Images/Screenshot_1667227630.png' width = 200, height = 400>  
   <img src='/Images/Screenshot_1667227789.png' width = 200, height = 400>
   <br>
+  Session deletion:<br>
+  <img src='/Images/Screenshot_1667227830.png' width = 200, height = 400>
+  <img src='/Images/Screenshot_1667227832.png' width = 200, height = 400>
+  <img src='/Images/Screenshot_1667227838.png' width = 200, height = 400>
+  <br>
   After creating a session user's can edit the session by long pressing the respective session. By clicking on user <i>View performance</i> can add test scores to visualize scores for respective student's session.
   <br>
-  <img src='/Images/Screenshot_1667227637.png' width = 200, height = 400>  
-  <img src='/Images/Screenshot_1667227640.png' width = 200, height = 400>  
-  <img src='/Images/Screenshot_1667227653.png' width = 200, height = 400>  
-  <img src='/Images/Screenshot_1667227658.png' width = 200, height = 400>  
-  <img src='/Images/Screenshot_1667227679.png' width = 200, height = 400>   
+  <img src='/Images/Screenshot_1667227637.png' width = 200, height = 400>
+  <img src='/Images/Screenshot_1667227640.png' width = 200, height = 400>
+  <img src='/Images/Screenshot_1667227653.png' width = 200, height = 400>
+  <img src='/Images/Screenshot_1667227658.png' width = 200, height = 400>
+  <img src='/Images/Screenshot_1667227679.png' width = 200, height = 400>
   <br>
-  All scores are normalized to a scale of 0-100. Users can remove added tests or long press the test to edit it. <i> Tution test</i> checkbox can be used to differentiate the actual tests and tuition tests.
+  All scores are normalized to a scale of 0-100. Users can remove added tests or long press the test to edit it. <i> Tution test</i> checkbox can be used to differentiate the actual and tuition tests.
 </p>
-### Fees
+
+#### Fees
+ Once a session is created for a student, a corresponding fees-info is created for the current month under <b> Fees details </b> tab. Users can then select the payment date to save payment info. Once saved, it will show under fees-summary, which can be viewed by clicking on the floating table icon. Fees summary enables the user to view past payment information and upcoming payment deadlines with filter to search for a particular month-year information.
+ <p>
+ <img src='/Images/Screenshot_1667227735.png' width = 200, height = 400>
+ <img src='/Images/Screenshot_1667227745.png' width = 200, height = 400>
+ <img src='/Images/Screenshot_1667227747.png' width = 200, height = 400>
+ <img src='/Images/Screenshot_1667227755.png' width = 200, height = 400> 
+ <br>
+ Filtering fees summary:<br>
+ <img src='/Images/Screenshot_1667227766.png' width = 200, height = 400>
+ <img src='/Images/Screenshot_1667227769.png' width = 200, height = 400>
+ <img src='/Images/Screenshot_1667227772.png' width = 200, height = 400> 
+ <br>
+ Deleting fees summary:<br>
+ <img src='/Images/Screenshot_1667227776.png' width = 200, height = 400>
+ <img src='/Images/Screenshot_1667227778.png' width = 200, height = 400>
+ </p>
+ 
