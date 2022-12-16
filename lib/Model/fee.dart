@@ -121,6 +121,15 @@ class FeeHelper{
     return true;
   }
 
+  Future<bool> deleteFeeForStudent(int studentId) async{
+    Database db = await DatabaseHelper.instance.database;
+    await db.delete(
+        feeTableName,
+        where: '$colStudentId = ?',
+        whereArgs: [studentId]);
+    return true;
+  }
+
   setPaidOn(int studentId, int month,int year,String paidOn) async{
     Database db = await DatabaseHelper.instance.database;
 

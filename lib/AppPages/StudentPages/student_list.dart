@@ -38,7 +38,9 @@ class _StudentListState extends State<StudentList> {
   }
 
   deleteStudent(int studentId)async{
-    try {
+    await StudentHelper.instance.delete(studentId);
+    getAllData();
+    /*try {
       bool isSuccessful = await StudentHelper.instance.delete(studentId);
 
       if(isSuccessful){
@@ -53,7 +55,7 @@ class _StudentListState extends State<StudentList> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Delete student session/fee details first."),
       ),);
-    }
+    }*/
   }
 
   deleteConfirmation(int studentId, String studentName){
@@ -71,7 +73,9 @@ class _StudentListState extends State<StudentList> {
           child: Text("Yes"),
           onPressed: (){
             deleteStudent(studentId);
-            Navigator.pop(context);
+            setState(() {
+              Navigator.pop(context);
+            });
           },
         )
       ]

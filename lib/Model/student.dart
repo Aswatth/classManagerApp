@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:class_manager/Model/board.dart';
 import 'package:class_manager/Model/class.dart';
+import 'package:class_manager/Model/fee.dart';
+import 'package:class_manager/Model/performance.dart';
+import 'package:class_manager/Model/session.dart';
 import 'package:class_manager/database_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
@@ -92,6 +95,16 @@ class StudentHelper{
     List<Map<String,dynamic>> data = await db.query(studentTableName,where: '$colId = ?',whereArgs: [studentId]);
 
     if(data.isNotEmpty) {
+
+      //Delete all associated sessions
+      await SessionHelper.instance.deleteSessionForStudent(studentId);
+
+      //Delete all associated performances
+      await PerformanceHelper.instance.deletePerformanceForStudent(studentId);
+
+      //Delete all associated fee details
+      await FeeHelper.instance.deleteFeeForStudent(studentId);
+
       await db.delete(studentTableName,where: '$colId = ?',whereArgs: [studentId]);
 
       print("Deleted successfully");

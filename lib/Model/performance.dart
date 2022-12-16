@@ -120,6 +120,16 @@ class PerformanceHelper{
     return true;
   }
 
+  Future<bool> deletePerformanceForStudent(int studentId)async{
+    //GET DB
+    Database db = await DatabaseHelper.instance.database;
+    await db.delete(
+        performanceTableName,
+        where: '$colStudentId = ?',
+        whereArgs: [studentId]);
+    return true;
+  }
+
   Future<List<PerformanceModel>> getPerformanceList(int studentId, String subjectName)async{
     //GET DB
     Database db = await DatabaseHelper.instance.database;

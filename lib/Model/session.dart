@@ -96,6 +96,15 @@ class SessionHelper{
         whereArgs: [studentId,subjectName]);
     return true;
   }
+  Future<bool> deleteSessionForStudent(int studentId)async{
+    //GET DB
+    Database db = await DatabaseHelper.instance.database;
+    await db.delete(
+        sessionTableName,
+        where: '$colStudentId = ?',
+        whereArgs: [studentId]);
+    return true;
+  }
 
   Future<List<SessionModel>> getSessionByStudentId(int studentId)async{
     Database db = await DatabaseHelper.instance.database;
