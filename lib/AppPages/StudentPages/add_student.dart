@@ -401,6 +401,7 @@ class _AddStudentState extends State<AddStudent> {
         content: Text("Added new student ${student.name} successfully!"),
       ),);
       //Navigator.pop(context); //Go back to home page
+      Navigator.pop(context);
       Navigator.push(context, MaterialPageRoute(builder: (context) =>StudentHome(studentModel: student) ,));
     }
     else{
