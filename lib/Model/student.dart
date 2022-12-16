@@ -48,7 +48,7 @@ class StudentHelper{
     db.execute(_createStudentTable);
   }
 
-  Future<bool> insertStudent(StudentModel student)async {
+  Future<int> insertStudent(StudentModel student)async {
     //GET DB
     Database db = await DatabaseHelper.instance.database;
 
@@ -58,13 +58,13 @@ class StudentHelper{
     if(data.isEmpty)
     {
       //Insert
-      await db.insert(studentTableName, student.toMap());
+      int id = await db.insert(studentTableName, student.toMap());
       print(student.toMap().toString()+" inserted successfully");
-      return true;
+      return id;
     }
     else{
       print(student.toString()+" already exists");
-      return false;
+      return -1;
     }
   }
 

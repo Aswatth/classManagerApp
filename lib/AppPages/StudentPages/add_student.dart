@@ -1,3 +1,5 @@
+import 'package:class_manager/AppPages/StudentPages/student_home.dart';
+import 'package:class_manager/AppPages/StudentPages/student_profile.dart';
 import 'package:class_manager/Model/board.dart';
 import 'package:class_manager/Model/class.dart';
 import 'package:class_manager/Model/student.dart';
@@ -391,13 +393,20 @@ class _AddStudentState extends State<AddStudent> {
         boardName: _boardName,
         location: _location
     );
-    bool isSuccessful = await StudentHelper.instance.insertStudent(student);
+    int studentId = await StudentHelper.instance.insertStudent(student);
 
-    if(isSuccessful){
+    if(studentId >= 1){
+      student.id = studentId;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Added new student ${student.name} successfully!"),
       ),);
-      Navigator.pop(context);
+      //Navigator.pop(context); //Go back to home page
+      Navigator.push(context, MaterialPageRoute(builder: (context) =>StudentHome(studentModel: student) ,));
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Student details exists"),
+      ),);
     }
   }
 
